@@ -79,13 +79,14 @@ export default function AdminPage() {
     setFilteredSubmissions(filtered)
   }, [submissions, institutionFilter, segmentFilter, yearFilter])
 
-  const fetchSubmissions = () => {
+  const fetchSubmissions = async () => {
     try {
-      const storedSubmissions = localStorage.getItem("uniformSubmissions")
-      if (storedSubmissions) {
-        const parsed = JSON.parse(storedSubmissions)
-        setSubmissions(parsed)
-        setFilteredSubmissions(parsed)
+      const response = await fetch("/api/submissions")
+      const data = await response.json()
+
+      if (data.submissions) {
+        setSubmissions(data.submissions)
+        setFilteredSubmissions(data.submissions)
       } else {
         setSubmissions([])
         setFilteredSubmissions([])

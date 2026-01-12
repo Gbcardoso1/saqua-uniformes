@@ -152,25 +152,25 @@ export default function UniformRequestForm() {
 
     setIsSubmitting(true)
     try {
-      const submission = {
-        id: Date.now().toString(),
-        timestamp: new Date().toISOString(),
-        name: formData.name,
-        matricula: formData.matricula,
-        institution: formData.institution,
-        uniforms: uniforms,
-        shoes: shoes,
+      const response = await fetch("/api/submissions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          matricula: formData.matricula,
+          institution: formData.institution,
+          uniforms: uniforms,
+          shoes: shoes,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to submit")
       }
-
-      // Recuperar submissões existentes do localStorage
-      const existingSubmissions = localStorage.getItem("uniformSubmissions")
-      const submissions = existingSubmissions ? JSON.parse(existingSubmissions) : []
-
-      // Adicionar nova submissão
-      submissions.push(submission)
-
-      // Salvar de volta no localStorage
-      localStorage.setItem("uniformSubmissions", JSON.stringify(submissions))
 
       setShowModal(false)
       setShowSuccessModal(true)

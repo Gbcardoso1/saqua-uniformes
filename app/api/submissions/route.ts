@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
 
 type Submission = {
   id: string
@@ -19,21 +20,69 @@ type Submission = {
 }
 
 export async function GET() {
-  return NextResponse.json({ submissions: [] })
+  try {
+    const supabase = await createClient()
+
+    const { data, error } = await supabase.from("submissions").select("*").order("submitted_at", { ascending: false })
+
+    if (error) {
+      console.error("Error fetching submissions:", error)
+      return NextResponse.json({ submissions: [] })
+    }
+
+    // Transform database format to match frontend expectations
+    const submissions: Submission[] = data.map((item) => ({
+      id: item.id,
+      timestamp: item.submitted_at,
+      name: item.requester_name,
+      matricula: item.registration,
+      institution: item.institution,
+      uniforms: item.uniforms || [],
+      shoes: item.shoes || [],
+    }))
+
+    return NextResponse.json({ submissions })
+  } catch (error) {
+    console.error("Error in GET:", error)
+    return NextResponse.json({ submissions: [] })
+  }
 }
 
 export async function POST(request: Request) {
   try {
     const data = await request.json()
+    const supabase = await createClient()
+
+    const { data: insertedData, error } = await supabase
+      .from("submissions")
+      .insert({
+        requester_name: data.name,
+        registration: data.matricula,
+        institution: data.institution,
+        uniforms: data.uniforms,
+        shoes: data.shoes,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error("Error inserting submission:", error)
+      return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+    }
 
     const submission: Submission = {
-      id: Date.now().toString(),
-      timestamp: new Date().toISOString(),
-      ...data,
+      id: insertedData.id,
+      timestamp: insertedData.submitted_at,
+      name: insertedData.requester_name,
+      matricula: insertedData.registration,
+      institution: insertedData.institution,
+      uniforms: insertedData.uniforms,
+      shoes: insertedData.shoes,
     }
 
     return NextResponse.json({ success: true, submission })
   } catch (error) {
+    console.error("Error in POST:", error)
     return NextResponse.json({ success: false, error: "Failed to save submission" }, { status: 500 })
   }
 }
