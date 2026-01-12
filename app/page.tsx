@@ -1,40 +1,36 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import UniformRequestForm from '@/components/uniform-request-form'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { Lock } from 'lucide-react'
-import Image from 'next/image'
+import type React from "react"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import UniformRequestForm from "@/components/uniform-request-form"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Lock } from "lucide-react"
+import Image from "next/image"
 
 export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
   const router = useRouter()
 
-  const ADMIN_USERNAME = 'patrimônio'
-  const ADMIN_PASSWORD = '#cmpp123'
+  const ADMIN_USERNAME = "patrimônio"
+  const ADMIN_PASSWORD = "#cmpp123"
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault()
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       // Store authentication in sessionStorage
-      sessionStorage.setItem('adminAuth', 'true')
-      router.push('/admin')
+      sessionStorage.setItem("adminAuth", "true")
+      router.push("/admin")
     } else {
-      alert('Login ou senha incorretos!')
-      setUsername('')
-      setPassword('')
+      alert("Login ou senha incorretos!")
+      setUsername("")
+      setPassword("")
     }
   }
 
@@ -42,8 +38,8 @@ export default function Home() {
     <>
       <header className="fixed top-0 left-0 right-0 z-50 bg-[#1a8b8b]/95 backdrop-blur supports-[backdrop-filter]:bg-[#1a8b8b]/90 border-b border-white/20">
         <div className="container flex h-16 items-center justify-between px-4 gap-4">
-          <Image 
-            src="/prefeitura.png" 
+          <Image
+            src="/prefeitura.png"
             alt="Prefeitura Sabuarena"
             width={200}
             height={60}
@@ -57,7 +53,7 @@ export default function Home() {
             className="gap-2 text-xs ml-auto bg-white/10 hover:bg-white/20 border-white/30 text-white"
           >
             <Lock className="h-3 w-3" />
-            Formulários Enviados
+            Gestão
           </Button>
         </div>
       </header>
@@ -116,11 +112,11 @@ export default function Home() {
               <Button
                 type="button"
                 variant="outline"
-                className="flex-1"
+                className="flex-1 bg-transparent"
                 onClick={() => {
                   setShowLoginModal(false)
-                  setUsername('')
-                  setPassword('')
+                  setUsername("")
+                  setPassword("")
                 }}
               >
                 Cancelar
