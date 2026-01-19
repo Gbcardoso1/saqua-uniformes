@@ -25,6 +25,18 @@ type ShoeItem = {
   quantity: string
 }
 
+type StudentKitItem = {
+  id: number
+  size: string
+  quantity: string
+}
+
+type TeacherKitItem = {
+  id: number
+  size: string
+  quantity: string
+}
+
 type FormData = {
   name: string
   matricula: string
@@ -48,6 +60,21 @@ const genders = [
 
 const shoeSizes = Array.from({ length: 28 }, (_, i) => (i + 18).toString())
 
+const studentKitSizes = [
+  { value: "KIT CRECHE", label: "KIT CRECHE" },
+  { value: "KIT PRÉ", label: "KIT PRÉ" },
+  { value: "KIT 1º E 2º", label: "KIT 1º E 2º" },
+  { value: "KIT EJA", label: "KIT EJA" },
+]
+
+const teacherPoloSizes = [
+  { value: "P", label: "P" },
+  { value: "M", label: "M" },
+  { value: "G", label: "G" },
+  { value: "GG", label: "GG" },
+  { value: "EXG", label: "EXG" },
+]
+
 export default function UniformRequestForm() {
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -59,10 +86,16 @@ export default function UniformRequestForm() {
 
   const [shoes, setShoes] = useState<ShoeItem[]>([{ id: 1, size: "", quantity: "" }])
 
+  const [studentKits, setStudentKits] = useState<StudentKitItem[]>([{ id: 1, size: "", quantity: "" }])
+
+  const [teacherKits, setTeacherKits] = useState<TeacherKitItem[]>([{ id: 1, size: "", quantity: "" }])
+
   const [showModal, setShowModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [nextUniformId, setNextUniformId] = useState(2)
   const [nextShoeId, setNextShoeId] = useState(2)
+  const [nextStudentKitId, setNextStudentKitId] = useState(2)
+  const [nextTeacherKitId, setNextTeacherKitId] = useState(2)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [pdfDownloaded, setPdfDownloaded] = useState(false)
 
@@ -103,6 +136,36 @@ export default function UniformRequestForm() {
     setShoes(shoes.map((s) => (s.id === id ? { ...s, [field]: value } : s)))
   }
 
+  const addStudentKit = () => {
+    setStudentKits([...studentKits, { id: nextStudentKitId, size: "", quantity: "" }])
+    setNextStudentKitId(nextStudentKitId + 1)
+  }
+
+  const removeStudentKit = (id: number) => {
+    if (studentKits.length > 1) {
+      setStudentKits(studentKits.filter((k) => k.id !== id))
+    }
+  }
+
+  const updateStudentKit = (id: number, field: keyof StudentKitItem, value: string) => {
+    setStudentKits(studentKits.map((k) => (k.id === id ? { ...k, [field]: value } : k)))
+  }
+
+  const addTeacherKit = () => {
+    setTeacherKits([...teacherKits, { id: nextTeacherKitId, size: "", quantity: "" }])
+    setNextTeacherKitId(nextTeacherKitId + 1)
+  }
+
+  const removeTeacherKit = (id: number) => {
+    if (teacherKits.length > 1) {
+      setTeacherKits(teacherKits.filter((k) => k.id !== id))
+    }
+  }
+
+  const updateTeacherKit = (id: number, field: keyof TeacherKitItem, value: string) => {
+    setTeacherKits(teacherKits.map((k) => (k.id === id ? { ...k, [field]: value } : k)))
+  }
+
   const validateForm = (): boolean => {
     if (!formData.name || !formData.matricula || !formData.institution) {
       alert("Por favor, preencha todos os campos do solicitante.")
@@ -129,6 +192,30 @@ export default function UniformRequestForm() {
       const qty = Number.parseInt(shoe.quantity)
       if (qty < 1) {
         alert("A quantidade de calçados deve ser maior que 0.")
+        return false
+      }
+    }
+
+    for (const kit of studentKits) {
+      if (!kit.size || !kit.quantity) {
+        alert("Por favor, preencha todos os campos dos kits de aluno.")
+        return false
+      }
+      const qty = Number.parseInt(kit.quantity)
+      if (qty < 1) {
+        alert("A quantidade de kits de aluno deve ser maior que 0.")
+        return false
+      }
+    }
+
+    for (const kit of teacherKits) {
+      if (!kit.size || !kit.quantity) {
+        alert("Por favor, preencha todos os campos dos kits de professor.")
+        return false
+      }
+      const qty = Number.parseInt(kit.quantity)
+      if (qty < 1) {
+        alert("A quantidade de kits de professor deve ser maior que 0.")
         return false
       }
     }
@@ -163,6 +250,8 @@ export default function UniformRequestForm() {
           institution: formData.institution,
           uniforms: uniforms,
           shoes: shoes,
+          studentKits: studentKits, // Added studentKits to submission
+          teacherKits: teacherKits, // Added teacherKits to submission
         }),
       })
 
@@ -179,6 +268,8 @@ export default function UniformRequestForm() {
       setFormData({ name: "", matricula: "", institution: "" })
       setUniforms([{ id: 1, type: "", gender: "", size: "", quantity: "" }])
       setShoes([{ id: 1, size: "", quantity: "" }])
+      setStudentKits([{ id: 1, size: "", quantity: "" }])
+      setTeacherKits([{ id: 1, size: "", quantity: "" }])
       setPdfDownloaded(false)
     } catch (error) {
       console.error("Error submitting form:", error)
@@ -250,6 +341,42 @@ export default function UniformRequestForm() {
         yPos = 20
       }
       doc.text(`${i + 1}. Tamanho: ${s.size} | Quantidade: ${s.quantity}`, 20, yPos)
+      yPos += 6
+    })
+
+    yPos += 6
+
+    doc.setFontSize(14)
+    doc.setFont("helvetica", "bold")
+    doc.text("KITS DE ALUNO", 20, yPos)
+    yPos += 7
+
+    doc.setFontSize(10)
+    doc.setFont("helvetica", "normal")
+    studentKits.forEach((k, i) => {
+      if (yPos > 270) {
+        doc.addPage()
+        yPos = 20
+      }
+      doc.text(`${i + 1}. Tipo: ${k.size} | Quantidade: ${k.quantity}`, 20, yPos)
+      yPos += 6
+    })
+
+    yPos += 6
+
+    doc.setFontSize(14)
+    doc.setFont("helvetica", "bold")
+    doc.text("KIT DE PROFESSOR (POLO + MOCHILA)", 20, yPos)
+    yPos += 7
+
+    doc.setFontSize(10)
+    doc.setFont("helvetica", "normal")
+    teacherKits.forEach((k, i) => {
+      if (yPos > 270) {
+        doc.addPage()
+        yPos = 20
+      }
+      doc.text(`${i + 1}. Tamanho da Polo: ${k.size} | Quantidade: ${k.quantity}`, 20, yPos)
       yPos += 6
     })
 
@@ -452,6 +579,114 @@ export default function UniformRequestForm() {
           </CardContent>
         </Card>
 
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Kits de Aluno</CardTitle>
+            <Button type="button" onClick={addStudentKit} size="sm" variant="outline">
+              <Plus className="mr-2 h-4 w-4" />
+              Adicionar
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {studentKits.map((kit) => (
+              <div key={kit.id} className="relative rounded-lg border border-border p-4">
+                {studentKits.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-2"
+                    onClick={() => removeStudentKit(kit.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Tipo</Label>
+                    <Select value={kit.size} onValueChange={(value) => updateStudentKit(kit.id, "size", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o kit" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {studentKitSizes.map((size) => (
+                          <SelectItem key={size.value} value={size.value}>
+                            {size.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Quantidade</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      placeholder="0"
+                      value={kit.quantity}
+                      onChange={(e) => updateStudentKit(kit.id, "quantity", e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Kit de Professor - Polo + Mochila</CardTitle>
+            <Button type="button" onClick={addTeacherKit} size="sm" variant="outline">
+              <Plus className="mr-2 h-4 w-4" />
+              Adicionar
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {teacherKits.map((kit) => (
+              <div key={kit.id} className="relative rounded-lg border border-border p-4">
+                {teacherKits.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-2"
+                    onClick={() => removeTeacherKit(kit.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Tamanho da Polo</Label>
+                    <Select value={kit.size} onValueChange={(value) => updateTeacherKit(kit.id, "size", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o tamanho" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {teacherPoloSizes.map((size) => (
+                          <SelectItem key={size.value} value={size.value}>
+                            {size.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Quantidade</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      placeholder="0"
+                      value={kit.quantity}
+                      onChange={(e) => updateTeacherKit(kit.id, "quantity", e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
         <div className="flex justify-center">
           <Button type="submit" size="lg" className="min-w-[200px]">
             Enviar Solicitação
@@ -504,6 +739,34 @@ export default function UniformRequestForm() {
                     <p className="font-medium">Item {index + 1}</p>
                     <p>
                       Tamanho: {shoe.size} | Quantidade: {shoe.quantity}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2">Kits de Aluno</h3>
+              <div className="space-y-2">
+                {studentKits.map((kit, index) => (
+                  <div key={kit.id} className="rounded-lg bg-muted p-3 text-sm">
+                    <p className="font-medium">Item {index + 1}</p>
+                    <p>
+                      Tipo: {kit.size} | Quantidade: {kit.quantity}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2">Kit de Professor - Polo + Mochila</h3>
+              <div className="space-y-2">
+                {teacherKits.map((kit, index) => (
+                  <div key={kit.id} className="rounded-lg bg-muted p-3 text-sm">
+                    <p className="font-medium">Item {index + 1}</p>
+                    <p>
+                      Tamanho da Polo: {kit.size} | Quantidade: {kit.quantity}
                     </p>
                   </div>
                 ))}

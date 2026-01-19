@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Download, ArrowLeft } from "lucide-react"
+import { Eye, Download, ArrowLeft, Trash2 } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 
@@ -26,6 +26,14 @@ type Submission = {
     size: string
     quantity: string
   }>
+  studentKits?: Array<{
+    size: string
+    quantity: string
+  }>
+  teacherKits?: Array<{
+    size: string
+    quantity: string
+  }>
 }
 
 export default function AdminPage() {
@@ -34,11 +42,14 @@ export default function AdminPage() {
   const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([])
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
   const [showDetailModal, setShowDetailModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [submissionToDelete, setSubmissionToDelete] = useState<Submission | null>(null)
   const [institutionFilter, setInstitutionFilter] = useState<string>("all")
   const [segmentFilter, setSegmentFilter] = useState<string>("all")
   const [yearFilter, setYearFilter] = useState<string>("all")
   const [institutions, setInstitutions] = useState<string[]>([])
   const [years, setYears] = useState<string[]>([])
+  const [isDeleting, setIsDeleting] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -103,6 +114,37 @@ export default function AdminPage() {
     setShowDetailModal(true)
   }
 
+  const confirmDelete = (submission: Submission) => {
+    setSubmissionToDelete(submission)
+    setShowDeleteModal(true)
+  }
+
+  const deleteSubmission = async () => {
+    if (!submissionToDelete) return
+
+    setIsDeleting(true)
+    try {
+      const response = await fetch(`/api/submissions/${submissionToDelete.id}`, {
+        method: "DELETE",
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setSubmissions(submissions.filter((s) => s.id !== submissionToDelete.id))
+        setShowDeleteModal(false)
+        setSubmissionToDelete(null)
+      } else {
+        alert("Erro ao excluir solicitação. Tente novamente.")
+      }
+    } catch (error) {
+      console.error("Error deleting submission:", error)
+      alert("Erro ao excluir solicitação. Tente novamente.")
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   const exportToCSV = () => {
     if (filteredSubmissions.length === 0) return
 
@@ -117,6 +159,14 @@ export default function AdminPage() {
 
       sub.shoes.forEach((shoe) => {
         csv += `"${date}","${sub.name}","${sub.matricula}","${sub.institution}","N/A","Tênis","N/A","${shoe.size}","${shoe.quantity}"\n`
+      })
+
+      sub.studentKits?.forEach((kit) => {
+        csv += `"${date}","${sub.name}","${sub.matricula}","${sub.institution}","N/A","Kit Aluno","N/A","${kit.size}","${kit.quantity}"\n`
+      })
+
+      sub.teacherKits?.forEach((kit) => {
+        csv += `"${date}","${sub.name}","${sub.matricula}","${sub.institution}","N/A","Kit Professor","N/A","${kit.size}","${kit.quantity}"\n`
       })
     })
 
@@ -240,6 +290,8 @@ export default function AdminPage() {
                       <TableHead>Instituição</TableHead>
                       <TableHead>Uniformes</TableHead>
                       <TableHead>Calçados</TableHead>
+                      <TableHead>Kits Aluno</TableHead>
+                      <TableHead>Kits Prof.</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -254,10 +306,22 @@ export default function AdminPage() {
                         <TableCell>{submission.institution}</TableCell>
                         <TableCell>{submission.uniforms.length}</TableCell>
                         <TableCell>{submission.shoes.length}</TableCell>
+                        <TableCell>{submission.studentKits?.length || 0}</TableCell>
+                        <TableCell>{submission.teacherKits?.length || 0}</TableCell>
                         <TableCell className="text-right">
-                          <Button variant="ghost" size="sm" onClick={() => viewDetails(submission)}>
-                            <Eye className="h-4 w-4" />
-                          </Button>
+                          <div className="flex justify-end gap-1">
+                            <Button variant="ghost" size="sm" onClick={() => viewDetails(submission)}>
+                              <Eye className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => confirmDelete(submission)}
+                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -345,8 +409,72 @@ export default function AdminPage() {
                   ))}
                 </div>
               </div>
+
+              {selectedSubmission.studentKits && selectedSubmission.studentKits.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-3 text-lg">Kits de Aluno</h3>
+                  <div className="space-y-2">
+                    {selectedSubmission.studentKits.map((kit, index) => (
+                      <div key={index} className="rounded-lg border border-border p-4">
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Tamanho</p>
+                            <p className="font-medium">{kit.size}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
+                            <p className="font-medium">{kit.quantity}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedSubmission.teacherKits && selectedSubmission.teacherKits.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-3 text-lg">Kits de Professor (Polo)</h3>
+                  <div className="space-y-2">
+                    {selectedSubmission.teacherKits.map((kit, index) => (
+                      <div key={index} className="rounded-lg border border-border p-4">
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Tamanho</p>
+                            <p className="font-medium">{kit.size}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
+                            <p className="font-medium">{kit.quantity}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Exclusão</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir a solicitação de{" "}
+              <span className="font-semibold">{submissionToDelete?.name}</span>? Esta ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setShowDeleteModal(false)} disabled={isDeleting}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={deleteSubmission} disabled={isDeleting}>
+              {isDeleting ? "Excluindo..." : "Excluir"}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
     </main>

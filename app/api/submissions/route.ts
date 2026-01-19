@@ -17,6 +17,14 @@ type Submission = {
     size: string
     quantity: string
   }>
+  studentKits?: Array<{
+    size: string
+    quantity: string
+  }>
+  teacherKits?: Array<{
+    size: string
+    quantity: string
+  }>
 }
 
 export async function GET() {
@@ -39,6 +47,8 @@ export async function GET() {
       institution: item.institution,
       uniforms: item.uniforms || [],
       shoes: item.shoes || [],
+      studentKits: item.student_kits || [], // Added studentKits mapping
+      teacherKits: item.teacher_kits || [], // Added teacherKits mapping
     }))
 
     return NextResponse.json({ submissions })
@@ -61,6 +71,8 @@ export async function POST(request: Request) {
         institution: data.institution,
         uniforms: data.uniforms,
         shoes: data.shoes,
+        student_kits: data.studentKits, // Added studentKits to insert
+        teacher_kits: data.teacherKits, // Added teacherKits to insert
       })
       .select()
       .single()
@@ -78,6 +90,8 @@ export async function POST(request: Request) {
       institution: insertedData.institution,
       uniforms: insertedData.uniforms,
       shoes: insertedData.shoes,
+      studentKits: insertedData.student_kits, // Added studentKits to response
+      teacherKits: insertedData.teacher_kits, // Added teacherKits to response
     }
 
     return NextResponse.json({ success: true, submission })
