@@ -64,6 +64,8 @@ const studentKitSizes = [
   { value: "KIT CRECHE", label: "KIT CRECHE" },
   { value: "KIT PRÉ", label: "KIT PRÉ" },
   { value: "KIT 1º E 2º", label: "KIT 1º E 2º" },
+  {value: "KIT 3° AO 5°", label: "KIT 3° AO 5°"},
+  {value: "KIT 6° AO 9°", label: "KIT 6° AO 6°"},
   { value: "KIT EJA", label: "KIT EJA" },
 ]
 
