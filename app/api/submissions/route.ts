@@ -23,7 +23,9 @@ type Submission = {
   }>
   teacherKits?: Array<{
     size: string
-    quantity: string
+    backpackSize: string
+    poloQuantity: string
+    backpackQuantity: string
   }>
 }
 

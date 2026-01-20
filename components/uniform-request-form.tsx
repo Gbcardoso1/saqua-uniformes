@@ -34,7 +34,9 @@ type StudentKitItem = {
 type TeacherKitItem = {
   id: number
   size: string
-  quantity: string
+  backpackSize: string
+  poloQuantity: string
+  backpackQuantity: string
 }
 
 type FormData = {
@@ -64,8 +66,6 @@ const studentKitSizes = [
   { value: "KIT CRECHE", label: "KIT CRECHE" },
   { value: "KIT PRÉ", label: "KIT PRÉ" },
   { value: "KIT 1º E 2º", label: "KIT 1º E 2º" },
-  {value: "KIT 3° AO 5°", label: "KIT 3° AO 5°"},
-  {value: "KIT 6° AO 9°", label: "KIT 6° AO 6°"},
   { value: "KIT EJA", label: "KIT EJA" },
 ]
 
@@ -75,6 +75,11 @@ const teacherPoloSizes = [
   { value: "G", label: "G" },
   { value: "GG", label: "GG" },
   { value: "EXG", label: "EXG" },
+]
+
+const backpackSizes = [
+  { value: "Educação Infantil", label: "Educação Infantil" },
+  { value: "Fundamental", label: "Fundamental" },
 ]
 
 export default function UniformRequestForm() {
@@ -90,7 +95,7 @@ export default function UniformRequestForm() {
 
   const [studentKits, setStudentKits] = useState<StudentKitItem[]>([{ id: 1, size: "", quantity: "" }])
 
-  const [teacherKits, setTeacherKits] = useState<TeacherKitItem[]>([{ id: 1, size: "", quantity: "" }])
+  const [teacherKits, setTeacherKits] = useState<TeacherKitItem[]>([{ id: 1, size: "", backpackSize: "", poloQuantity: "", backpackQuantity: "" }])
 
   const [showModal, setShowModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
@@ -154,7 +159,7 @@ export default function UniformRequestForm() {
   }
 
   const addTeacherKit = () => {
-    setTeacherKits([...teacherKits, { id: nextTeacherKitId, size: "", quantity: "" }])
+    setTeacherKits([...teacherKits, { id: nextTeacherKitId, size: "", backpackSize: "", poloQuantity: "", backpackQuantity: "" }])
     setNextTeacherKitId(nextTeacherKitId + 1)
   }
 
@@ -170,56 +175,8 @@ export default function UniformRequestForm() {
 
   const validateForm = (): boolean => {
     if (!formData.name || !formData.matricula || !formData.institution) {
-      alert("Por favor, preencha todos os campos do solicitante.")
+      alert("Por favor, preencha os campos obrigatórios: Nome do Solicitante, Matrícula e Nome da Instituição de Ensino.")
       return false
-    }
-
-    for (const uniform of uniforms) {
-      if (!uniform.type || !uniform.gender || !uniform.size || !uniform.quantity) {
-        alert("Por favor, preencha todos os campos dos uniformes.")
-        return false
-      }
-      const qty = Number.parseInt(uniform.quantity)
-      if (qty < 1) {
-        alert("A quantidade de uniformes deve ser maior que 0.")
-        return false
-      }
-    }
-
-    for (const shoe of shoes) {
-      if (!shoe.size || !shoe.quantity) {
-        alert("Por favor, preencha todos os campos dos calçados.")
-        return false
-      }
-      const qty = Number.parseInt(shoe.quantity)
-      if (qty < 1) {
-        alert("A quantidade de calçados deve ser maior que 0.")
-        return false
-      }
-    }
-
-    for (const kit of studentKits) {
-      if (!kit.size || !kit.quantity) {
-        alert("Por favor, preencha todos os campos dos kits de aluno.")
-        return false
-      }
-      const qty = Number.parseInt(kit.quantity)
-      if (qty < 1) {
-        alert("A quantidade de kits de aluno deve ser maior que 0.")
-        return false
-      }
-    }
-
-    for (const kit of teacherKits) {
-      if (!kit.size || !kit.quantity) {
-        alert("Por favor, preencha todos os campos dos kits de professor.")
-        return false
-      }
-      const qty = Number.parseInt(kit.quantity)
-      if (qty < 1) {
-        alert("A quantidade de kits de professor deve ser maior que 0.")
-        return false
-      }
     }
 
     return true
@@ -271,7 +228,7 @@ export default function UniformRequestForm() {
       setUniforms([{ id: 1, type: "", gender: "", size: "", quantity: "" }])
       setShoes([{ id: 1, size: "", quantity: "" }])
       setStudentKits([{ id: 1, size: "", quantity: "" }])
-      setTeacherKits([{ id: 1, size: "", quantity: "" }])
+      setTeacherKits([{ id: 1, size: "", backpackSize: "", poloQuantity: "", backpackQuantity: "" }])
       setPdfDownloaded(false)
     } catch (error) {
       console.error("Error submitting form:", error)
@@ -378,7 +335,7 @@ export default function UniformRequestForm() {
         doc.addPage()
         yPos = 20
       }
-      doc.text(`${i + 1}. Tamanho da Polo: ${k.size} | Quantidade: ${k.quantity}`, 20, yPos)
+      doc.text(`${i + 1}. Polo: ${k.size} (Qtd: ${k.poloQuantity}) | Mochila: ${k.backpackSize} (Qtd: ${k.backpackQuantity})`, 20, yPos)
       yPos += 6
     })
 
@@ -657,7 +614,7 @@ export default function UniformRequestForm() {
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 )}
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                   <div className="space-y-2">
                     <Label>Tamanho da Polo</Label>
                     <Select value={kit.size} onValueChange={(value) => updateTeacherKit(kit.id, "size", value)}>
@@ -674,13 +631,38 @@ export default function UniformRequestForm() {
                     </Select>
                   </div>
                   <div className="space-y-2">
-                    <Label>Quantidade</Label>
+                    <Label>Qtd. Polo</Label>
                     <Input
                       type="number"
                       min="1"
                       placeholder="0"
-                      value={kit.quantity}
-                      onChange={(e) => updateTeacherKit(kit.id, "quantity", e.target.value)}
+                      value={kit.poloQuantity}
+                      onChange={(e) => updateTeacherKit(kit.id, "poloQuantity", e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Tamanho da Mochila</Label>
+                    <Select value={kit.backpackSize} onValueChange={(value) => updateTeacherKit(kit.id, "backpackSize", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o tipo" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {backpackSizes.map((size) => (
+                          <SelectItem key={size.value} value={size.value}>
+                            {size.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Qtd. Mochila</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      placeholder="0"
+                      value={kit.backpackQuantity}
+                      onChange={(e) => updateTeacherKit(kit.id, "backpackQuantity", e.target.value)}
                     />
                   </div>
                 </div>
@@ -768,7 +750,7 @@ export default function UniformRequestForm() {
                   <div key={kit.id} className="rounded-lg bg-muted p-3 text-sm">
                     <p className="font-medium">Item {index + 1}</p>
                     <p>
-                      Tamanho da Polo: {kit.size} | Quantidade: {kit.quantity}
+                      Polo: {kit.size} (Qtd: {kit.poloQuantity}) | Mochila: {kit.backpackSize} (Qtd: {kit.backpackQuantity})
                     </p>
                   </div>
                 ))}
