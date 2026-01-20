@@ -23,11 +23,9 @@ type Submission = {
   }>
   teacherKits?: Array<{
     size: string
-    quantity: string
-  }>
-  backpacks?: Array<{
-    type: string
-    quantity: string
+    backpackSize: string
+    poloQuantity: string
+    backpackQuantity: string
   }>
 }
 
@@ -51,9 +49,8 @@ export async function GET() {
       institution: item.institution,
       uniforms: item.uniforms || [],
       shoes: item.shoes || [],
-      studentKits: item.student_kits || [],
-      teacherKits: item.teacher_kits || [],
-      backpacks: item.backpacks || [],
+      studentKits: item.student_kits || [], // Added studentKits mapping
+      teacherKits: item.teacher_kits || [], // Added teacherKits mapping
     }))
 
     return NextResponse.json({ submissions })
@@ -76,9 +73,8 @@ export async function POST(request: Request) {
         institution: data.institution,
         uniforms: data.uniforms,
         shoes: data.shoes,
-        student_kits: data.studentKits,
-        teacher_kits: data.teacherKits,
-        backpacks: data.backpacks,
+        student_kits: data.studentKits, // Added studentKits to insert
+        teacher_kits: data.teacherKits, // Added teacherKits to insert
       })
       .select()
       .single()
@@ -96,9 +92,8 @@ export async function POST(request: Request) {
       institution: insertedData.institution,
       uniforms: insertedData.uniforms,
       shoes: insertedData.shoes,
-      studentKits: insertedData.student_kits,
-      teacherKits: insertedData.teacher_kits,
-      backpacks: insertedData.backpacks,
+      studentKits: insertedData.student_kits, // Added studentKits to response
+      teacherKits: insertedData.teacher_kits, // Added teacherKits to response
     }
 
     return NextResponse.json({ success: true, submission })
