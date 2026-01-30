@@ -31,7 +31,13 @@ type StudentKitItem = {
   quantity: string
 }
 
-type TeacherKitItem = {
+type TeacherPoloItem = {
+  id: number
+  size: string
+  quantity: string
+}
+
+type BackpackItem = {
   id: number
   size: string
   quantity: string
@@ -64,22 +70,22 @@ const studentKitSizes = [
   { value: "KIT CRECHE", label: "KIT CRECHE" },
   { value: "KIT PRÉ", label: "KIT PRÉ" },
   { value: "KIT 1º E 2º", label: "KIT 1º E 2º" },
-  { value: "KIT 3° AO 5°", label: "KIT 3° AO 5°" },
-  { value: "KIT 6° AO 9°", label: "KIT 6° AO 6°" }, 
-  { value: "KIT EJA", label: "KIT EJA" },
-]
-
-
-const studentKitSizes = [
-  { value: "KIT CRECHE", label: "KIT CRECHE" },
-  { value: "KIT PRÉ", label: "KIT PRÉ" },
-  { value: "KIT 1º E 2º", label: "KIT 1º E 2º" },
   { value: "KIT 3º AO 5º", label: "KIT 3º AO 5º" },
-  { value: "KIT 6º AO 9º", label: "KIT 6º AO 9º" },
   { value: "KIT EJA", label: "KIT EJA" },
 ]
 
+const teacherPoloSizes = [
+  { value: "P", label: "P" },
+  { value: "M", label: "M" },
+  { value: "G", label: "G" },
+  { value: "GG", label: "GG" },
+  { value: "EXG", label: "EXG" },
+]
 
+const backpackSizes = [
+  { value: "Educação Infantil", label: "Educação Infantil" },
+  { value: "Fundamental", label: "Fundamental" },
+]
 
 export default function UniformRequestForm() {
   const [formData, setFormData] = useState<FormData>({
@@ -89,19 +95,18 @@ export default function UniformRequestForm() {
   })
 
   const [uniforms, setUniforms] = useState<UniformItem[]>([{ id: 1, type: "", gender: "", size: "", quantity: "" }])
-
   const [shoes, setShoes] = useState<ShoeItem[]>([{ id: 1, size: "", quantity: "" }])
-
   const [studentKits, setStudentKits] = useState<StudentKitItem[]>([{ id: 1, size: "", quantity: "" }])
-
-  const [teacherKits, setTeacherKits] = useState<TeacherKitItem[]>([{ id: 1, size: "", quantity: "" }])
+  const [teacherPolos, setTeacherPolos] = useState<TeacherPoloItem[]>([{ id: 1, size: "", quantity: "" }])
+  const [backpacks, setBackpacks] = useState<BackpackItem[]>([{ id: 1, size: "", quantity: "" }])
 
   const [showModal, setShowModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [nextUniformId, setNextUniformId] = useState(2)
   const [nextShoeId, setNextShoeId] = useState(2)
   const [nextStudentKitId, setNextStudentKitId] = useState(2)
-  const [nextTeacherKitId, setNextTeacherKitId] = useState(2)
+  const [nextTeacherPoloId, setNextTeacherPoloId] = useState(2)
+  const [nextBackpackId, setNextBackpackId] = useState(2)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [pdfDownloaded, setPdfDownloaded] = useState(false)
 
@@ -157,73 +162,40 @@ export default function UniformRequestForm() {
     setStudentKits(studentKits.map((k) => (k.id === id ? { ...k, [field]: value } : k)))
   }
 
-  const addTeacherKit = () => {
-    setTeacherKits([...teacherKits, { id: nextTeacherKitId, size: "", quantity: "" }])
-    setNextTeacherKitId(nextTeacherKitId + 1)
+  const addTeacherPolo = () => {
+    setTeacherPolos([...teacherPolos, { id: nextTeacherPoloId, size: "", quantity: "" }])
+    setNextTeacherPoloId(nextTeacherPoloId + 1)
   }
 
-  const removeTeacherKit = (id: number) => {
-    if (teacherKits.length > 1) {
-      setTeacherKits(teacherKits.filter((k) => k.id !== id))
+  const removeTeacherPolo = (id: number) => {
+    if (teacherPolos.length > 1) {
+      setTeacherPolos(teacherPolos.filter((p) => p.id !== id))
     }
   }
 
-  const updateTeacherKit = (id: number, field: keyof TeacherKitItem, value: string) => {
-    setTeacherKits(teacherKits.map((k) => (k.id === id ? { ...k, [field]: value } : k)))
+  const updateTeacherPolo = (id: number, field: keyof TeacherPoloItem, value: string) => {
+    setTeacherPolos(teacherPolos.map((p) => (p.id === id ? { ...p, [field]: value } : p)))
+  }
+
+  const addBackpack = () => {
+    setBackpacks([...backpacks, { id: nextBackpackId, size: "", quantity: "" }])
+    setNextBackpackId(nextBackpackId + 1)
+  }
+
+  const removeBackpack = (id: number) => {
+    if (backpacks.length > 1) {
+      setBackpacks(backpacks.filter((b) => b.id !== id))
+    }
+  }
+
+  const updateBackpack = (id: number, field: keyof BackpackItem, value: string) => {
+    setBackpacks(backpacks.map((b) => (b.id === id ? { ...b, [field]: value } : b)))
   }
 
   const validateForm = (): boolean => {
     if (!formData.name || !formData.matricula || !formData.institution) {
-      alert("Por favor, preencha todos os campos do solicitante.")
+      alert("Por favor, preencha os campos obrigatórios: Nome do Solicitante, Matrícula e Nome da Instituição de Ensino.")
       return false
-    }
-
-    for (const uniform of uniforms) {
-      if (!uniform.type || !uniform.gender || !uniform.size || !uniform.quantity) {
-        alert("Por favor, preencha todos os campos dos uniformes.")
-        return false
-      }
-      const qty = Number.parseInt(uniform.quantity)
-      if (qty < 1) {
-        alert("A quantidade de uniformes deve ser maior que 0.")
-        return false
-      }
-    }
-
-    for (const shoe of shoes) {
-      if (!shoe.size || !shoe.quantity) {
-        alert("Por favor, preencha todos os campos dos calçados.")
-        return false
-      }
-      const qty = Number.parseInt(shoe.quantity)
-      if (qty < 1) {
-        alert("A quantidade de calçados deve ser maior que 0.")
-        return false
-      }
-    }
-
-    for (const kit of studentKits) {
-      if (!kit.size || !kit.quantity) {
-        alert("Por favor, preencha todos os campos dos kits de aluno.")
-        return false
-      }
-      const qty = Number.parseInt(kit.quantity)
-      if (qty < 1) {
-        alert("A quantidade de kits de aluno deve ser maior que 0.")
-        return false
-      }
-    }
-
-    for (const kit of teacherKits) {
-      if (!kit.size || !kit.quantity) {
-        alert("Por favor, preencha todos os campos dos kits de professor.")
-        return false
-      }
-      const qty = Number.parseInt(kit.quantity)
-      if (qty < 1) {
-        alert("A quantidade de kits de professor deve ser maior que 0.")
-        return false
-      }
     }
 
     return true
@@ -256,8 +228,9 @@ export default function UniformRequestForm() {
           institution: formData.institution,
           uniforms: uniforms,
           shoes: shoes,
-          studentKits: studentKits, // Added studentKits to submission
-          teacherKits: teacherKits, // Added teacherKits to submission
+          studentKits: studentKits,
+          teacherPolos: teacherPolos,
+          backpacks: backpacks,
         }),
       })
 
@@ -275,7 +248,8 @@ export default function UniformRequestForm() {
       setUniforms([{ id: 1, type: "", gender: "", size: "", quantity: "" }])
       setShoes([{ id: 1, size: "", quantity: "" }])
       setStudentKits([{ id: 1, size: "", quantity: "" }])
-      setTeacherKits([{ id: 1, size: "", quantity: "" }])
+      setTeacherPolos([{ id: 1, size: "", quantity: "" }])
+      setBackpacks([{ id: 1, size: "", quantity: "" }])
       setPdfDownloaded(false)
     } catch (error) {
       console.error("Error submitting form:", error)
@@ -352,6 +326,7 @@ export default function UniformRequestForm() {
 
     yPos += 6
 
+    // Kits de Aluno
     doc.setFontSize(14)
     doc.setFont("helvetica", "bold")
     doc.text("KITS DE ALUNO", 20, yPos)
@@ -370,19 +345,39 @@ export default function UniformRequestForm() {
 
     yPos += 6
 
+    // Kit de Professor - Polo + Bolsa
     doc.setFontSize(14)
     doc.setFont("helvetica", "bold")
-    doc.text("KIT DE PROFESSOR (POLO + MOCHILA)", 20, yPos)
+    doc.text("KIT DE PROFESSOR - POLO + BOLSA", 20, yPos)
     yPos += 7
 
     doc.setFontSize(10)
     doc.setFont("helvetica", "normal")
-    teacherKits.forEach((k, i) => {
+    teacherPolos.forEach((p, i) => {
       if (yPos > 270) {
         doc.addPage()
         yPos = 20
       }
-      doc.text(`${i + 1}. Tamanho da Polo: ${k.size} | Quantidade: ${k.quantity}`, 20, yPos)
+      doc.text(`${i + 1}. Tamanho da Polo: ${p.size} | Quantidade: ${p.quantity}`, 20, yPos)
+      yPos += 6
+    })
+
+    yPos += 6
+
+    // Mochila
+    doc.setFontSize(14)
+    doc.setFont("helvetica", "bold")
+    doc.text("MOCHILA", 20, yPos)
+    yPos += 7
+
+    doc.setFontSize(10)
+    doc.setFont("helvetica", "normal")
+    backpacks.forEach((b, i) => {
+      if (yPos > 270) {
+        doc.addPage()
+        yPos = 20
+      }
+      doc.text(`${i + 1}. Tamanho: ${b.size} | Quantidade: ${b.quantity}`, 20, yPos)
       yPos += 6
     })
 
@@ -641,22 +636,22 @@ export default function UniformRequestForm() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Kit de Professor - Polo + Mochila</CardTitle>
-            <Button type="button" onClick={addTeacherKit} size="sm" variant="outline">
+            <CardTitle>Kit de Professor - Polo + Bolsa</CardTitle>
+            <Button type="button" onClick={addTeacherPolo} size="sm" variant="outline">
               <Plus className="mr-2 h-4 w-4" />
               Adicionar
             </Button>
           </CardHeader>
           <CardContent className="space-y-4">
-            {teacherKits.map((kit) => (
-              <div key={kit.id} className="relative rounded-lg border border-border p-4">
-                {teacherKits.length > 1 && (
+            {teacherPolos.map((polo) => (
+              <div key={polo.id} className="relative rounded-lg border border-border p-4">
+                {teacherPolos.length > 1 && (
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
                     className="absolute right-2 top-2"
-                    onClick={() => removeTeacherKit(kit.id)}
+                    onClick={() => removeTeacherPolo(polo.id)}
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -664,7 +659,7 @@ export default function UniformRequestForm() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
                     <Label>Tamanho da Polo</Label>
-                    <Select value={kit.size} onValueChange={(value) => updateTeacherKit(kit.id, "size", value)}>
+                    <Select value={polo.size} onValueChange={(value) => updateTeacherPolo(polo.id, "size", value)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione o tamanho" />
                       </SelectTrigger>
@@ -683,8 +678,62 @@ export default function UniformRequestForm() {
                       type="number"
                       min="1"
                       placeholder="0"
-                      value={kit.quantity}
-                      onChange={(e) => updateTeacherKit(kit.id, "quantity", e.target.value)}
+                      value={polo.quantity}
+                      onChange={(e) => updateTeacherPolo(polo.id, "quantity", e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Mochila</CardTitle>
+            <Button type="button" onClick={addBackpack} size="sm" variant="outline">
+              <Plus className="mr-2 h-4 w-4" />
+              Adicionar
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {backpacks.map((backpack) => (
+              <div key={backpack.id} className="relative rounded-lg border border-border p-4">
+                {backpacks.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-2"
+                    onClick={() => removeBackpack(backpack.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Tamanho da Mochila</Label>
+                    <Select value={backpack.size} onValueChange={(value) => updateBackpack(backpack.id, "size", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o tamanho" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {backpackSizes.map((size) => (
+                          <SelectItem key={size.value} value={size.value}>
+                            {size.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Quantidade</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      placeholder="0"
+                      value={backpack.quantity}
+                      onChange={(e) => updateBackpack(backpack.id, "quantity", e.target.value)}
                     />
                   </div>
                 </div>
@@ -766,13 +815,27 @@ export default function UniformRequestForm() {
             </div>
 
             <div>
-              <h3 className="font-semibold mb-2">Kit de Professor - Polo + Mochila</h3>
+              <h3 className="font-semibold mb-2">Kit de Professor - Polo + Bolsa</h3>
               <div className="space-y-2">
-                {teacherKits.map((kit, index) => (
-                  <div key={kit.id} className="rounded-lg bg-muted p-3 text-sm">
+                {teacherPolos.map((polo, index) => (
+                  <div key={polo.id} className="rounded-lg bg-muted p-3 text-sm">
                     <p className="font-medium">Item {index + 1}</p>
                     <p>
-                      Tamanho da Polo: {kit.size} | Quantidade: {kit.quantity}
+                      Tamanho da Polo: {polo.size} | Quantidade: {polo.quantity}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2">Mochila</h3>
+              <div className="space-y-2">
+                {backpacks.map((backpack, index) => (
+                  <div key={backpack.id} className="rounded-lg bg-muted p-3 text-sm">
+                    <p className="font-medium">Item {index + 1}</p>
+                    <p>
+                      Tamanho: {backpack.size} | Quantidade: {backpack.quantity}
                     </p>
                   </div>
                 ))}
@@ -780,40 +843,23 @@ export default function UniformRequestForm() {
             </div>
 
             {!pdfDownloaded && (
-              <div className="rounded-lg bg-amber-50 border border-amber-200 p-4">
-                <div className="flex items-start gap-3">
-                  <svg
-                    className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                    />
-                  </svg>
-                  <div>
-                    <p className="font-semibold text-amber-800 text-sm">Atenção</p>
-                    <p className="text-amber-700 text-sm mt-1">
-                      É necessário baixar o PDF antes de confirmar o envio da solicitação.
-                    </p>
-                  </div>
-                </div>
+              <div className="rounded-lg border-2 border-yellow-500 bg-yellow-50 p-4">
+                <p className="text-sm text-yellow-800 font-medium flex items-center gap-2">
+                  <span className="text-yellow-600">⚠</span>
+                  É necessário baixar o PDF antes de confirmar o envio.
+                </p>
               </div>
             )}
 
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setShowModal(false)} disabled={isSubmitting}>
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+              <Button type="button" variant="outline" onClick={() => setShowModal(false)}>
                 Voltar
               </Button>
-              <Button variant="outline" onClick={downloadPDF} disabled={isSubmitting}>
+              <Button type="button" variant="secondary" onClick={downloadPDF}>
                 <Download className="mr-2 h-4 w-4" />
-                {pdfDownloaded ? "PDF Baixado ✓" : "Baixar PDF"}
+                {pdfDownloaded ? "PDF Baixado" : "Baixar PDF"}
               </Button>
-              <Button onClick={confirmSubmission} disabled={isSubmitting || !pdfDownloaded}>
+              <Button type="button" onClick={confirmSubmission} disabled={isSubmitting || !pdfDownloaded}>
                 {isSubmitting ? "Enviando..." : "Confirmar Envio"}
               </Button>
             </div>
@@ -824,19 +870,10 @@ export default function UniformRequestForm() {
       <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Solicitação Enviada com Sucesso!</DialogTitle>
-            <DialogDescription>
-              Sua solicitação de uniformes e calçados foi registrada e será processada em breve.
-            </DialogDescription>
+            <DialogTitle>Solicitação Enviada!</DialogTitle>
+            <DialogDescription>Sua solicitação foi enviada com sucesso e está sendo processada.</DialogDescription>
           </DialogHeader>
-          <div className="flex justify-center py-4">
-            <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
-              <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-          </div>
-          <div className="flex justify-center">
+          <div className="flex justify-end">
             <Button onClick={() => setShowSuccessModal(false)}>Fechar</Button>
           </div>
         </DialogContent>
