@@ -30,7 +30,11 @@ type Submission = {
     size: string
     quantity: string
   }>
-  teacherKits?: Array<{
+  teacherPolos?: Array<{
+    size: string
+    quantity: string
+  }>
+  backpacks?: Array<{
     size: string
     quantity: string
   }>
@@ -165,8 +169,12 @@ export default function AdminPage() {
         csv += `"${date}","${sub.name}","${sub.matricula}","${sub.institution}","N/A","Kit Aluno","N/A","${kit.size}","${kit.quantity}"\n`
       })
 
-      sub.teacherKits?.forEach((kit) => {
-        csv += `"${date}","${sub.name}","${sub.matricula}","${sub.institution}","N/A","Kit Professor","N/A","${kit.size}","${kit.quantity}"\n`
+      sub.teacherPolos?.forEach((polo) => {
+        csv += `"${date}","${sub.name}","${sub.matricula}","${sub.institution}","N/A","Polo Professor","N/A","${polo.size}","${polo.quantity}"\n`
+      })
+
+      sub.backpacks?.forEach((backpack) => {
+        csv += `"${date}","${sub.name}","${sub.matricula}","${sub.institution}","N/A","Mochila","N/A","${backpack.size}","${backpack.quantity}"\n`
       })
     })
 
@@ -291,7 +299,8 @@ export default function AdminPage() {
                       <TableHead>Uniformes</TableHead>
                       <TableHead>Calçados</TableHead>
                       <TableHead>Kits Aluno</TableHead>
-                      <TableHead>Kits Prof.</TableHead>
+                      <TableHead>Polos Prof.</TableHead>
+                      <TableHead>Mochilas</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
@@ -307,7 +316,8 @@ export default function AdminPage() {
                         <TableCell>{submission.uniforms.length}</TableCell>
                         <TableCell>{submission.shoes.length}</TableCell>
                         <TableCell>{submission.studentKits?.length || 0}</TableCell>
-                        <TableCell>{submission.teacherKits?.length || 0}</TableCell>
+                        <TableCell>{submission.teacherPolos?.length || 0}</TableCell>
+                        <TableCell>{submission.backpacks?.length || 0}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-1">
                             <Button variant="ghost" size="sm" onClick={() => viewDetails(submission)}>
@@ -432,20 +442,42 @@ export default function AdminPage() {
                 </div>
               )}
 
-              {selectedSubmission.teacherKits && selectedSubmission.teacherKits.length > 0 && (
+              {selectedSubmission.teacherPolos && selectedSubmission.teacherPolos.length > 0 && (
                 <div>
-                  <h3 className="font-semibold mb-3 text-lg">Kits de Professor (Polo)</h3>
+                  <h3 className="font-semibold mb-3 text-lg">Kit de Professor - Polo + Bolsa</h3>
                   <div className="space-y-2">
-                    {selectedSubmission.teacherKits.map((kit, index) => (
+                    {selectedSubmission.teacherPolos.map((polo, index) => (
+                      <div key={index} className="rounded-lg border border-border p-4">
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Tamanho da Polo</p>
+                            <p className="font-medium">{polo.size}</p>
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
+                            <p className="font-medium">{polo.quantity}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {selectedSubmission.backpacks && selectedSubmission.backpacks.length > 0 && (
+                <div>
+                  <h3 className="font-semibold mb-3 text-lg">Mochila</h3>
+                  <div className="space-y-2">
+                    {selectedSubmission.backpacks.map((backpack, index) => (
                       <div key={index} className="rounded-lg border border-border p-4">
                         <div className="grid gap-3 sm:grid-cols-2">
                           <div>
                             <p className="text-xs text-muted-foreground mb-1">Tamanho</p>
-                            <p className="font-medium">{kit.size}</p>
+                            <p className="font-medium">{backpack.size}</p>
                           </div>
                           <div>
                             <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
-                            <p className="font-medium">{kit.quantity}</p>
+                            <p className="font-medium">{backpack.quantity}</p>
                           </div>
                         </div>
                       </div>

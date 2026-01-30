@@ -70,13 +70,15 @@ const studentKitSizes = [
 ]
 
 
-const teacherPoloSizes = [
-  { value: "P", label: "P" },
-  { value: "M", label: "M" },
-  { value: "G", label: "G" },
-  { value: "GG", label: "GG" },
-  { value: "EXG", label: "EXG" },
+const studentKitSizes = [
+  { value: "KIT CRECHE", label: "KIT CRECHE" },
+  { value: "KIT PRÉ", label: "KIT PRÉ" },
+  { value: "KIT 1º E 2º", label: "KIT 1º E 2º" },
+  { value: "KIT 3º AO 5º", label: "KIT 3º AO 5º" },
+  { value: "KIT 6º AO 9º", label: "KIT 6º AO 9º" },
+  { value: "KIT EJA", label: "KIT EJA" },
 ]
+
 
 
 export default function UniformRequestForm() {
