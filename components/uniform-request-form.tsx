@@ -33,6 +33,8 @@ type StudentKitItem = {
 
 type TeacherPoloItem = {
   id: number
+  kit: string
+  kitQuantity: string
   size: string
   quantity: string
 }
@@ -71,6 +73,7 @@ const studentKitSizes = [
   { value: "KIT PRÉ", label: "KIT PRÉ" },
   { value: "KIT 1º E 2º", label: "KIT 1º E 2º" },
   { value: "KIT 3º AO 5º", label: "KIT 3º AO 5º" },
+  { value: "KIT 6º AO 9º", label: "KIT 6º AO 9º" },
   { value: "KIT EJA", label: "KIT EJA" },
 ]
 
@@ -87,6 +90,10 @@ const backpackSizes = [
   { value: "Fundamental", label: "Fundamental" },
 ]
 
+const teacherKitOptions = [
+  { value: "Kit de Professor", label: "Kit de Professor" },
+]
+
 export default function UniformRequestForm() {
   const [formData, setFormData] = useState<FormData>({
     name: "",
@@ -97,7 +104,7 @@ export default function UniformRequestForm() {
   const [uniforms, setUniforms] = useState<UniformItem[]>([{ id: 1, type: "", gender: "", size: "", quantity: "" }])
   const [shoes, setShoes] = useState<ShoeItem[]>([{ id: 1, size: "", quantity: "" }])
   const [studentKits, setStudentKits] = useState<StudentKitItem[]>([{ id: 1, size: "", quantity: "" }])
-  const [teacherPolos, setTeacherPolos] = useState<TeacherPoloItem[]>([{ id: 1, size: "", quantity: "" }])
+  const [teacherPolos, setTeacherPolos] = useState<TeacherPoloItem[]>([{ id: 1, kit: "", kitQuantity: "", size: "", quantity: "" }])
   const [backpacks, setBackpacks] = useState<BackpackItem[]>([{ id: 1, size: "", quantity: "" }])
 
   const [showModal, setShowModal] = useState(false)
@@ -163,7 +170,7 @@ export default function UniformRequestForm() {
   }
 
   const addTeacherPolo = () => {
-    setTeacherPolos([...teacherPolos, { id: nextTeacherPoloId, size: "", quantity: "" }])
+    setTeacherPolos([...teacherPolos, { id: nextTeacherPoloId, kit: "", kitQuantity: "", size: "", quantity: "" }])
     setNextTeacherPoloId(nextTeacherPoloId + 1)
   }
 
@@ -248,7 +255,7 @@ export default function UniformRequestForm() {
       setUniforms([{ id: 1, type: "", gender: "", size: "", quantity: "" }])
       setShoes([{ id: 1, size: "", quantity: "" }])
       setStudentKits([{ id: 1, size: "", quantity: "" }])
-      setTeacherPolos([{ id: 1, size: "", quantity: "" }])
+      setTeacherPolos([{ id: 1, kit: "", kitQuantity: "", size: "", quantity: "" }])
       setBackpacks([{ id: 1, size: "", quantity: "" }])
       setPdfDownloaded(false)
     } catch (error) {
@@ -345,10 +352,10 @@ export default function UniformRequestForm() {
 
     yPos += 6
 
-    // Kit de Professor - Polo + Bolsa
+    // Kit de Professor - Polo
     doc.setFontSize(14)
     doc.setFont("helvetica", "bold")
-    doc.text("KIT DE PROFESSOR - POLO + BOLSA", 20, yPos)
+    doc.text("KIT DE PROFESSOR - POLO", 20, yPos)
     yPos += 7
 
     doc.setFontSize(10)
@@ -358,8 +365,8 @@ export default function UniformRequestForm() {
         doc.addPage()
         yPos = 20
       }
-      doc.text(`${i + 1}. Tamanho da Polo: ${p.size} | Quantidade: ${p.quantity}`, 20, yPos)
-      yPos += 6
+doc.text(`${i + 1}. Kit: ${p.kit} | Qtd Kit: ${p.kitQuantity} | Polo: ${p.size} | Qtd: ${p.quantity}`, 20, yPos)
+  yPos += 6
     })
 
     yPos += 6
@@ -636,7 +643,7 @@ export default function UniformRequestForm() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Kit de Professor - Polo + Bolsa</CardTitle>
+            <CardTitle>Kit de Professor - Polo</CardTitle>
             <Button type="button" onClick={addTeacherPolo} size="sm" variant="outline">
               <Plus className="mr-2 h-4 w-4" />
               Adicionar
@@ -656,31 +663,60 @@ export default function UniformRequestForm() {
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 )}
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label>Tamanho da Polo</Label>
-                    <Select value={polo.size} onValueChange={(value) => updateTeacherPolo(polo.id, "size", value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o tamanho" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {teacherPoloSizes.map((size) => (
-                          <SelectItem key={size.value} value={size.value}>
-                            {size.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                <div className="space-y-4">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Selecionar Kit de Professor</Label>
+                      <Select value={polo.kit} onValueChange={(value) => updateTeacherPolo(polo.id, "kit", value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o kit" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {teacherKitOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Quantidade</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        placeholder="0"
+                        value={polo.kitQuantity}
+                        onChange={(e) => updateTeacherPolo(polo.id, "kitQuantity", e.target.value)}
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Quantidade</Label>
-                    <Input
-                      type="number"
-                      min="1"
-                      placeholder="0"
-                      value={polo.quantity}
-                      onChange={(e) => updateTeacherPolo(polo.id, "quantity", e.target.value)}
-                    />
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label>Tamanho da Polo</Label>
+                      <Select value={polo.size} onValueChange={(value) => updateTeacherPolo(polo.id, "size", value)}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecione o tamanho" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {teacherPoloSizes.map((size) => (
+                            <SelectItem key={size.value} value={size.value}>
+                              {size.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Quantidade</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        placeholder="0"
+                        value={polo.quantity}
+                        onChange={(e) => updateTeacherPolo(polo.id, "quantity", e.target.value)}
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -815,15 +851,14 @@ export default function UniformRequestForm() {
             </div>
 
             <div>
-              <h3 className="font-semibold mb-2">Kit de Professor - Polo + Bolsa</h3>
+              <h3 className="font-semibold mb-2">Kit de Professor - Polo</h3>
               <div className="space-y-2">
                 {teacherPolos.map((polo, index) => (
-                  <div key={polo.id} className="rounded-lg bg-muted p-3 text-sm">
-                    <p className="font-medium">Item {index + 1}</p>
-                    <p>
-                      Tamanho da Polo: {polo.size} | Quantidade: {polo.quantity}
-                    </p>
-                  </div>
+<div key={polo.id} className="rounded-lg bg-muted p-3 text-sm">
+  <p className="font-medium">Item {index + 1}</p>
+  <p>Kit: {polo.kit} | Qtd Kit: {polo.kitQuantity}</p>
+  <p>Tamanho da Polo: {polo.size} | Quantidade: {polo.quantity}</p>
+  </div>
                 ))}
               </div>
             </div>
