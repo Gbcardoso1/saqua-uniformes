@@ -352,10 +352,10 @@ export default function UniformRequestForm() {
 
     yPos += 6
 
-    // Kit de Professor - Polo + Bolsa
+    // Kit de Professor - Polo
     doc.setFontSize(14)
     doc.setFont("helvetica", "bold")
-    doc.text("KIT DE PROFESSOR - POLO + BOLSA", 20, yPos)
+    doc.text("KIT DE PROFESSOR - POLO", 20, yPos)
     yPos += 7
 
     doc.setFontSize(10)
@@ -643,7 +643,7 @@ doc.text(`${i + 1}. Kit: ${p.kit} | Qtd Kit: ${p.kitQuantity} | Polo: ${p.size} 
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Kit de Professor - Polo + Bolsa</CardTitle>
+            <CardTitle>Kit de Professor - Polo</CardTitle>
             <Button type="button" onClick={addTeacherPolo} size="sm" variant="outline">
               <Plus className="mr-2 h-4 w-4" />
               Adicionar
@@ -851,7 +851,7 @@ doc.text(`${i + 1}. Kit: ${p.kit} | Qtd Kit: ${p.kitQuantity} | Polo: ${p.size} 
             </div>
 
             <div>
-              <h3 className="font-semibold mb-2">Kit de Professor - Polo + Bolsa</h3>
+              <h3 className="font-semibold mb-2">Kit de Professor - Polo</h3>
               <div className="space-y-2">
                 {teacherPolos.map((polo, index) => (
 <div key={polo.id} className="rounded-lg bg-muted p-3 text-sm">
