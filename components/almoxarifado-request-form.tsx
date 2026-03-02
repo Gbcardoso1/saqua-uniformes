@@ -176,6 +176,27 @@ const stationeryItems = [
   "UMEDECEDOR DE DEDOS - 75X21MM - ESPUMA UND.",
 ]
 
+// Itens de Cozinha
+const kitchenItems = [
+  "BACIA ALUMINIO - 40",
+  "BACIA PLASTICA - 32L",
+  "BULE 4,5L",
+  "BULE 9L",
+  "CAIXA ORGANIZADORA PRETA - 30 LTS",
+  "CANECA BRANCA PROFESSOR",
+  "CONCHA N 12",
+  "FACA DE COZINHA - N 7",
+  "FRIGIDEIRA - N 32",
+  "FRIGIDEIRA - N 40",
+  "PANELA INOX - N 24",
+  "PANELA INOX - N 32",
+  "PANELA INOX - N 36",
+  "PANELA INOX - N 50",
+  "TAMPA PANELA INOX - N 24",
+  "TAMPA PANELA INOX - N 32",
+  "TAMPA PANELA INOX - N 36",
+]
+
 const institutions = [
   "Escola Municipal Alfredo Castro",
   "Escola Municipal Alkindar Sento Sé",
@@ -223,6 +244,12 @@ type StationeryListItem = {
   quantity: string
 }
 
+type KitchenListItem = {
+  id: number
+  item: string
+  quantity: string
+}
+
 export default function AlmoxarifadoRequestForm() {
   const [formData, setFormData] = useState({
     name: "",
@@ -231,7 +258,9 @@ export default function AlmoxarifadoRequestForm() {
   })
 
   const [stationeryItemsList, setStationeryItemsList] = useState<StationeryListItem[]>([{ id: 1, item: "", quantity: "" }])
+  const [kitchenItemsList, setKitchenItemsList] = useState<KitchenListItem[]>([{ id: 1, item: "", quantity: "" }])
   const [nextStationeryId, setNextStationeryId] = useState(2)
+  const [nextKitchenId, setNextKitchenId] = useState(2)
 
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -257,6 +286,20 @@ export default function AlmoxarifadoRequestForm() {
 
   const updateStationeryItem = (id: number, field: keyof StationeryListItem, value: string) => {
     setStationeryItemsList(stationeryItemsList.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
+  }
+
+  // Kitchen functions
+  const addKitchenItem = () => {
+    setKitchenItemsList([...kitchenItemsList, { id: nextKitchenId, item: "", quantity: "" }])
+    setNextKitchenId(nextKitchenId + 1)
+  }
+
+  const removeKitchenItem = (id: number) => {
+    setKitchenItemsList(kitchenItemsList.filter((item) => item.id !== id))
+  }
+
+  const updateKitchenItem = (id: number, field: keyof KitchenListItem, value: string) => {
+    setKitchenItemsList(kitchenItemsList.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
   }
 
   const generatePDF = () => {
@@ -303,6 +346,29 @@ export default function AlmoxarifadoRequestForm() {
       yPos += 5
     }
 
+    // Kitchen Items
+    const filledKitchen = kitchenItemsList.filter((k) => k.item && k.quantity)
+    if (filledKitchen.length > 0) {
+      if (yPos > 250) {
+        doc.addPage()
+        yPos = 20
+      }
+      doc.setFontSize(12)
+      doc.setFont("helvetica", "bold")
+      doc.text("ITENS DE COZINHA", 20, yPos)
+      yPos += 8
+      doc.setFont("helvetica", "normal")
+      doc.setFontSize(10)
+      filledKitchen.forEach((k, i) => {
+        if (yPos > 270) {
+          doc.addPage()
+          yPos = 20
+        }
+        doc.text(`${i + 1}. ${k.item} | Qtd: ${k.quantity}`, 20, yPos)
+        yPos += 6
+      })
+    }
+
     doc.save(`solicitacao-almoxarifado-${formData.name.replace(/\s+/g, "-")}.pdf`)
   }
 
@@ -315,6 +381,7 @@ export default function AlmoxarifadoRequestForm() {
         ...formData,
         submissionType: "almoxarifado",
         stationeryItems: stationeryItemsList.filter((s) => s.item && s.quantity),
+        kitchenItems: kitchenItemsList.filter((k) => k.item && k.quantity),
       }
 
       const response = await fetch("/api/submissions", {
@@ -333,7 +400,9 @@ export default function AlmoxarifadoRequestForm() {
       // Reset form
       setFormData({ name: "", matricula: "", institution: "" })
       setStationeryItemsList([{ id: 1, item: "", quantity: "" }])
+      setKitchenItemsList([{ id: 1, item: "", quantity: "" }])
       setNextStationeryId(2)
+      setNextKitchenId(2)
     } catch (error) {
       console.error("Error submitting form:", error)
       alert("Erro ao enviar solicitação. Tente novamente.")
@@ -435,6 +504,62 @@ export default function AlmoxarifadoRequestForm() {
                       placeholder="0"
                       value={item.quantity}
                       onChange={(e) => updateStationeryItem(item.id, "quantity", e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
+      {/* Itens de Cozinha */}
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+            <CardTitle>Itens de Cozinha</CardTitle>
+            <Button type="button" variant="outline" size="sm" onClick={addKitchenItem} className="gap-1 bg-transparent">
+              <Plus className="h-4 w-4" /> Adicionar Item
+            </Button>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {kitchenItemsList.map((item) => (
+              <div key={item.id} className="rounded-lg border border-border bg-muted/50 p-4">
+                <div className="flex items-start justify-end mb-2">
+                  {kitchenItemsList.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeKitchenItem(item.id)}
+                      className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Item</Label>
+                    <Select value={item.item} onValueChange={(value) => updateKitchenItem(item.id, "item", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o item" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {kitchenItems.map((kitchenItem) => (
+                          <SelectItem key={kitchenItem} value={kitchenItem}>
+                            {kitchenItem}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Quantidade</Label>
+                    <Input
+                      type="number"
+                      min="1"
+                      placeholder="0"
+                      value={item.quantity}
+                      onChange={(e) => updateKitchenItem(item.id, "quantity", e.target.value)}
                     />
                   </div>
                 </div>
