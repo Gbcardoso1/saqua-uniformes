@@ -5,17 +5,19 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import UniformRequestForm from "@/components/uniform-request-form"
+import AlmoxarifadoRequestForm from "@/components/almoxarifado-request-form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Lock } from "lucide-react"
+import { Lock, Shirt, Package } from "lucide-react"
 import Image from "next/image"
 
 export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const [activeTab, setActiveTab] = useState<"uniformes" | "almoxarifado">("uniformes")
   const router = useRouter()
 
   const ADMIN_USERNAME = "patrimônio"
@@ -62,13 +64,46 @@ export default function Home() {
         <div className="mx-auto max-w-4xl">
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-white mb-2 text-balance">
-              Formulário de Solicitação de Uniformes e Calçados
+              {activeTab === "uniformes"
+                ? "Formulário de Solicitação de Uniformes e Calçados"
+                : "Formulário de Solicitação de Almoxarifado"}
             </h1>
-            <p className="text-white/90 text-pretty">
-              Preencha os dados abaixo para solicitar uniformes e calçados para sua instituição
+            <p className="text-white/90 text-pretty mb-6">
+              {activeTab === "uniformes"
+                ? "Preencha os dados abaixo para solicitar uniformes e calçados para sua instituição"
+                : "Preencha os dados abaixo para solicitar itens de papelaria e cozinha para sua instituição"}
             </p>
+
+            {/* Tab Navigation */}
+            <div className="flex justify-center gap-2 mb-8">
+              <Button
+                onClick={() => setActiveTab("uniformes")}
+                variant={activeTab === "uniformes" ? "default" : "outline"}
+                className={`gap-2 ${
+                  activeTab === "uniformes"
+                    ? "bg-white text-[#1a8b8b] hover:bg-white/90"
+                    : "bg-transparent border-white/30 text-white hover:bg-white/10"
+                }`}
+              >
+                <Shirt className="h-4 w-4" />
+                Uniformes e Calçados
+              </Button>
+              <Button
+                onClick={() => setActiveTab("almoxarifado")}
+                variant={activeTab === "almoxarifado" ? "default" : "outline"}
+                className={`gap-2 ${
+                  activeTab === "almoxarifado"
+                    ? "bg-white text-amber-700 hover:bg-white/90"
+                    : "bg-transparent border-white/30 text-white hover:bg-white/10"
+                }`}
+              >
+                <Package className="h-4 w-4" />
+                Almoxarifado
+              </Button>
+            </div>
           </div>
-          <UniformRequestForm />
+          
+          {activeTab === "uniformes" ? <UniformRequestForm /> : <AlmoxarifadoRequestForm />}
         </div>
       </main>
 

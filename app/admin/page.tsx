@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Download, ArrowLeft, Trash2 } from "lucide-react"
+import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 
@@ -16,6 +16,7 @@ type Submission = {
   name: string
   matricula: string
   institution: string
+  submissionType?: string
   uniforms: Array<{
     type: string
     gender: string
@@ -31,6 +32,8 @@ type Submission = {
     quantity: string
   }>
   teacherPolos?: Array<{
+    kit?: string
+    kitQuantity?: string
     size: string
     quantity: string
   }>
@@ -38,6 +41,15 @@ type Submission = {
     size: string
     quantity: string
   }>
+  stationeryItems?: Array<{
+    item: string
+    quantity: string
+  }>
+  kitchenItems?: Array<{
+    item: string
+    quantity: string
+  }>
+  status?: string
 }
 
 export default function AdminPage() {
@@ -50,10 +62,13 @@ export default function AdminPage() {
   const [submissionToDelete, setSubmissionToDelete] = useState<Submission | null>(null)
   const [institutionFilter, setInstitutionFilter] = useState<string>("all")
   const [segmentFilter, setSegmentFilter] = useState<string>("all")
-  const [yearFilter, setYearFilter] = useState<string>("all")
+  const [monthFilter, setMonthFilter] = useState<string>("all")
+  const [typeFilter, setTypeFilter] = useState<string>("all")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
   const [institutions, setInstitutions] = useState<string[]>([])
-  const [years, setYears] = useState<string[]>([])
+  const [months, setMonths] = useState<{ value: string; label: string }[]>([])
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isUpdating, setIsUpdating] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -70,14 +85,27 @@ export default function AdminPage() {
     const uniqueInstitutions = [...new Set(submissions.map((s) => s.institution))].sort()
     setInstitutions(uniqueInstitutions)
 
-    const uniqueYears = [...new Set(submissions.map((s) => new Date(s.timestamp).getFullYear().toString()))].sort(
-      (a, b) => Number(b) - Number(a),
-    )
-    setYears(uniqueYears)
+    const monthNames = ["Janeiro", "Fevereiro", "Marco", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
+    const uniqueMonths = [...new Set(submissions.map((s) => {
+      const d = new Date(s.timestamp)
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
+    }))].sort((a, b) => b.localeCompare(a))
+    setMonths(uniqueMonths.map((m) => {
+      const [year, month] = m.split("-")
+      return { value: m, label: `${monthNames[Number(month) - 1]} ${year}` }
+    }))
   }, [submissions])
 
   useEffect(() => {
     let filtered = submissions
+
+    if (typeFilter !== "all") {
+      filtered = filtered.filter((s) => (s.submissionType || "uniformes") === typeFilter)
+    }
+
+    if (statusFilter !== "all") {
+      filtered = filtered.filter((s) => (s.status || "pendente") === statusFilter)
+    }
 
     if (institutionFilter !== "all") {
       filtered = filtered.filter((s) => s.institution === institutionFilter)
@@ -87,12 +115,15 @@ export default function AdminPage() {
       filtered = filtered.filter((s) => s.uniforms.some((u) => u.gender === segmentFilter))
     }
 
-    if (yearFilter !== "all") {
-      filtered = filtered.filter((s) => new Date(s.timestamp).getFullYear().toString() === yearFilter)
+    if (monthFilter !== "all") {
+      filtered = filtered.filter((s) => {
+        const d = new Date(s.timestamp)
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}` === monthFilter
+      })
     }
 
     setFilteredSubmissions(filtered)
-  }, [submissions, institutionFilter, segmentFilter, yearFilter])
+  }, [submissions, institutionFilter, segmentFilter, monthFilter, typeFilter, statusFilter])
 
   const fetchSubmissions = async () => {
     try {
@@ -197,7 +228,212 @@ export default function AdminPage() {
   const clearFilters = () => {
     setInstitutionFilter("all")
     setSegmentFilter("all")
-    setYearFilter("all")
+    setMonthFilter("all")
+    setTypeFilter("all")
+    setStatusFilter("all")
+  }
+
+  const updateStatus = async (submission: Submission, newStatus: string) => {
+    setIsUpdating(true)
+    try {
+      const response = await fetch(`/api/submissions/${submission.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: newStatus }),
+      })
+
+      if (response.ok) {
+        setSubmissions((prev) =>
+          prev.map((s) =>
+            s.id === submission.id ? { ...s, status: newStatus } : s
+          )
+        )
+        if (selectedSubmission?.id === submission.id) {
+          setSelectedSubmission((prev) =>
+            prev ? { ...prev, status: newStatus } : null
+          )
+        }
+      }
+    } catch (error) {
+      console.error("Error updating submission:", error)
+    } finally {
+      setIsUpdating(false)
+    }
+  }
+
+  const downloadSubmissionPDF = async (submission: Submission) => {
+    const { jsPDF } = await import("jspdf")
+    const doc = new jsPDF()
+    const isAlmoxarifado = submission.submissionType === "almoxarifado"
+    const date = new Date(submission.timestamp).toLocaleString("pt-BR")
+
+    // Header
+    doc.setFontSize(18)
+    doc.setFont("helvetica", "bold")
+    doc.text(isAlmoxarifado ? "SOLICITACAO DE ALMOXARIFADO" : "SOLICITACAO DE UNIFORMES E CALCADOS", 105, 20, { align: "center" })
+
+    doc.setFontSize(10)
+    doc.setFont("helvetica", "normal")
+    doc.text(`Data: ${date}`, 105, 28, { align: "center" })
+
+    // Horizontal line
+    doc.setLineWidth(0.5)
+    doc.line(20, 32, 190, 32)
+
+    // Dados do Solicitante
+    doc.setFontSize(14)
+    doc.setFont("helvetica", "bold")
+    doc.text("DADOS DO SOLICITANTE", 20, 40)
+
+    doc.setFontSize(11)
+    doc.setFont("helvetica", "normal")
+    let yPos = 48
+    doc.text(`Nome: ${submission.name}`, 20, yPos)
+    yPos += 7
+    doc.text(`Matricula: ${submission.matricula}`, 20, yPos)
+    yPos += 7
+    doc.text(`Instituicao: ${submission.institution}`, 20, yPos)
+    yPos += 7
+    const statusLabel = (submission.status || "pendente") === "pendente" ? "Pendente" : submission.status === "processando" ? "Processando" : "Finalizado"
+    doc.text(`Status: ${statusLabel}`, 20, yPos)
+    yPos += 12
+
+    if (isAlmoxarifado) {
+      // Stationery Items
+      if (submission.stationeryItems && submission.stationeryItems.length > 0) {
+        doc.setFontSize(14)
+        doc.setFont("helvetica", "bold")
+        doc.text("ITENS DE PAPELARIA", 20, yPos)
+        yPos += 8
+        doc.setFont("helvetica", "normal")
+        doc.setFontSize(10)
+        submission.stationeryItems.forEach((s, i) => {
+          if (yPos > 270) { doc.addPage(); yPos = 20 }
+          doc.text(`${i + 1}. ${s.item} | Qtd: ${s.quantity}`, 20, yPos)
+          yPos += 6
+        })
+        yPos += 5
+      }
+
+      // Kitchen Items
+      if (submission.kitchenItems && submission.kitchenItems.length > 0) {
+        if (yPos > 250) { doc.addPage(); yPos = 20 }
+        doc.setFontSize(14)
+        doc.setFont("helvetica", "bold")
+        doc.text("ITENS DE COZINHA", 20, yPos)
+        yPos += 8
+        doc.setFont("helvetica", "normal")
+        doc.setFontSize(10)
+        submission.kitchenItems.forEach((k, i) => {
+          if (yPos > 270) { doc.addPage(); yPos = 20 }
+          doc.text(`${i + 1}. ${k.item} | Qtd: ${k.quantity}`, 20, yPos)
+          yPos += 6
+        })
+      }
+    } else {
+      // Uniformes
+      if (submission.uniforms.length > 0) {
+        doc.setFontSize(14)
+        doc.setFont("helvetica", "bold")
+        doc.text("UNIFORMES", 20, yPos)
+        yPos += 7
+        doc.setFontSize(10)
+        doc.setFont("helvetica", "normal")
+        submission.uniforms.forEach((u, i) => {
+          if (yPos > 270) { doc.addPage(); yPos = 20 }
+          doc.text(`${i + 1}. Tipo: ${u.type} | Genero: ${u.gender} | Tamanho: ${u.size} | Qtd: ${u.quantity}`, 20, yPos)
+          yPos += 6
+        })
+        yPos += 6
+      }
+
+      // Calcados
+      if (submission.shoes.length > 0) {
+        if (yPos > 250) { doc.addPage(); yPos = 20 }
+        doc.setFontSize(14)
+        doc.setFont("helvetica", "bold")
+        doc.text("CALCADOS (TENIS)", 20, yPos)
+        yPos += 7
+        doc.setFontSize(10)
+        doc.setFont("helvetica", "normal")
+        submission.shoes.forEach((s, i) => {
+          if (yPos > 270) { doc.addPage(); yPos = 20 }
+          doc.text(`${i + 1}. Tamanho: ${s.size} | Quantidade: ${s.quantity}`, 20, yPos)
+          yPos += 6
+        })
+        yPos += 6
+      }
+
+      // Kits de Aluno
+      if (submission.studentKits && submission.studentKits.length > 0) {
+        if (yPos > 250) { doc.addPage(); yPos = 20 }
+        doc.setFontSize(14)
+        doc.setFont("helvetica", "bold")
+        doc.text("KITS DE ALUNO", 20, yPos)
+        yPos += 7
+        doc.setFontSize(10)
+        doc.setFont("helvetica", "normal")
+        submission.studentKits.forEach((k, i) => {
+          if (yPos > 270) { doc.addPage(); yPos = 20 }
+          doc.text(`${i + 1}. Tipo: ${k.size} | Quantidade: ${k.quantity}`, 20, yPos)
+          yPos += 6
+        })
+        yPos += 6
+      }
+
+      // Kit de Professor
+      if (submission.teacherPolos && submission.teacherPolos.some((p) => p.kit && p.kitQuantity)) {
+        if (yPos > 250) { doc.addPage(); yPos = 20 }
+        doc.setFontSize(14)
+        doc.setFont("helvetica", "bold")
+        doc.text("KIT DE PROFESSOR", 20, yPos)
+        yPos += 7
+        doc.setFontSize(10)
+        doc.setFont("helvetica", "normal")
+        submission.teacherPolos.filter((p) => p.kit && p.kitQuantity).forEach((p, i) => {
+          if (yPos > 270) { doc.addPage(); yPos = 20 }
+          doc.text(`${i + 1}. Kit: ${p.kit} | Qtd: ${p.kitQuantity}`, 20, yPos)
+          yPos += 6
+        })
+        yPos += 6
+      }
+
+      // Polo de Professor
+      if (submission.teacherPolos && submission.teacherPolos.some((p) => p.size && p.quantity)) {
+        if (yPos > 250) { doc.addPage(); yPos = 20 }
+        doc.setFontSize(14)
+        doc.setFont("helvetica", "bold")
+        doc.text("POLO DE PROFESSOR", 20, yPos)
+        yPos += 7
+        doc.setFontSize(10)
+        doc.setFont("helvetica", "normal")
+        submission.teacherPolos.filter((p) => p.size && p.quantity).forEach((p, i) => {
+          if (yPos > 270) { doc.addPage(); yPos = 20 }
+          doc.text(`${i + 1}. Tamanho: ${p.size} | Qtd: ${p.quantity}`, 20, yPos)
+          yPos += 6
+        })
+        yPos += 6
+      }
+
+      // Mochilas
+      if (submission.backpacks && submission.backpacks.length > 0) {
+        if (yPos > 250) { doc.addPage(); yPos = 20 }
+        doc.setFontSize(14)
+        doc.setFont("helvetica", "bold")
+        doc.text("MOCHILA", 20, yPos)
+        yPos += 7
+        doc.setFontSize(10)
+        doc.setFont("helvetica", "normal")
+        submission.backpacks.forEach((b, i) => {
+          if (yPos > 270) { doc.addPage(); yPos = 20 }
+          doc.text(`${i + 1}. Tamanho: ${b.size} | Quantidade: ${b.quantity}`, 20, yPos)
+          yPos += 6
+        })
+      }
+    }
+
+    const type = isAlmoxarifado ? "almoxarifado" : "uniformes"
+    doc.save(`solicitacao-${type}-${submission.name.replace(/\s+/g, "-")}.pdf`)
   }
 
   if (!isAuthenticated) {
@@ -206,7 +442,7 @@ export default function AdminPage() {
 
   return (
     <main className="min-h-screen bg-background p-4 md:p-8">
-      <div className="mx-auto max-w-7xl">
+      <div className="w-full">
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">Painel Administrativo</h1>
@@ -229,6 +465,19 @@ export default function AdminPage() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <CardTitle>Solicitações Recebidas ({filteredSubmissions.length})</CardTitle>
               <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                <div className="space-y-2 sm:space-y-0 sm:w-40">
+                  <Label className="sm:sr-only">Tipo</Label>
+                  <Select value={typeFilter} onValueChange={setTypeFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Todos os Tipos" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos os Tipos</SelectItem>
+                      <SelectItem value="uniformes">Uniformes</SelectItem>
+                      <SelectItem value="almoxarifado">Almoxarifado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 <div className="space-y-2 sm:space-y-0 sm:w-48">
                   <Label className="sm:sr-only">Instituição</Label>
                   <Select value={institutionFilter} onValueChange={setInstitutionFilter}>
@@ -258,19 +507,33 @@ export default function AdminPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2 sm:space-y-0 sm:w-36">
-                  <Label className="sm:sr-only">Ano</Label>
-                  <Select value={yearFilter} onValueChange={setYearFilter}>
+                <div className="space-y-2 sm:space-y-0 sm:w-44">
+                  <Label className="sm:sr-only">Mes</Label>
+                  <Select value={monthFilter} onValueChange={setMonthFilter}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Todos os Anos" />
+                      <SelectValue placeholder="Todos os Meses" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">Todos os Anos</SelectItem>
-                      {years.map((year) => (
-                        <SelectItem key={year} value={year}>
-                          {year}
+                      <SelectItem value="all">Todos os Meses</SelectItem>
+                      {months.map((month) => (
+                        <SelectItem key={month.value} value={month.value}>
+                          {month.label}
                         </SelectItem>
                       ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2 sm:space-y-0 sm:w-36">
+                  <Label className="sm:sr-only">Status</Label>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Todos os Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos os Status</SelectItem>
+                      <SelectItem value="pendente">Pendente</SelectItem>
+                      <SelectItem value="processando">Processando</SelectItem>
+                      <SelectItem value="finalizado">Finalizado</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -293,48 +556,91 @@ export default function AdminPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Data/Hora</TableHead>
+                      <TableHead>Tipo</TableHead>
+                      <TableHead>Status</TableHead>
                       <TableHead>Nome</TableHead>
                       <TableHead>Matrícula</TableHead>
                       <TableHead>Instituição</TableHead>
-                      <TableHead>Uniformes</TableHead>
-                      <TableHead>Calçados</TableHead>
-                      <TableHead>Kits Aluno</TableHead>
-                      <TableHead>Polos Prof.</TableHead>
-                      <TableHead>Mochilas</TableHead>
+                      <TableHead>Itens</TableHead>
                       <TableHead className="text-right">Ações</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {filteredSubmissions.map((submission) => (
-                      <TableRow key={submission.id}>
-                        <TableCell className="whitespace-nowrap">
-                          {new Date(submission.timestamp).toLocaleString("pt-BR")}
-                        </TableCell>
-                        <TableCell className="font-medium">{submission.name}</TableCell>
-                        <TableCell>{submission.matricula}</TableCell>
-                        <TableCell>{submission.institution}</TableCell>
-                        <TableCell>{submission.uniforms.length}</TableCell>
-                        <TableCell>{submission.shoes.length}</TableCell>
-                        <TableCell>{submission.studentKits?.length || 0}</TableCell>
-                        <TableCell>{submission.teacherPolos?.length || 0}</TableCell>
-                        <TableCell>{submission.backpacks?.length || 0}</TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end gap-1">
-                            <Button variant="ghost" size="sm" onClick={() => viewDetails(submission)}>
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => confirmDelete(submission)}
-                              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    {filteredSubmissions.map((submission) => {
+                      const isAlmoxarifado = submission.submissionType === "almoxarifado"
+                      const itemCount = isAlmoxarifado
+                        ? (submission.stationeryItems?.length || 0) + (submission.kitchenItems?.length || 0)
+                        : submission.uniforms.length + submission.shoes.length + (submission.studentKits?.length || 0) + (submission.teacherPolos?.length || 0) + (submission.backpacks?.length || 0)
+                      
+                      return (
+                        <TableRow key={submission.id}>
+                          <TableCell className="whitespace-nowrap">
+                            {new Date(submission.timestamp).toLocaleString("pt-BR")}
+                          </TableCell>
+                          <TableCell>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                              isAlmoxarifado 
+                                ? "bg-amber-100 text-amber-800" 
+                                : "bg-teal-100 text-teal-800"
+                            }`}>
+                              {isAlmoxarifado ? "Almoxarifado" : "Uniformes"}
+                            </span>
+                          </TableCell>
+                          <TableCell>
+                            {(() => {
+                              const status = submission.status || "pendente"
+                              const config = {
+                                pendente: { bg: "bg-yellow-100 text-yellow-800", icon: <Clock className="h-3 w-3" />, label: "Pendente" },
+                                processando: { bg: "bg-blue-100 text-blue-800", icon: <Loader2 className="h-3 w-3" />, label: "Processando" },
+                                finalizado: { bg: "bg-green-100 text-green-800", icon: <CheckCircle2 className="h-3 w-3" />, label: "Finalizado" },
+                              }[status] || { bg: "bg-yellow-100 text-yellow-800", icon: <Clock className="h-3 w-3" />, label: "Pendente" }
+                              return (
+                                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg}`}>
+                                  {config.icon}
+                                  {config.label}
+                                </span>
+                              )
+                            })()}
+                          </TableCell>
+                          <TableCell className="font-medium">{submission.name}</TableCell>
+                          <TableCell>{submission.matricula}</TableCell>
+                          <TableCell>{submission.institution}</TableCell>
+                          <TableCell>{itemCount} itens</TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1">
+                              <Select
+                                value={submission.status || "pendente"}
+                                onValueChange={(value) => updateStatus(submission, value)}
+                                disabled={isUpdating}
+                              >
+                                <SelectTrigger className="h-8 w-[130px] text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="pendente">Pendente</SelectItem>
+                                  <SelectItem value="processando">Processando</SelectItem>
+                                  <SelectItem value="finalizado">Finalizado</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button variant="ghost" size="sm" onClick={() => downloadSubmissionPDF(submission)} title="Baixar PDF">
+                                <FileDown className="h-4 w-4" />
+                              </Button>
+                              <Button variant="ghost" size="sm" onClick={() => viewDetails(submission)}>
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => confirmDelete(submission)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
                   </TableBody>
                 </Table>
               </div>
@@ -346,17 +652,47 @@ export default function AdminPage() {
       <Dialog open={showDetailModal} onOpenChange={setShowDetailModal}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Detalhes da Solicitação</DialogTitle>
-            <DialogDescription>
-              Solicitação enviada em{" "}
-              {selectedSubmission && new Date(selectedSubmission.timestamp).toLocaleString("pt-BR")}
-            </DialogDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle>Detalhes da Solicitação</DialogTitle>
+                <DialogDescription>
+                  Solicitação enviada em{" "}
+                  {selectedSubmission && new Date(selectedSubmission.timestamp).toLocaleString("pt-BR")}
+                </DialogDescription>
+              </div>
+              {selectedSubmission && (
+                <div className="flex gap-2">
+                  <Select
+                    value={selectedSubmission.status || "pendente"}
+                    onValueChange={(value) => updateStatus(selectedSubmission, value)}
+                    disabled={isUpdating}
+                  >
+                    <SelectTrigger className="w-[150px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="pendente">Pendente</SelectItem>
+                      <SelectItem value="processando">Processando</SelectItem>
+                      <SelectItem value="finalizado">Finalizado</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Button variant="outline" onClick={() => downloadSubmissionPDF(selectedSubmission)}>
+                    <FileDown className="mr-2 h-4 w-4" />
+                    PDF
+                  </Button>
+                </div>
+              )}
+            </div>
           </DialogHeader>
           {selectedSubmission && (
             <div className="space-y-6">
               <div>
                 <h3 className="font-semibold mb-3 text-lg">Dados do Solicitante</h3>
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="grid gap-3 sm:grid-cols-4">
+                  <div className="rounded-lg bg-muted p-3">
+                    <p className="text-xs text-muted-foreground mb-1">Tipo</p>
+                    <p className="font-medium">{selectedSubmission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes"}</p>
+                  </div>
                   <div className="rounded-lg bg-muted p-3">
                     <p className="text-xs text-muted-foreground mb-1">Nome</p>
                     <p className="font-medium">{selectedSubmission.name}</p>
@@ -372,118 +708,198 @@ export default function AdminPage() {
                 </div>
               </div>
 
-              <div>
-                <h3 className="font-semibold mb-3 text-lg">Uniformes Solicitados</h3>
-                <div className="space-y-2">
-                  {selectedSubmission.uniforms.map((uniform, index) => (
-                    <div key={index} className="rounded-lg border border-border p-4">
-                      <div className="grid gap-3 sm:grid-cols-4">
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-1">Segmento</p>
-                          <p className="font-medium">{uniform.type}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-1">Gênero</p>
-                          <p className="font-medium">{uniform.gender}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-1">Tamanho</p>
-                          <p className="font-medium">{uniform.size}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
-                          <p className="font-medium">{uniform.quantity}</p>
-                        </div>
+              {/* Almoxarifado Items */}
+              {selectedSubmission.submissionType === "almoxarifado" && (
+                <>
+                  {selectedSubmission.stationeryItems && selectedSubmission.stationeryItems.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold mb-3 text-lg">Itens de Papelaria</h3>
+                      <div className="space-y-2">
+                        {selectedSubmission.stationeryItems.map((item, index) => (
+                          <div key={index} className="rounded-lg border border-border p-4">
+                            <div className="grid gap-3 sm:grid-cols-2">
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Item</p>
+                                <p className="font-medium">{item.item}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
+                                <p className="font-medium">{item.quantity}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
+                  )}
 
-              <div>
-                <h3 className="font-semibold mb-3 text-lg">Calçados Solicitados (Tênis)</h3>
-                <div className="space-y-2">
-                  {selectedSubmission.shoes.map((shoe, index) => (
-                    <div key={index} className="rounded-lg border border-border p-4">
-                      <div className="grid gap-3 sm:grid-cols-2">
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-1">Tamanho</p>
-                          <p className="font-medium">{shoe.size}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
-                          <p className="font-medium">{shoe.quantity}</p>
-                        </div>
+                  {selectedSubmission.kitchenItems && selectedSubmission.kitchenItems.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold mb-3 text-lg">Itens de Cozinha</h3>
+                      <div className="space-y-2">
+                        {selectedSubmission.kitchenItems.map((item, index) => (
+                          <div key={index} className="rounded-lg border border-border p-4">
+                            <div className="grid gap-3 sm:grid-cols-2">
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Item</p>
+                                <p className="font-medium">{item.item}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
+                                <p className="font-medium">{item.quantity}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {selectedSubmission.studentKits && selectedSubmission.studentKits.length > 0 && (
-                <div>
-                  <h3 className="font-semibold mb-3 text-lg">Kits de Aluno</h3>
-                  <div className="space-y-2">
-                    {selectedSubmission.studentKits.map((kit, index) => (
-                      <div key={index} className="rounded-lg border border-border p-4">
-                        <div className="grid gap-3 sm:grid-cols-2">
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">Tamanho</p>
-                            <p className="font-medium">{kit.size}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
-                            <p className="font-medium">{kit.quantity}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                  )}
+                </>
               )}
 
-              {selectedSubmission.teacherPolos && selectedSubmission.teacherPolos.length > 0 && (
-                <div>
-                  <h3 className="font-semibold mb-3 text-lg">Kit de Professor - Polo + Bolsa</h3>
-                  <div className="space-y-2">
-                    {selectedSubmission.teacherPolos.map((polo, index) => (
-                      <div key={index} className="rounded-lg border border-border p-4">
-                        <div className="grid gap-3 sm:grid-cols-2">
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">Tamanho da Polo</p>
-                            <p className="font-medium">{polo.size}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
-                            <p className="font-medium">{polo.quantity}</p>
+              {/* Uniform Items */}
+              {selectedSubmission.submissionType !== "almoxarifado" && (
+                <>
+                  <div>
+                    <h3 className="font-semibold mb-3 text-lg">Uniformes Solicitados</h3>
+                    <div className="space-y-2">
+                      {selectedSubmission.uniforms.map((uniform, index) => (
+                        <div key={index} className="rounded-lg border border-border p-4">
+                          <div className="grid gap-3 sm:grid-cols-4">
+                            <div>
+                              <p className="text-xs text-muted-foreground mb-1">Segmento</p>
+                              <p className="font-medium">{uniform.type}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground mb-1">Gênero</p>
+                              <p className="font-medium">{uniform.gender}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground mb-1">Tamanho</p>
+                              <p className="font-medium">{uniform.size}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
+                              <p className="font-medium">{uniform.quantity}</p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
 
-              {selectedSubmission.backpacks && selectedSubmission.backpacks.length > 0 && (
-                <div>
-                  <h3 className="font-semibold mb-3 text-lg">Mochila</h3>
-                  <div className="space-y-2">
-                    {selectedSubmission.backpacks.map((backpack, index) => (
-                      <div key={index} className="rounded-lg border border-border p-4">
-                        <div className="grid gap-3 sm:grid-cols-2">
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">Tamanho</p>
-                            <p className="font-medium">{backpack.size}</p>
-                          </div>
-                          <div>
-                            <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
-                            <p className="font-medium">{backpack.quantity}</p>
+                  <div>
+                    <h3 className="font-semibold mb-3 text-lg">Calçados Solicitados (Tênis)</h3>
+                    <div className="space-y-2">
+                      {selectedSubmission.shoes.map((shoe, index) => (
+                        <div key={index} className="rounded-lg border border-border p-4">
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <div>
+                              <p className="text-xs text-muted-foreground mb-1">Tamanho</p>
+                              <p className="font-medium">{shoe.size}</p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
+                              <p className="font-medium">{shoe.quantity}</p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
+
+                  {selectedSubmission.studentKits && selectedSubmission.studentKits.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold mb-3 text-lg">Kits de Aluno</h3>
+                      <div className="space-y-2">
+                        {selectedSubmission.studentKits.map((kit, index) => (
+                          <div key={index} className="rounded-lg border border-border p-4">
+                            <div className="grid gap-3 sm:grid-cols-2">
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Tamanho</p>
+                                <p className="font-medium">{kit.size}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
+                                <p className="font-medium">{kit.quantity}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedSubmission.teacherPolos && selectedSubmission.teacherPolos.length > 0 && (
+                    <>
+                      {selectedSubmission.teacherPolos.some((p) => p.kit && p.kitQuantity) && (
+                        <div>
+                          <h3 className="font-semibold mb-3 text-lg">Kit de Professor</h3>
+                          <div className="space-y-2">
+                            {selectedSubmission.teacherPolos.filter((p) => p.kit && p.kitQuantity).map((polo, index) => (
+                              <div key={index} className="rounded-lg border border-border p-4">
+                                <div className="grid gap-3 sm:grid-cols-2">
+                                  <div>
+                                    <p className="text-xs text-muted-foreground mb-1">Kit</p>
+                                    <p className="font-medium">{polo.kit}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
+                                    <p className="font-medium">{polo.kitQuantity}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {selectedSubmission.teacherPolos.some((p) => p.size && p.quantity) && (
+                        <div>
+                          <h3 className="font-semibold mb-3 text-lg">Polo de Professor</h3>
+                          <div className="space-y-2">
+                            {selectedSubmission.teacherPolos.filter((p) => p.size && p.quantity).map((polo, index) => (
+                              <div key={index} className="rounded-lg border border-border p-4">
+                                <div className="grid gap-3 sm:grid-cols-2">
+                                  <div>
+                                    <p className="text-xs text-muted-foreground mb-1">Tamanho da Polo</p>
+                                    <p className="font-medium">{polo.size}</p>
+                                  </div>
+                                  <div>
+                                    <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
+                                    <p className="font-medium">{polo.quantity}</p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+
+                  {selectedSubmission.backpacks && selectedSubmission.backpacks.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold mb-3 text-lg">Mochila</h3>
+                      <div className="space-y-2">
+                        {selectedSubmission.backpacks.map((backpack, index) => (
+                          <div key={index} className="rounded-lg border border-border p-4">
+                            <div className="grid gap-3 sm:grid-cols-2">
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Tamanho</p>
+                                <p className="font-medium">{backpack.size}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
+                                <p className="font-medium">{backpack.quantity}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
