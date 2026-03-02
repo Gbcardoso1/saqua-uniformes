@@ -7,6 +7,7 @@ type Submission = {
   name: string
   matricula: string
   institution: string
+  submissionType?: string
   uniforms: Array<{
     type: string
     gender: string
@@ -29,6 +30,15 @@ type Submission = {
     size: string
     quantity: string
   }>
+  stationeryItems?: Array<{
+    item: string
+    quantity: string
+  }>
+  kitchenItems?: Array<{
+    item: string
+    quantity: string
+  }>
+  status?: string
 }
 
 export async function GET() {
@@ -49,11 +59,15 @@ export async function GET() {
       name: item.requester_name,
       matricula: item.registration,
       institution: item.institution,
+      submissionType: item.submission_type || "uniformes",
       uniforms: item.uniforms || [],
       shoes: item.shoes || [],
       studentKits: item.student_kits || [],
       teacherPolos: item.teacher_polos || [],
       backpacks: item.backpacks || [],
+      stationeryItems: item.stationery_items || [],
+      kitchenItems: item.kitchen_items || [],
+      status: item.status || "pendente",
     }))
 
     return NextResponse.json({ submissions })
@@ -74,11 +88,14 @@ export async function POST(request: Request) {
         requester_name: data.name,
         registration: data.matricula,
         institution: data.institution,
-        uniforms: data.uniforms,
-        shoes: data.shoes,
-        student_kits: data.studentKits,
-        teacher_polos: data.teacherPolos,
-        backpacks: data.backpacks,
+        submission_type: data.submissionType || "uniformes",
+        uniforms: data.uniforms || [],
+        shoes: data.shoes || [],
+        student_kits: data.studentKits || [],
+        teacher_polos: data.teacherPolos || [],
+        backpacks: data.backpacks || [],
+        stationery_items: data.stationeryItems || [],
+        kitchen_items: data.kitchenItems || [],
       })
       .select()
       .single()
@@ -94,11 +111,14 @@ export async function POST(request: Request) {
       name: insertedData.requester_name,
       matricula: insertedData.registration,
       institution: insertedData.institution,
-      uniforms: insertedData.uniforms,
-      shoes: insertedData.shoes,
-      studentKits: insertedData.student_kits,
-      teacherPolos: insertedData.teacher_polos,
-      backpacks: insertedData.backpacks,
+      submissionType: insertedData.submission_type,
+      uniforms: insertedData.uniforms || [],
+      shoes: insertedData.shoes || [],
+      studentKits: insertedData.student_kits || [],
+      teacherPolos: insertedData.teacher_polos || [],
+      backpacks: insertedData.backpacks || [],
+      stationeryItems: insertedData.stationery_items || [],
+      kitchenItems: insertedData.kitchen_items || [],
     }
 
     return NextResponse.json({ success: true, submission })
