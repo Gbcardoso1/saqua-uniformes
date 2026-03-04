@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown } from "lucide-react"
+import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 
@@ -65,6 +65,7 @@ export default function AdminPage() {
   const [monthFilter, setMonthFilter] = useState<string>("all")
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes">("almoxarifado")
   const [institutions, setInstitutions] = useState<string[]>([])
   const [months, setMonths] = useState<{ value: string; label: string }[]>([])
   const [isDeleting, setIsDeleting] = useState(false)
@@ -99,6 +100,9 @@ export default function AdminPage() {
   useEffect(() => {
     let filtered = submissions
 
+    // Filter by active tab
+    filtered = filtered.filter((s) => (s.submissionType || "uniformes") === activeTab)
+
     if (typeFilter !== "all") {
       filtered = filtered.filter((s) => (s.submissionType || "uniformes") === typeFilter)
     }
@@ -123,7 +127,7 @@ export default function AdminPage() {
     }
 
     setFilteredSubmissions(filtered)
-  }, [submissions, institutionFilter, segmentFilter, monthFilter, typeFilter, statusFilter])
+  }, [submissions, institutionFilter, segmentFilter, monthFilter, typeFilter, statusFilter, activeTab])
 
   const fetchSubmissions = async () => {
     try {
@@ -223,6 +227,18 @@ export default function AdminPage() {
   const handleLogout = () => {
     sessionStorage.removeItem("adminAuth")
     router.push("/")
+  }
+
+  const almoxarifadoCount = submissions.filter((s) => s.submissionType === "almoxarifado").length
+  const uniformesCount = submissions.filter((s) => (s.submissionType || "uniformes") === "uniformes").length
+
+  const handleTabChange = (tab: "almoxarifado" | "uniformes") => {
+    setActiveTab(tab)
+    setInstitutionFilter("all")
+    setSegmentFilter("all")
+    setMonthFilter("all")
+    setTypeFilter("all")
+    setStatusFilter("all")
   }
 
   const clearFilters = () => {
@@ -446,7 +462,7 @@ export default function AdminPage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">Painel Administrativo</h1>
-            <p className="text-muted-foreground">Visualize todas as solicitações de uniformes e calçados</p>
+            <p className="text-muted-foreground">Gerencie todas as solicitações recebidas</p>
           </div>
           <div className="flex gap-2">
             <Button onClick={exportToCSV} variant="outline" disabled={filteredSubmissions.length === 0}>
@@ -460,24 +476,63 @@ export default function AdminPage() {
           </div>
         </div>
 
+        {/* Tabs */}
+        <div className="flex border-b border-border mb-6">
+          <button
+            type="button"
+            onClick={() => handleTabChange("almoxarifado")}
+            className={`relative flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
+              activeTab === "almoxarifado"
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Package className="h-4 w-4" />
+            <span>Almoxarifado</span>
+            {almoxarifadoCount > 0 && (
+              <span className={`ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+                activeTab === "almoxarifado"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground"
+              }`}>
+                {almoxarifadoCount}
+              </span>
+            )}
+            {activeTab === "almoxarifado" && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange("uniformes")}
+            className={`relative flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
+              activeTab === "uniformes"
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <Shirt className="h-4 w-4" />
+            <span>Uniformes e Kits</span>
+            {uniformesCount > 0 && (
+              <span className={`ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+                activeTab === "uniformes"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground"
+              }`}>
+                {uniformesCount}
+              </span>
+            )}
+            {activeTab === "uniformes" && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
+            )}
+          </button>
+        </div>
+
         <Card>
           <CardHeader>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <CardTitle>Solicitações Recebidas ({filteredSubmissions.length})</CardTitle>
               <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-                <div className="space-y-2 sm:space-y-0 sm:w-40">
-                  <Label className="sm:sr-only">Tipo</Label>
-                  <Select value={typeFilter} onValueChange={setTypeFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Todos os Tipos" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos os Tipos</SelectItem>
-                      <SelectItem value="uniformes">Uniformes</SelectItem>
-                      <SelectItem value="almoxarifado">Almoxarifado</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
                 <div className="space-y-2 sm:space-y-0 sm:w-48">
                   <Label className="sm:sr-only">Instituição</Label>
                   <Select value={institutionFilter} onValueChange={setInstitutionFilter}>
@@ -494,19 +549,21 @@ export default function AdminPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2 sm:space-y-0 sm:w-48">
-                  <Label className="sm:sr-only">Gênero</Label>
-                  <Select value={segmentFilter} onValueChange={setSegmentFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Todos os Gêneros" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos os Gêneros</SelectItem>
-                      <SelectItem value="Masculino">Masculino</SelectItem>
-                      <SelectItem value="Feminino">Feminino</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {activeTab === "uniformes" && (
+                  <div className="space-y-2 sm:space-y-0 sm:w-48">
+                    <Label className="sm:sr-only">Genero</Label>
+                    <Select value={segmentFilter} onValueChange={setSegmentFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Todos os Generos" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os Generos</SelectItem>
+                        <SelectItem value="Masculino">Masculino</SelectItem>
+                        <SelectItem value="Feminino">Feminino</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
                 <div className="space-y-2 sm:space-y-0 sm:w-44">
                   <Label className="sm:sr-only">Mes</Label>
                   <Select value={monthFilter} onValueChange={setMonthFilter}>
@@ -556,7 +613,6 @@ export default function AdminPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Data/Hora</TableHead>
-                      <TableHead>Tipo</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Nome</TableHead>
                       <TableHead>Matrícula</TableHead>
@@ -576,15 +632,6 @@ export default function AdminPage() {
                         <TableRow key={submission.id}>
                           <TableCell className="whitespace-nowrap">
                             {new Date(submission.timestamp).toLocaleString("pt-BR")}
-                          </TableCell>
-                          <TableCell>
-                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                              isAlmoxarifado 
-                                ? "bg-amber-100 text-amber-800" 
-                                : "bg-teal-100 text-teal-800"
-                            }`}>
-                              {isAlmoxarifado ? "Almoxarifado" : "Uniformes"}
-                            </span>
                           </TableCell>
                           <TableCell>
                             {(() => {
