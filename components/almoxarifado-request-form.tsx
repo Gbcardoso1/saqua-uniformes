@@ -176,87 +176,7 @@ const stationeryItems = [
   "UMEDECEDOR DE DEDOS - 75X21MM - ESPUMA UND.",
 ]
 
-// Itens de Cozinha
-const kitchenItems = [
-  "ABRIDOR DE LATA - EM ACO INOXIDAVEL 9 CM",
-  "ACENDEDOR DE FOGAO",
-  "ASSADEIRA - RETANGULAR",
-  "ASSADEIRA - RETANGULAR LARGURA 29 CM E COMPRIMENTO 42 CM DE INOX 4,5 DE ALTURA",
-  "BACIA PLASTICA - PLASTICO POLIPROPILENO CANELADA COM CAPACIDADE 15L, BPA FREE",
-  "BACIA PLASTICA - PLASTICO POLIPROPILENO CANELADA COM CAPACIDADE 35L, BPA FREE",
-  "BACIA PLASTICA - PLASTICO POLIPROPILENO CANELADA COM CAPACIDADE 40L, BPA FREE",
-  "BATEDOR DE CLARA",
-  "BOWL DE INOX - COM TAMPA, CAPACIDADE 1,6L REVESTIDO DE ACO INOXIDAVEL",
-  "BOWL DE INOX - COM TAMPA, CAPACIDADE 2,5L REVESTIDO DE ACO INOXIDAVEL",
-  "BOWL DE INOX - COM TAMPA, CAPACIDADE 3,5L REVESTIDO DE ACO INOXIDAVEL",
-  "BOWL DE INOX - COM TAMPA, CAPACIDADE 6L 30 CM REVESTIDO DE ACO INOXIDAVEL",
-  "CAIXA ORGANIZADORA - 20L",
-  "CAIXA ORGANIZADORA - 30L",
-  "CAIXA ORGANIZADORA - 55L",
-  "CANECA",
-  "COLHER DE MESA",
-  "COLHER DE SILICONE INFANTIL",
-  "COLHER PARA ARROZ",
-  "COLHER PARA MASSA",
-  "COLHER SILICONE",
-  "CONCHA GRANDE - EM ACO INOXIDAVEL 50 CM",
-  "CONCHA MEDIA - EM ACO INOXIDAVEL 38 CM",
-  "CONCHA MEDIA",
-  "DESCASCADOR DE LEGUMES",
-  "ESCORREDOR DE ARROZ",
-  "ESCORREDOR DE LOUCA",
-  "ESCUMADEIRA GRANDE - EM ALUMINIO FUNDIDO COMPRIMENTO DE 50CM",
-  "ESCUMADEIRA MEDIA - EM ALUMINIO FUNDIDO COMPRIMENTO DE 30CM",
-  "ESPATULA INOX - VAZADA EM ACO INOXIDAVEL MEDINDO 38CM",
-  "ESPREMEDOR DE BATATA - EM ACO INOXIDAVEL MEDINDO 27CM TOTAL",
-  "FACA - EM ACO INOX MULTIUSO COM CABO DE POLIPROPILENO N 03 CABO 15CM LARGURA LAMINA 4,5 CM",
-  "FACA - EM ACO INOX MULTIUSO COM CABO DE POLIPROPILENO N 04, 21,6 CM",
-  "FACA - EM ACO INOX MULTIUSO COM CABO DE POLIPROPILENO N 06",
-  "FACA - EM ACO INOX MULTIUSO COM CABO DE POLIPROPILENO N 07",
-  "FACA - EM ACO INOX MULTIUSO COM CABO DE POLIPROPILENO N 08, CABO 10 CM, LAMINA 17 CM",
-  "FACA - EM ACO INOX MULTIUSO COM CABO DE POLIPROPILENO N 10, CABO 15 CM, LAMINA 22 CM",
-  "FACA - EM ACO INOX MULTIUSO COM CABO DE POLIPROPILENO 15CM LAMINA 30CM",
-  "FRIGIDEIRA - PANQUEQUEIRA TAPIOQUEIRA ANTIADERENTE 20CM",
-  "FRIGIDEIRA - REVESTIMENTO INTERNO ANTIADERENTE, E EXTERNO EM ALUMINIO GROSSO 32 CM",
-  "FRIGIDEIRA - REVESTIMENTO INTERNO ANTIADERENTE, E EXTERNO EM ALUMINIO GROSSO 40 CM",
-  "FUNIL EM PLASTICO POLIPROPILENO 150 ML",
-  "GARRAFA PLASTICA - 2L (BPA FREE)",
-  "GARRAFA TERMICA - CAPACIDADE 1L (BPA FREE)",
-  "GARRAFA TERMICA - CAPACIDADE 1,8L (BPA FREE)",
-  "JARRA - EM PLASTICO TRANSPARENTE POLIPROPILENO COM TAMPA CAPACIDADE DE 4 LITROS (BPA FREE)",
-  "LEITEIRA/CANECAO",
-  "LIXEIRA PLASTICA - 20L",
-  "LIXEIRA PLASTICA - 40L",
-  "LIXEIRA PLASTICA - 60L",
-  "LIXEIRA PLASTICA - COM TAMPA E PEDAL INJETADO EM PLASTICO POLIPROPILENO CAPACIDADE 100L",
-  "PANELA - CACAROLA ANTIADERENTE TEFLON COM TAMPA 20CM",
-  "PANELA - CACAROLA ANTIADERENTE TEFLON COM TAMPA 28 CM",
-  "PANELA - CACAROLA PROFISSIONAL EM ALUMINIO COM TAMPA N 32 CM",
-  "PANELA - CACAROLA PROFISSIONAL EM ALUMINIO COM TAMPA N 35 CM",
-  "PANELA - CACAROLA PROFISSIONAL EM ALUMINIO COM TAMPA N 36",
-  "PANELA - CACAROLA PROFISSIONAL EM ALUMINIO COM TAMPA N 40 25CM",
-  "PANELA - CACAROLA PROFISSIONAL EM ALUMINIO COM TAMPA N 50",
-  "PANELA DE PRESSAO - 13L",
-  "PANELA DE PRESSAO - 20L",
-  "PANELA DE PRESSAO - 24L",
-  "PEGADOR DE MACARRAO",
-  "PEGADOR DE SALADA",
-  "PENEIRA - EM ACO INOXIDAVEL 18 CM",
-  "PENEIRA - EM ACO INOXIDAVEL 25 CM",
-  "PENEIRA CONICA - EM ACO INOXIDAVEL 14 CM",
-  "POTE PARA MANTIMENTO",
-  "POTE PLASTICO",
-  "POTE PLASTICO - 1,9L (BPA FREE)",
-  "POTE PLASTICO - 3,8L (BPA FREE)",
-  "PRATO - PRATO FUNDO VIDRO 22CM DIAMANTE",
-  "PRATO INFANTIL DE PLASTICO",
-  "PRATO INFANTIL DE SILICONE COM VENTOSA",
-  "RALADOR - 4 FACES ACO INOX 21CM",
-  "SALEIRO - EM VIDRO TRANSPARENTE, TAMPA EM ACO INOXIDAVEL MEDINDO 4X4X10CM",
-  "SOCADOR - PARA FEIJAO EM POLIETILENO MEDINDO 24,5 CM",
-  "TABUA PARA CORTE",
-  "TABUA PARA CORTE - EM POLIETILENO MEDINDO 50 CM DE COMPRIMENTO E 30 CM DE LARGURA",
-]
+
 
 const institutions = [
   "Escola Municipal Alfredo Castro",
@@ -305,12 +225,6 @@ type StationeryListItem = {
   quantity: string
 }
 
-type KitchenListItem = {
-  id: number
-  item: string
-  quantity: string
-}
-
 export default function AlmoxarifadoRequestForm() {
   const [formData, setFormData] = useState({
     name: "",
@@ -319,9 +233,7 @@ export default function AlmoxarifadoRequestForm() {
   })
 
   const [stationeryItemsList, setStationeryItemsList] = useState<StationeryListItem[]>([{ id: 1, item: "", quantity: "" }])
-  const [kitchenItemsList, setKitchenItemsList] = useState<KitchenListItem[]>([{ id: 1, item: "", quantity: "" }])
   const [nextStationeryId, setNextStationeryId] = useState(2)
-  const [nextKitchenId, setNextKitchenId] = useState(2)
 
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -349,19 +261,7 @@ export default function AlmoxarifadoRequestForm() {
     setStationeryItemsList(stationeryItemsList.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
   }
 
-  // Kitchen functions
-  const addKitchenItem = () => {
-    setKitchenItemsList([...kitchenItemsList, { id: nextKitchenId, item: "", quantity: "" }])
-    setNextKitchenId(nextKitchenId + 1)
-  }
 
-  const removeKitchenItem = (id: number) => {
-    setKitchenItemsList(kitchenItemsList.filter((item) => item.id !== id))
-  }
-
-  const updateKitchenItem = (id: number, field: keyof KitchenListItem, value: string) => {
-    setKitchenItemsList(kitchenItemsList.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
-  }
 
   const generatePDF = () => {
     const doc = new jsPDF()
@@ -406,31 +306,6 @@ export default function AlmoxarifadoRequestForm() {
       })
       yPos += 5
     }
-
-    // Kitchen Items
-    const filledKitchen = kitchenItemsList.filter((k) => k.item && k.quantity)
-    if (filledKitchen.length > 0) {
-      if (yPos > 250) {
-        doc.addPage()
-        yPos = 20
-      }
-      doc.setFontSize(12)
-      doc.setFont("helvetica", "bold")
-      doc.text("ITENS DE COZINHA", 20, yPos)
-      yPos += 8
-      doc.setFont("helvetica", "normal")
-      doc.setFontSize(10)
-      filledKitchen.forEach((k, i) => {
-        if (yPos > 270) {
-          doc.addPage()
-          yPos = 20
-        }
-        doc.text(`${i + 1}. ${k.item} | Qtd: ${k.quantity}`, 20, yPos)
-        yPos += 6
-      })
-    }
-
-    doc.save(`solicitacao-almoxarifado-${formData.name.replace(/\s+/g, "-")}.pdf`)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -442,7 +317,6 @@ export default function AlmoxarifadoRequestForm() {
         ...formData,
         submissionType: "almoxarifado",
         stationeryItems: stationeryItemsList.filter((s) => s.item && s.quantity),
-        kitchenItems: kitchenItemsList.filter((k) => k.item && k.quantity),
       }
 
       const response = await fetch("/api/submissions", {
@@ -461,9 +335,7 @@ export default function AlmoxarifadoRequestForm() {
       // Reset form
       setFormData({ name: "", matricula: "", institution: "" })
       setStationeryItemsList([{ id: 1, item: "", quantity: "" }])
-      setKitchenItemsList([{ id: 1, item: "", quantity: "" }])
       setNextStationeryId(2)
-      setNextKitchenId(2)
     } catch (error) {
       console.error("Error submitting form:", error)
       alert("Erro ao enviar solicitação. Tente novamente.")
@@ -565,62 +437,6 @@ export default function AlmoxarifadoRequestForm() {
                       placeholder="0"
                       value={item.quantity}
                       onChange={(e) => updateStationeryItem(item.id, "quantity", e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-      {/* Itens de Cozinha */}
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-            <CardTitle>Itens de Cozinha</CardTitle>
-            <Button type="button" variant="outline" size="sm" onClick={addKitchenItem} className="gap-1 bg-transparent">
-              <Plus className="h-4 w-4" /> Adicionar Item
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {kitchenItemsList.map((item) => (
-              <div key={item.id} className="rounded-lg border border-border bg-muted/50 p-4">
-                <div className="flex items-start justify-end mb-2">
-                  {kitchenItemsList.length > 1 && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeKitchenItem(item.id)}
-                      className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label>Item</Label>
-                    <Select value={item.item} onValueChange={(value) => updateKitchenItem(item.id, "item", value)}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione o item" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {kitchenItems.map((kitchenItem) => (
-                          <SelectItem key={kitchenItem} value={kitchenItem}>
-                            {kitchenItem}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Quantidade</Label>
-                    <Input
-                      type="number"
-                      min="1"
-                      placeholder="0"
-                      value={item.quantity}
-                      onChange={(e) => updateKitchenItem(item.id, "quantity", e.target.value)}
                     />
                   </div>
                 </div>

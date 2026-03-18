@@ -34,10 +34,6 @@ type Submission = {
     item: string
     quantity: string
   }>
-  kitchenItems?: Array<{
-    item: string
-    quantity: string
-  }>
   status?: string
 }
 
@@ -66,7 +62,6 @@ export async function GET() {
       teacherPolos: item.teacher_polos || [],
       backpacks: item.backpacks || [],
       stationeryItems: item.stationery_items || [],
-      kitchenItems: item.kitchen_items || [],
       status: item.status || "pendente",
     }))
 
@@ -95,7 +90,6 @@ export async function POST(request: Request) {
         teacher_polos: data.teacherPolos || [],
         backpacks: data.backpacks || [],
         stationery_items: data.stationeryItems || [],
-        kitchen_items: data.kitchenItems || [],
       })
       .select()
       .single()
@@ -118,7 +112,6 @@ export async function POST(request: Request) {
       teacherPolos: insertedData.teacher_polos || [],
       backpacks: insertedData.backpacks || [],
       stationeryItems: insertedData.stationery_items || [],
-      kitchenItems: insertedData.kitchen_items || [],
     }
 
     return NextResponse.json({ success: true, submission })
