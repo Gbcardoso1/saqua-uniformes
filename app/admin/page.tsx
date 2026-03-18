@@ -45,10 +45,6 @@ type Submission = {
     item: string
     quantity: string
   }>
-  kitchenItems?: Array<{
-    item: string
-    quantity: string
-  }>
   status?: string
 }
 
@@ -329,22 +325,6 @@ export default function AdminPage() {
           yPos += 6
         })
         yPos += 5
-      }
-
-      // Kitchen Items
-      if (submission.kitchenItems && submission.kitchenItems.length > 0) {
-        if (yPos > 250) { doc.addPage(); yPos = 20 }
-        doc.setFontSize(14)
-        doc.setFont("helvetica", "bold")
-        doc.text("ITENS DE COZINHA", 20, yPos)
-        yPos += 8
-        doc.setFont("helvetica", "normal")
-        doc.setFontSize(10)
-        submission.kitchenItems.forEach((k, i) => {
-          if (yPos > 270) { doc.addPage(); yPos = 20 }
-          doc.text(`${i + 1}. ${k.item} | Qtd: ${k.quantity}`, 20, yPos)
-          yPos += 6
-        })
       }
     } else {
       // Uniformes
