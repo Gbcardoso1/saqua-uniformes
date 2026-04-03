@@ -16,7 +16,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { CheckCircle, Plus, Trash2, Download } from "lucide-react"
-import { jsPDF } from "jspdf"
 
 // Itens de Papelaria
 const stationeryItems = [
@@ -302,8 +301,10 @@ export default function AlmoxarifadoRequestForm() {
   const [stationeryItemsList, setStationeryItemsList] = useState<StationeryListItem[]>([{ id: 1, item: "", quantity: "" }])
   const [nextStationeryId, setNextStationeryId] = useState(2)
 
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [pdfDownloaded, setPdfDownloaded] = useState(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -330,7 +331,8 @@ export default function AlmoxarifadoRequestForm() {
 
 
 
-  const generatePDF = () => {
+  const downloadPDF = async () => {
+    const { jsPDF } = await import("jspdf")
     const doc = new jsPDF()
 
     // Header
@@ -338,26 +340,32 @@ export default function AlmoxarifadoRequestForm() {
     doc.setFont("helvetica", "bold")
     doc.text("SOLICITACAO DE ALMOXARIFADO", 105, 20, { align: "center" })
 
+    // Horizontal line
+    doc.setLineWidth(0.5)
+    doc.line(20, 25, 190, 25)
+
     doc.setFontSize(10)
     doc.setFont("helvetica", "normal")
-    doc.text(`Data: ${new Date().toLocaleDateString("pt-BR")}`, 105, 28, { align: "center" })
+    doc.text(`Data: ${new Date().toLocaleDateString("pt-BR")}`, 105, 32, { align: "center" })
 
     // Personal Info
-    doc.setFontSize(12)
+    doc.setFontSize(14)
     doc.setFont("helvetica", "bold")
-    doc.text("DADOS DO SOLICITANTE", 20, 40)
+    doc.text("DADOS DO SOLICITANTE", 20, 42)
     doc.setFont("helvetica", "normal")
-    doc.setFontSize(10)
-    doc.text(`Nome: ${formData.name}`, 20, 48)
-    doc.text(`Matricula: ${formData.matricula}`, 20, 54)
-    doc.text(`Instituicao: ${formData.institution}`, 20, 60)
-
-    let yPos = 75
+    doc.setFontSize(11)
+    let yPos = 50
+    doc.text(`Nome: ${formData.name}`, 20, yPos)
+    yPos += 7
+    doc.text(`Matricula: ${formData.matricula}`, 20, yPos)
+    yPos += 7
+    doc.text(`Instituicao: ${formData.institution}`, 20, yPos)
+    yPos += 12
 
     // Stationery Items
     const filledStationery = stationeryItemsList.filter((s) => s.item && s.quantity)
     if (filledStationery.length > 0) {
-      doc.setFontSize(12)
+      doc.setFontSize(14)
       doc.setFont("helvetica", "bold")
       doc.text("ITENS DE PAPELARIA", 20, yPos)
       yPos += 8
@@ -371,14 +379,25 @@ export default function AlmoxarifadoRequestForm() {
         doc.text(`${i + 1}. ${s.item} | Qtd: ${s.quantity}`, 20, yPos)
         yPos += 6
       })
-      yPos += 5
     }
+
+    doc.save(`solicitacao-almoxarifado-${formData.name.replace(/\s+/g, "-")}-${Date.now()}.pdf`)
+    setPdfDownloaded(true)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    setIsSubmitting(true)
+    setPdfDownloaded(false)
+    setShowConfirmModal(true)
+  }
 
+  const confirmSubmission = async () => {
+    if (!pdfDownloaded) {
+      alert("Por favor, baixe o PDF antes de confirmar o envio.")
+      return
+    }
+
+    setIsSubmitting(true)
     try {
       const submissionData = {
         ...formData,
@@ -396,13 +415,14 @@ export default function AlmoxarifadoRequestForm() {
         throw new Error("Erro ao enviar solicitação")
       }
 
-      generatePDF()
+      setShowConfirmModal(false)
       setShowSuccessModal(true)
 
       // Reset form
       setFormData({ name: "", matricula: "", institution: "" })
       setStationeryItemsList([{ id: 1, item: "", quantity: "" }])
       setNextStationeryId(2)
+      setPdfDownloaded(false)
     } catch (error) {
       console.error("Error submitting form:", error)
       alert("Erro ao enviar solicitação. Tente novamente.")
@@ -518,6 +538,59 @@ export default function AlmoxarifadoRequestForm() {
         </Button>
       </div>
 
+      {/* Confirm Modal */}
+      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Resumo da Solicitação</DialogTitle>
+            <DialogDescription>Verifique os dados da sua solicitação abaixo</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6">
+            <div>
+              <h3 className="font-semibold mb-2">Dados do Solicitante</h3>
+              <div className="space-y-1 text-sm">
+                <p><span className="font-medium">Nome:</span> {formData.name}</p>
+                <p><span className="font-medium">Matrícula:</span> {formData.matricula}</p>
+                <p><span className="font-medium">Instituição:</span> {formData.institution}</p>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-semibold mb-2">Itens de Papelaria</h3>
+              <div className="space-y-2">
+                {stationeryItemsList.filter((s) => s.item && s.quantity).map((s, index) => (
+                  <div key={s.id} className="rounded-lg bg-muted p-3 text-sm">
+                    <p className="font-medium">Item {index + 1}</p>
+                    <p>{s.item} | Qtd: {s.quantity}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {!pdfDownloaded && (
+              <div className="rounded-lg border-2 border-yellow-500 bg-yellow-50 p-4">
+                <p className="text-sm text-yellow-800 font-medium">
+                  É necessário baixar o PDF antes de confirmar o envio.
+                </p>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
+              <Button type="button" variant="outline" onClick={() => setShowConfirmModal(false)}>
+                Voltar
+              </Button>
+              <Button type="button" variant="secondary" onClick={downloadPDF}>
+                <Download className="mr-2 h-4 w-4" />
+                {pdfDownloaded ? "PDF Baixado" : "Baixar PDF"}
+              </Button>
+              <Button type="button" onClick={confirmSubmission} disabled={isSubmitting || !pdfDownloaded}>
+                {isSubmitting ? "Enviando..." : "Confirmar Envio"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Success Modal */}
       <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
         <DialogContent className="sm:max-w-md">
@@ -529,7 +602,7 @@ export default function AlmoxarifadoRequestForm() {
             </div>
             <DialogTitle className="text-center">Solicitação Enviada!</DialogTitle>
             <DialogDescription className="text-center">
-              Sua solicitação de almoxarifado foi enviada com sucesso. O PDF foi baixado automaticamente.
+              Sua solicitação de almoxarifado foi enviada com sucesso.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
