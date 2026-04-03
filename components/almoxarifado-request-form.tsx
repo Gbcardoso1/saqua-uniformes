@@ -373,6 +373,9 @@ export default function AlmoxarifadoRequestForm() {
       })
       yPos += 5
     }
+
+    // Save the PDF
+    doc.save(`solicitacao-almoxarifado-${formData.name.replace(/\s+/g, "-")}-${Date.now()}.pdf`)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
