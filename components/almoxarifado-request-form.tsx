@@ -221,7 +221,23 @@ const stationeryItems = [
   "UMEDECEDOR DE DEDOS - 75X21MM - ESPUMA UND.",
 ]
 
-
+// Itens de Creche
+const crecheItems = [
+  "BANHEIRA PARA BEBE",
+  "BEBE CONFORTO ATE 13 KG",
+  "CAPA PARA BEBE CONFORTO 96CMX65CM",
+  "COLCHONETE CASAL",
+  "EDREDOM 1,80M X 2,40M",
+  "LENCOL DE BERCO C/ ELASTICO LISO 70CM X 1.30M X 15CM UND.",
+  "LENCOL DE CASAL C/ ELASTICO UND.",
+  "LENCOL DE CASAL S/ ELASTICO UND.",
+  "MANTA MICROFIBRA - 2,20 X 1,80 (BRANCO)",
+  "MANTA MICROFIBRA - 2,20 X 1,80 (CINZA)",
+  "TOALHA DE BANHO BRANCA UND.",
+  "TOALHA DE BANHO C/ CAPUZ BRANCA 65CM X 80 CM UND.",
+  "TOALHA DE ROSTO BRANCA UND.",
+  "TOALHINHA LAVABO UND.",
+]
 
 const institutions = [
   "Escola Municipal Alfredo Castro",
@@ -270,6 +286,12 @@ type StationeryListItem = {
   quantity: string
 }
 
+type CrecheListItem = {
+  id: number
+  item: string
+  quantity: string
+}
+
 export default function AlmoxarifadoRequestForm() {
   const [formData, setFormData] = useState({
     name: "",
@@ -279,6 +301,9 @@ export default function AlmoxarifadoRequestForm() {
 
   const [stationeryItemsList, setStationeryItemsList] = useState<StationeryListItem[]>([{ id: 1, item: "", quantity: "" }])
   const [nextStationeryId, setNextStationeryId] = useState(2)
+
+  const [crecheItemsList, setCrecheItemsList] = useState<CrecheListItem[]>([{ id: 1, item: "", quantity: "" }])
+  const [nextCrecheId, setNextCrecheId] = useState(2)
 
   const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
@@ -308,7 +333,19 @@ export default function AlmoxarifadoRequestForm() {
     setStationeryItemsList(stationeryItemsList.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
   }
 
+  // Creche functions
+  const addCrecheItem = () => {
+    setCrecheItemsList([...crecheItemsList, { id: nextCrecheId, item: "", quantity: "" }])
+    setNextCrecheId(nextCrecheId + 1)
+  }
 
+  const removeCrecheItem = (id: number) => {
+    setCrecheItemsList(crecheItemsList.filter((item) => item.id !== id))
+  }
+
+  const updateCrecheItem = (id: number, field: keyof CrecheListItem, value: string) => {
+    setCrecheItemsList(crecheItemsList.map((item) => (item.id === id ? { ...item, [field]: value } : item)))
+  }
 
   const downloadPDF = async () => {
     const { jsPDF } = await import("jspdf")
@@ -358,6 +395,30 @@ export default function AlmoxarifadoRequestForm() {
         doc.text(`${i + 1}. ${s.item} | Qtd: ${s.quantity}`, 20, yPos)
         yPos += 6
       })
+      yPos += 4
+    }
+
+    // Creche Items
+    const filledCreche = crecheItemsList.filter((c) => c.item && c.quantity)
+    if (filledCreche.length > 0) {
+      if (yPos > 250) {
+        doc.addPage()
+        yPos = 20
+      }
+      doc.setFontSize(14)
+      doc.setFont("helvetica", "bold")
+      doc.text("ITENS DE CRECHE", 20, yPos)
+      yPos += 8
+      doc.setFont("helvetica", "normal")
+      doc.setFontSize(10)
+      filledCreche.forEach((c, i) => {
+        if (yPos > 270) {
+          doc.addPage()
+          yPos = 20
+        }
+        doc.text(`${i + 1}. ${c.item} | Qtd: ${c.quantity}`, 20, yPos)
+        yPos += 6
+      })
     }
 
     doc.save(`solicitacao-almoxarifado-${formData.name.replace(/\s+/g, "-")}-${Date.now()}.pdf`)
@@ -382,6 +443,7 @@ export default function AlmoxarifadoRequestForm() {
         ...formData,
         submissionType: "almoxarifado",
         stationeryItems: stationeryItemsList.filter((s) => s.item && s.quantity),
+        crecheItems: crecheItemsList.filter((c) => c.item && c.quantity),
       }
 
       const response = await fetch("/api/submissions", {
@@ -401,6 +463,8 @@ export default function AlmoxarifadoRequestForm() {
       setFormData({ name: "", matricula: "", institution: "" })
       setStationeryItemsList([{ id: 1, item: "", quantity: "" }])
       setNextStationeryId(2)
+      setCrecheItemsList([{ id: 1, item: "", quantity: "" }])
+      setNextCrecheId(2)
       setPdfDownloaded(false)
     } catch (error) {
       console.error("Error submitting form:", error)
@@ -511,6 +575,62 @@ export default function AlmoxarifadoRequestForm() {
         </CardContent>
       </Card>
 
+      {/* Itens de Creche */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+          <CardTitle>Itens de Creche</CardTitle>
+          <Button type="button" variant="outline" size="sm" onClick={addCrecheItem} className="gap-1 bg-transparent">
+            <Plus className="h-4 w-4" /> Adicionar Item
+          </Button>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {crecheItemsList.map((item) => (
+            <div key={item.id} className="rounded-lg border border-border bg-muted/50 p-4">
+              <div className="flex items-start justify-end mb-2">
+                {crecheItemsList.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeCrecheItem(item.id)}
+                    className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Item</Label>
+                  <Select value={item.item} onValueChange={(value) => updateCrecheItem(item.id, "item", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o item" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {crecheItems.map((crecheItem) => (
+                        <SelectItem key={crecheItem} value={crecheItem}>
+                          {crecheItem}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Quantidade</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    placeholder="0"
+                    value={item.quantity}
+                    onChange={(e) => updateCrecheItem(item.id, "quantity", e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
       <div className="flex justify-center">
         <Button type="submit" size="lg" className="min-w-[200px]" disabled={isSubmitting}>
           {isSubmitting ? "Enviando..." : "Enviar Solicitação"}
@@ -545,6 +665,20 @@ export default function AlmoxarifadoRequestForm() {
                 ))}
               </div>
             </div>
+
+            {crecheItemsList.filter((c) => c.item && c.quantity).length > 0 && (
+              <div>
+                <h3 className="font-semibold mb-2">Itens de Creche</h3>
+                <div className="space-y-2">
+                  {crecheItemsList.filter((c) => c.item && c.quantity).map((c, index) => (
+                    <div key={c.id} className="rounded-lg bg-muted p-3 text-sm">
+                      <p className="font-medium">Item {index + 1}</p>
+                      <p>{c.item} | Qtd: {c.quantity}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {!pdfDownloaded && (
               <div className="rounded-lg border-2 border-yellow-500 bg-yellow-50 p-4">
