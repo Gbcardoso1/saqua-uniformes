@@ -8,29 +8,32 @@ type Submission = {
   matricula: string
   institution: string
   submissionType?: string
-
   uniforms: Array<{
     type: string
     gender: string
     size: string
     quantity: string
   }>
-
   shoes: Array<{
     size: string
     quantity: string
   }>
-
+  studentKits?: Array<{
+    size: string
+    quantity: string
+  }>
+  teacherPolos?: Array<{
+    size: string
+    quantity: string
+  }>
+  backpacks?: Array<{
+    size: string
+    quantity: string
+  }>
   stationeryItems?: Array<{
     item: string
     quantity: string
   }>
-
-  crecheItems?: Array<{
-    item: string
-    quantity: string
-  }>
-
   status?: string
 }
 
@@ -59,7 +62,6 @@ export async function GET() {
       teacherPolos: item.teacher_polos || [],
       backpacks: item.backpacks || [],
       stationeryItems: item.stationery_items || [],
-      crecheItems: item.almoxarifado || [],
       status: item.status || "pendente",
     }))
 
@@ -88,7 +90,6 @@ export async function POST(request: Request) {
         teacher_polos: data.teacherPolos || [],
         backpacks: data.backpacks || [],
         stationery_items: data.stationeryItems || [],
-        almoxarifado: data.crecheItems || [],
       })
       .select()
       .single()
@@ -110,8 +111,7 @@ export async function POST(request: Request) {
       studentKits: insertedData.student_kits || [],
       teacherPolos: insertedData.teacher_polos || [],
       backpacks: insertedData.backpacks || [],
-      crecheItems: insertedData.almoxarifado || [],
-      crecheItems: insertedData.creche_items || [],
+      stationeryItems: insertedData.stationery_items || [],
     }
 
     return NextResponse.json({ success: true, submission })
