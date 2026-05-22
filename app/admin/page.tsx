@@ -45,6 +45,10 @@ type Submission = {
     item: string
     quantity: string
   }>
+  crecheItems?: Array<{
+    item: string
+    quantity: string
+  }>
   status?: string
 }
 
@@ -322,6 +326,23 @@ export default function AdminPage() {
         submission.stationeryItems.forEach((s, i) => {
           if (yPos > 270) { doc.addPage(); yPos = 20 }
           doc.text(`${i + 1}. ${s.item} | Qtd: ${s.quantity}`, 20, yPos)
+          yPos += 6
+        })
+        yPos += 5
+      }
+
+      // Creche Items
+      if (submission.crecheItems && submission.crecheItems.length > 0) {
+        if (yPos > 250) { doc.addPage(); yPos = 20 }
+        doc.setFontSize(14)
+        doc.setFont("helvetica", "bold")
+        doc.text("ITENS DE CRECHE", 20, yPos)
+        yPos += 8
+        doc.setFont("helvetica", "normal")
+        doc.setFontSize(10)
+        submission.crecheItems.forEach((c, i) => {
+          if (yPos > 270) { doc.addPage(); yPos = 20 }
+          doc.text(`${i + 1}. ${c.item} | Qtd: ${c.quantity}`, 20, yPos)
           yPos += 6
         })
         yPos += 5
@@ -765,6 +786,28 @@ export default function AdminPage() {
                       <h3 className="font-semibold mb-3 text-lg">Itens de Cozinha</h3>
                       <div className="space-y-2">
                         {selectedSubmission.kitchenItems.map((item, index) => (
+                          <div key={index} className="rounded-lg border border-border p-4">
+                            <div className="grid gap-3 sm:grid-cols-2">
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Item</p>
+                                <p className="font-medium">{item.item}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
+                                <p className="font-medium">{item.quantity}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedSubmission.crecheItems && selectedSubmission.crecheItems.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold mb-3 text-lg">Itens de Creche</h3>
+                      <div className="space-y-2">
+                        {selectedSubmission.crecheItems.map((item, index) => (
                           <div key={index} className="rounded-lg border border-border p-4">
                             <div className="grid gap-3 sm:grid-cols-2">
                               <div>

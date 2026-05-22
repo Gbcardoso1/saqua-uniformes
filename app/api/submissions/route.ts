@@ -34,6 +34,10 @@ type Submission = {
     item: string
     quantity: string
   }>
+  crecheItems?: Array<{
+    item: string
+    quantity: string
+  }>
   status?: string
 }
 
@@ -62,6 +66,7 @@ export async function GET() {
       teacherPolos: item.teacher_polos || [],
       backpacks: item.backpacks || [],
       stationeryItems: item.stationery_items || [],
+      crecheItems: item.creche_items || [],
       status: item.status || "pendente",
     }))
 
@@ -90,6 +95,7 @@ export async function POST(request: Request) {
         teacher_polos: data.teacherPolos || [],
         backpacks: data.backpacks || [],
         stationery_items: data.stationeryItems || [],
+        creche_items: data.crecheItems || [],
       })
       .select()
       .single()
@@ -112,6 +118,7 @@ export async function POST(request: Request) {
       teacherPolos: insertedData.teacher_polos || [],
       backpacks: insertedData.backpacks || [],
       stationeryItems: insertedData.stationery_items || [],
+      crecheItems: insertedData.creche_items || [],
     }
 
     return NextResponse.json({ success: true, submission })
