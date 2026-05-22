@@ -626,7 +626,7 @@ export default function AdminPage() {
                     {filteredSubmissions.map((submission) => {
                       const isAlmoxarifado = submission.submissionType === "almoxarifado"
                       const itemCount = isAlmoxarifado
-                        ? (submission.stationeryItems?.length || 0) + (submission.kitchenItems?.length || 0)
+                        ? (submission.stationeryItems?.length || 0) + (submission.kitchenItems?.length || 0) + (submission.crecheItems?.length || 0)
                         : submission.uniforms.length + submission.shoes.length + (submission.studentKits?.length || 0) + (submission.teacherPolos?.length || 0) + (submission.backpacks?.length || 0)
                       
                       return (
