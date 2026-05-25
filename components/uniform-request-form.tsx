@@ -7,24 +7,14 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Download, Search, ShoppingCart, ChevronDown, ChevronUp, X, Shirt, Package, Users, Backpack } from "lucide-react"
+import { Download, Search, ChevronDown, ChevronUp, Shirt, Package, Users, Backpack } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 type FormData = {
   name: string
   matricula: string
   institution: string
-}
-
-type CartItem = {
-  id: string
-  category: string
-  name: string
-  details?: string
-  quantity: number
 }
 
 // Uniformes organizados por tipo/série
@@ -83,7 +73,6 @@ export default function UniformRequestForm() {
   const [pdfDownloaded, setPdfDownloaded] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(Object.keys(uniformCategories)))
-  const [cartOpen, setCartOpen] = useState(false)
 
   // Estado para quantidades - chave: "categoria|genero|tamanho"
   const [uniformQuantities, setUniformQuantities] = useState<Record<string, number>>({})
@@ -93,89 +82,17 @@ export default function UniformRequestForm() {
   const [kitPoloQuantity, setKitPoloQuantity] = useState<number>(0)
   const [backpackQuantities, setBackpackQuantities] = useState<Record<string, number>>({})
 
-  // Calcular itens do carrinho
-  const cartItems = useMemo(() => {
-    const items: CartItem[] = []
-
-    // Uniformes
-    Object.entries(uniformQuantities).forEach(([key, qty]) => {
-      if (qty > 0) {
-        const [category, gender, size] = key.split("|")
-        items.push({
-          id: `uniform-${key}`,
-          category: "Uniformes",
-          name: category,
-          details: `${gender} - Tam. ${size}`,
-          quantity: qty,
-        })
-      }
-    })
-
-    // Calçados
-    Object.entries(shoeQuantities).forEach(([size, qty]) => {
-      if (qty > 0) {
-        items.push({
-          id: `shoe-${size}`,
-          category: "Calçados",
-          name: "Tênis",
-          details: `Tam. ${size}`,
-          quantity: qty,
-        })
-      }
-    })
-
-    // Kits de Aluno
-    Object.entries(kitQuantities).forEach(([kit, qty]) => {
-      if (qty > 0) {
-        items.push({
-          id: `kit-${kit}`,
-          category: "Kits de Aluno",
-          name: kit,
-          quantity: qty,
-        })
-      }
-    })
-
-    // Kit de Professor
-    if (kitPoloQuantity > 0) {
-      items.push({
-        id: "kit-professor",
-        category: "Kit Professor",
-        name: "Kit de Professor",
-        quantity: kitPoloQuantity,
-      })
-    }
-
-    // Polos
-    Object.entries(poloQuantities).forEach(([size, qty]) => {
-      if (qty > 0) {
-        items.push({
-          id: `polo-${size}`,
-          category: "Polo Professor",
-          name: "Polo",
-          details: `Tam. ${size}`,
-          quantity: qty,
-        })
-      }
-    })
-
-    // Mochilas
-    Object.entries(backpackQuantities).forEach(([type, qty]) => {
-      if (qty > 0) {
-        items.push({
-          id: `backpack-${type}`,
-          category: "Mochilas",
-          name: "Mochila",
-          details: type,
-          quantity: qty,
-        })
-      }
-    })
-
-    return items
+  // Calcular total de itens
+  const totalItems = useMemo(() => {
+    let total = 0
+    Object.values(uniformQuantities).forEach(qty => { if (qty > 0) total += qty })
+    Object.values(shoeQuantities).forEach(qty => { if (qty > 0) total += qty })
+    Object.values(kitQuantities).forEach(qty => { if (qty > 0) total += qty })
+    if (kitPoloQuantity > 0) total += kitPoloQuantity
+    Object.values(poloQuantities).forEach(qty => { if (qty > 0) total += qty })
+    Object.values(backpackQuantities).forEach(qty => { if (qty > 0) total += qty })
+    return total
   }, [uniformQuantities, shoeQuantities, kitQuantities, poloQuantities, kitPoloQuantity, backpackQuantities])
-
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
   const toggleCategory = (category: string) => {
     const newExpanded = new Set(expandedCategories)
@@ -189,27 +106,6 @@ export default function UniformRequestForm() {
 
   const expandAll = () => setExpandedCategories(new Set(Object.keys(uniformCategories)))
   const collapseAll = () => setExpandedCategories(new Set())
-
-  const removeFromCart = (itemId: string) => {
-    if (itemId.startsWith("uniform-")) {
-      const key = itemId.replace("uniform-", "")
-      setUniformQuantities((prev) => ({ ...prev, [key]: 0 }))
-    } else if (itemId.startsWith("shoe-")) {
-      const size = itemId.replace("shoe-", "")
-      setShoeQuantities((prev) => ({ ...prev, [size]: 0 }))
-    } else if (itemId.startsWith("kit-") && itemId !== "kit-professor") {
-      const kit = itemId.replace("kit-", "")
-      setKitQuantities((prev) => ({ ...prev, [kit]: 0 }))
-    } else if (itemId === "kit-professor") {
-      setKitPoloQuantity(0)
-    } else if (itemId.startsWith("polo-")) {
-      const size = itemId.replace("polo-", "")
-      setPoloQuantities((prev) => ({ ...prev, [size]: 0 }))
-    } else if (itemId.startsWith("backpack-")) {
-      const type = itemId.replace("backpack-", "")
-      setBackpackQuantities((prev) => ({ ...prev, [type]: 0 }))
-    }
-  }
 
   const validateForm = (): boolean => {
     if (!formData.name || !formData.matricula || !formData.institution) {
@@ -444,73 +340,6 @@ export default function UniformRequestForm() {
     doc.save(`solicitacao-${formData.name.replace(/\s+/g, "-")}-${Date.now()}.pdf`)
     setPdfDownloaded(true)
   }
-
-  // Componente do Carrinho
-  const CartButton = () => (
-    <Sheet open={cartOpen} onOpenChange={setCartOpen}>
-      <SheetTrigger asChild>
-        <Button variant="outline" size="lg" className="fixed bottom-6 right-6 z-50 h-14 gap-2 rounded-full shadow-lg">
-          <ShoppingCart className="h-5 w-5" />
-          <span className="font-semibold">Carrinho</span>
-          {totalItems > 0 && (
-            <Badge className="ml-1 bg-primary text-primary-foreground">{totalItems}</Badge>
-          )}
-        </Button>
-      </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md">
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
-            <ShoppingCart className="h-5 w-5" />
-            Itens Selecionados ({totalItems})
-          </SheetTitle>
-        </SheetHeader>
-        <ScrollArea className="h-[calc(100vh-180px)] mt-4">
-          {cartItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-              <ShoppingCart className="h-12 w-12 mb-4 opacity-50" />
-              <p>Nenhum item selecionado</p>
-              <p className="text-sm">Adicione itens preenchendo as quantidades</p>
-            </div>
-          ) : (
-            <div className="space-y-3 pr-4">
-              {cartItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between rounded-lg border bg-card p-3"
-                >
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="text-xs">{item.category}</Badge>
-                    </div>
-                    <p className="font-medium mt-1">{item.name}</p>
-                    {item.details && <p className="text-sm text-muted-foreground">{item.details}</p>}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Badge variant="outline" className="text-sm">Qtd: {item.quantity}</Badge>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                      onClick={() => removeFromCart(item.id)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </ScrollArea>
-        {cartItems.length > 0 && (
-          <div className="absolute bottom-0 left-0 right-0 border-t bg-background p-4">
-            <Button className="w-full" size="lg" onClick={() => { setCartOpen(false); handleSubmit({ preventDefault: () => {} } as React.FormEvent) }}>
-              Enviar Solicitação
-            </Button>
-          </div>
-        )}
-      </SheetContent>
-    </Sheet>
-  )
 
   return (
     <>
@@ -879,8 +708,7 @@ export default function UniformRequestForm() {
         </div>
       </form>
 
-      {/* Carrinho Flutuante */}
-      <CartButton />
+
 
       {/* Modal de Resumo */}
       <Dialog open={showModal} onOpenChange={setShowModal}>
@@ -901,16 +729,83 @@ export default function UniformRequestForm() {
 
             <div>
               <h3 className="font-semibold mb-2">Itens Selecionados ({totalItems})</h3>
-              <div className="space-y-2">
-                {cartItems.map((item) => (
-                  <div key={item.id} className="rounded-lg bg-muted p-3 text-sm">
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {/* Uniformes */}
+                {Object.entries(uniformQuantities).filter(([, qty]) => qty > 0).map(([key, qty]) => {
+                  const [type, gender, size] = key.split("|")
+                  return (
+                    <div key={key} className="rounded-lg bg-muted p-3 text-sm">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Badge variant="outline" className="mr-2">Uniformes</Badge>
+                          <span className="font-medium">{type}</span>
+                          <span className="text-muted-foreground"> - {gender} - Tam. {size}</span>
+                        </div>
+                        <Badge>Qtd: {qty}</Badge>
+                      </div>
+                    </div>
+                  )
+                })}
+                {/* Calçados */}
+                {Object.entries(shoeQuantities).filter(([, qty]) => qty > 0).map(([size, qty]) => (
+                  <div key={`shoe-${size}`} className="rounded-lg bg-muted p-3 text-sm">
                     <div className="flex items-center justify-between">
                       <div>
-                        <Badge variant="outline" className="mr-2">{item.category}</Badge>
-                        <span className="font-medium">{item.name}</span>
-                        {item.details && <span className="text-muted-foreground"> - {item.details}</span>}
+                        <Badge variant="outline" className="mr-2">Calçados</Badge>
+                        <span className="font-medium">Tênis</span>
+                        <span className="text-muted-foreground"> - Tam. {size}</span>
                       </div>
-                      <Badge>Qtd: {item.quantity}</Badge>
+                      <Badge>Qtd: {qty}</Badge>
+                    </div>
+                  </div>
+                ))}
+                {/* Kits Aluno */}
+                {Object.entries(kitQuantities).filter(([, qty]) => qty > 0).map(([kit, qty]) => (
+                  <div key={`kit-${kit}`} className="rounded-lg bg-muted p-3 text-sm">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Badge variant="outline" className="mr-2">Kit Aluno</Badge>
+                        <span className="font-medium">{kit}</span>
+                      </div>
+                      <Badge>Qtd: {qty}</Badge>
+                    </div>
+                  </div>
+                ))}
+                {/* Kit Professor */}
+                {kitPoloQuantity > 0 && (
+                  <div className="rounded-lg bg-muted p-3 text-sm">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Badge variant="outline" className="mr-2">Kit Professor</Badge>
+                        <span className="font-medium">Kit Completo</span>
+                      </div>
+                      <Badge>Qtd: {kitPoloQuantity}</Badge>
+                    </div>
+                  </div>
+                )}
+                {/* Polos */}
+                {Object.entries(poloQuantities).filter(([, qty]) => qty > 0).map(([size, qty]) => (
+                  <div key={`polo-${size}`} className="rounded-lg bg-muted p-3 text-sm">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Badge variant="outline" className="mr-2">Polo Professor</Badge>
+                        <span className="font-medium">Polo</span>
+                        <span className="text-muted-foreground"> - Tam. {size}</span>
+                      </div>
+                      <Badge>Qtd: {qty}</Badge>
+                    </div>
+                  </div>
+                ))}
+                {/* Mochilas */}
+                {Object.entries(backpackQuantities).filter(([, qty]) => qty > 0).map(([type, qty]) => (
+                  <div key={`backpack-${type}`} className="rounded-lg bg-muted p-3 text-sm">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Badge variant="outline" className="mr-2">Mochilas</Badge>
+                        <span className="font-medium">Mochila</span>
+                        <span className="text-muted-foreground"> - {type}</span>
+                      </div>
+                      <Badge>Qtd: {qty}</Badge>
                     </div>
                   </div>
                 ))}
