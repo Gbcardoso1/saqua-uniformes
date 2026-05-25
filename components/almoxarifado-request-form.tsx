@@ -729,31 +729,6 @@ export default function AlmoxarifadoRequestForm() {
         </TabsContent>
       </Tabs>
 
-      {/* Resumo dos itens selecionados */}
-      {(selectedStationeryCount > 0 || selectedCrecheCount > 0) && (
-        <Card className="border-primary/50 bg-primary/5">
-          <CardHeader>
-            <CardTitle className="text-lg">Resumo da Solicitação</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-4">
-              {selectedStationeryCount > 0 && (
-                <div className="flex items-center gap-2">
-                  <Package className="h-4 w-4 text-primary" />
-                  <span className="font-medium">{selectedStationeryCount} item(ns) de papelaria</span>
-                </div>
-              )}
-              {selectedCrecheCount > 0 && (
-                <div className="flex items-center gap-2">
-                  <Baby className="h-4 w-4 text-primary" />
-                  <span className="font-medium">{selectedCrecheCount} item(ns) de creche</span>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       <Button type="submit" className="w-full" size="lg">
         Enviar Solicitação
       </Button>
