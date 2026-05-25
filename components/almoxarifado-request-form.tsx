@@ -574,19 +574,19 @@ export default function AlmoxarifadoRequestForm() {
       </Card>
 
       <Tabs defaultValue="papelaria" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="papelaria" className="gap-2">
+        <TabsList className="grid w-full grid-cols-2 h-auto">
+          <TabsTrigger value="papelaria" className="flex flex-col gap-1 py-3">
             <Package className="h-4 w-4" />
-            Papelaria
+            <span className="text-xs">Papelaria</span>
             {selectedStationeryCount > 0 && (
-              <Badge variant="secondary" className="ml-1">{selectedStationeryCount}</Badge>
+              <Badge variant="secondary" className="text-xs">{selectedStationeryCount}</Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="creche" className="gap-2">
+          <TabsTrigger value="creche" className="flex flex-col gap-1 py-3">
             <Baby className="h-4 w-4" />
-            Creche
+            <span className="text-xs">Creche</span>
             {selectedCrecheCount > 0 && (
-              <Badge variant="secondary" className="ml-1">{selectedCrecheCount}</Badge>
+              <Badge variant="secondary" className="text-xs">{selectedCrecheCount}</Badge>
             )}
           </TabsTrigger>
         </TabsList>
