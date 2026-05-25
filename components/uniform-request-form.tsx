@@ -21,28 +21,28 @@ type FormData = {
 const uniformCategories = {
   "Creche": {
     genders: ["Masculino", "Feminino"],
-    sizes: ["6/12 meses", "1", "2", "3"],
+    sizes: ["6/12 M", "1", "2", "4", "6", "8", "10", "12"],
   },
   "Pré": {
     genders: ["Masculino", "Feminino"],
-    sizes: ["4", "6", "8"],
+    sizes: ["4", "6", "8", "10", "12", "14"],
   },
   "1º ao 5º ano": {
     genders: ["Masculino", "Feminino"],
-    sizes: ["4", "6", "8", "10", "12", "14", "16"],
+    sizes: ["8", "10", "12", "14", "16", "P", "M", "G", "GG", "EG", "EXG"],
   },
   "6º ao 9º ano": {
     genders: ["Masculino", "Feminino"],
-    sizes: ["P", "M", "G", "GG", "XG"],
+    sizes: ["14", "16", "P", "M", "G", "GG", "EG", "EXG"],
   },
   "EJA": {
     genders: ["Masculino", "Feminino"],
-    sizes: ["P", "M", "G", "GG", "XG"],
+    sizes: ["16", "P", "M", "G", "GG", "EG", "EXG"],
   },
 }
 
 // Calçados - tamanhos disponíveis
-const shoeSizes = Array.from({ length: 28 }, (_, i) => (i + 18).toString())
+const shoeSizes = ["14/15", "16/17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45"]
 
 // Kits de Aluno
 const studentKitTypes = [
