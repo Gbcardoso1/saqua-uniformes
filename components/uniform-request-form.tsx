@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Download, Search, ChevronDown, ChevronUp, Shirt, Package, Users, Backpack } from "lucide-react"
+import { Download, Search, ChevronDown, ChevronUp, Shirt, Package, Users, Backpack, Footprints } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -396,7 +396,7 @@ export default function UniformRequestForm() {
               )}
             </TabsTrigger>
             <TabsTrigger value="calcados" className="flex flex-col gap-1 py-3">
-              <span className="text-lg">👟</span>
+              <Footprints className="h-4 w-4" />
               <span className="text-xs">Calçados</span>
               {Object.values(shoeQuantities).some(q => q > 0) && (
                 <Badge variant="secondary" className="text-xs">{Object.values(shoeQuantities).filter(q => q > 0).length}</Badge>
