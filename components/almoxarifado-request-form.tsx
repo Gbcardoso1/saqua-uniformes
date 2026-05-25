@@ -3,24 +3,24 @@
 import type React from "react"
 import { useState, useMemo } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog"
-import { CheckCircle, Download, Search, Package, Baby } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
+import { RequestCart, type CartItem } from "@/components/request-cart"
+import { Download, Send, ChevronDown, ChevronUp, Search, Pencil, Baby, Users } from "lucide-react"
+
+type FormData = {
+  name: string
+  matricula: string
+  institution: string
+}
 
 // Itens de Papelaria organizados por categoria
-const stationeryCategories = {
+const stationeryCategories: Record<string, string[]> = {
   "Pincéis e Arte": [
     "PINCEL CHATO LONGO 815-0 - 12 UND",
     "PINCEL CHATO LONGO 815-2 - 12 UND",
@@ -266,7 +266,7 @@ const stationeryCategories = {
 }
 
 // Itens de Creche
-const crecheItemsList = [
+const crecheItems = [
   "BANHEIRA PARA BEBE",
   "BEBE CONFORTO ATE 13 KG",
   "CAPA PARA BEBE CONFORTO 96CMX65CM",
@@ -284,199 +284,163 @@ const crecheItemsList = [
 ]
 
 export default function AlmoxarifadoRequestForm() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: "",
     matricula: "",
     institution: "",
   })
 
-  // Estado para quantidades de papelaria (chave = nome do item, valor = quantidade)
-  const [stationeryQuantities, setStationeryQuantities] = useState<Record<string, string>>({})
-  
-  // Estado para quantidades de creche
-  const [crecheQuantities, setCrecheQuantities] = useState<Record<string, string>>({})
-  
-  // Estado para busca
-  const [stationerySearch, setStationerySearch] = useState("")
-  const [crecheSearch, setCrecheSearch] = useState("")
-  
-  // Estado para categoria expandida
-  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({})
+  const [stationeryQuantities, setStationeryQuantities] = useState<Record<string, number>>({})
+  const [crecheQuantities, setCrecheQuantities] = useState<Record<string, number>>({})
 
-  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [showModal, setShowModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [pdfDownloaded, setPdfDownloaded] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("")
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>(
+    Object.keys(stationeryCategories).reduce((acc, key) => ({ ...acc, [key]: false }), {})
+  )
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+  const updateStationeryQuantity = (item: string, quantity: number) => {
+    setStationeryQuantities(prev => {
+      if (quantity <= 0) {
+        const { [item]: _, ...rest } = prev
+        return rest
+      }
+      return { ...prev, [item]: quantity }
+    })
   }
 
-  const updateStationeryQuantity = (item: string, quantity: string) => {
-    setStationeryQuantities(prev => ({
-      ...prev,
-      [item]: quantity
-    }))
+  const updateCrecheQuantity = (item: string, quantity: number) => {
+    setCrecheQuantities(prev => {
+      if (quantity <= 0) {
+        const { [item]: _, ...rest } = prev
+        return rest
+      }
+      return { ...prev, [item]: quantity }
+    })
   }
 
-  const updateCrecheQuantity = (item: string, quantity: string) => {
-    setCrecheQuantities(prev => ({
-      ...prev,
-      [item]: quantity
-    }))
+  const cartItems = useMemo(() => {
+    const items: CartItem[] = []
+
+    Object.entries(stationeryQuantities).forEach(([item, qty]) => {
+      const category = Object.entries(stationeryCategories).find(([, catItems]) => 
+        catItems.includes(item)
+      )?.[0] || "Papelaria"
+      
+      items.push({
+        id: `stationery-${item}`,
+        category: "Papelaria",
+        name: item.length > 40 ? item.substring(0, 40) + "..." : item,
+        details: category,
+        quantity: qty
+      })
+    })
+
+    Object.entries(crecheQuantities).forEach(([item, qty]) => {
+      items.push({
+        id: `creche-${item}`,
+        category: "Creche",
+        name: item.length > 40 ? item.substring(0, 40) + "..." : item,
+        quantity: qty
+      })
+    })
+
+    return items
+  }, [stationeryQuantities, crecheQuantities])
+
+  const removeCartItem = (id: string) => {
+    if (id.startsWith("stationery-")) {
+      const item = id.replace("stationery-", "")
+      setStationeryQuantities(prev => {
+        const { [item]: _, ...rest } = prev
+        return rest
+      })
+    } else if (id.startsWith("creche-")) {
+      const item = id.replace("creche-", "")
+      setCrecheQuantities(prev => {
+        const { [item]: _, ...rest } = prev
+        return rest
+      })
+    }
+  }
+
+  const clearCart = () => {
+    setStationeryQuantities({})
+    setCrecheQuantities({})
   }
 
   const toggleCategory = (category: string) => {
-    setExpandedCategories(prev => ({
-      ...prev,
-      [category]: !prev[category]
-    }))
+    setExpandedCategories(prev => ({ ...prev, [category]: !prev[category] }))
   }
 
-  const expandAllCategories = () => {
-    const allExpanded: Record<string, boolean> = {}
-    Object.keys(stationeryCategories).forEach(cat => {
-      allExpanded[cat] = true
-    })
-    setExpandedCategories(allExpanded)
+  const expandAll = () => {
+    setExpandedCategories(Object.keys(stationeryCategories).reduce((acc, key) => ({ ...acc, [key]: true }), {}))
   }
 
-  const collapseAllCategories = () => {
-    setExpandedCategories({})
+  const collapseAll = () => {
+    setExpandedCategories(Object.keys(stationeryCategories).reduce((acc, key) => ({ ...acc, [key]: false }), {}))
   }
 
-  // Filtrar itens de papelaria por busca
-  const filteredStationeryCategories = useMemo(() => {
-    if (!stationerySearch.trim()) return stationeryCategories
+  const stationeryCount = Object.values(stationeryQuantities).reduce((a, b) => a + b, 0)
+  const crecheCount = Object.values(crecheQuantities).reduce((a, b) => a + b, 0)
+
+  const filteredCategories = useMemo(() => {
+    if (!searchTerm) return stationeryCategories
     
-    const search = stationerySearch.toLowerCase()
     const filtered: Record<string, string[]> = {}
-    
     Object.entries(stationeryCategories).forEach(([category, items]) => {
-      const matchedItems = items.filter(item => 
-        item.toLowerCase().includes(search)
+      const filteredItems = items.filter(item => 
+        item.toLowerCase().includes(searchTerm.toLowerCase())
       )
-      if (matchedItems.length > 0) {
-        filtered[category] = matchedItems
+      if (filteredItems.length > 0) {
+        filtered[category] = filteredItems
       }
     })
-    
     return filtered
-  }, [stationerySearch])
+  }, [searchTerm])
 
-  // Filtrar itens de creche por busca
   const filteredCrecheItems = useMemo(() => {
-    if (!crecheSearch.trim()) return crecheItemsList
-    const search = crecheSearch.toLowerCase()
-    return crecheItemsList.filter(item => item.toLowerCase().includes(search))
-  }, [crecheSearch])
+    if (!searchTerm) return crecheItems
+    return crecheItems.filter(item => 
+      item.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  }, [searchTerm])
 
-  // Contar itens selecionados
-  const selectedStationeryCount = Object.values(stationeryQuantities).filter(q => q && parseInt(q) > 0).length
-  const selectedCrecheCount = Object.values(crecheQuantities).filter(q => q && parseInt(q) > 0).length
-
-  // Obter itens selecionados para exibição
-  const getSelectedStationeryItems = () => {
-    return Object.entries(stationeryQuantities)
-      .filter(([, qty]) => qty && parseInt(qty) > 0)
-      .map(([item, quantity]) => ({ item, quantity }))
-  }
-
-  const getSelectedCrecheItems = () => {
-    return Object.entries(crecheQuantities)
-      .filter(([, qty]) => qty && parseInt(qty) > 0)
-      .map(([item, quantity]) => ({ item, quantity }))
-  }
-
-  const downloadPDF = async () => {
-    const { jsPDF } = await import("jspdf")
-    const doc = new jsPDF()
-
-    // Header
-    doc.setFontSize(18)
-    doc.setFont("helvetica", "bold")
-    doc.text("SOLICITACAO DE ALMOXARIFADO", 105, 20, { align: "center" })
-
-    // Horizontal line
-    doc.setLineWidth(0.5)
-    doc.line(20, 25, 190, 25)
-
-    doc.setFontSize(10)
-    doc.setFont("helvetica", "normal")
-    doc.text(`Data: ${new Date().toLocaleDateString("pt-BR")}`, 105, 32, { align: "center" })
-
-    // Personal Info
-    doc.setFontSize(14)
-    doc.setFont("helvetica", "bold")
-    doc.text("DADOS DO SOLICITANTE", 20, 42)
-    doc.setFont("helvetica", "normal")
-    doc.setFontSize(11)
-    let yPos = 50
-    doc.text(`Nome: ${formData.name}`, 20, yPos)
-    yPos += 7
-    doc.text(`Matricula: ${formData.matricula}`, 20, yPos)
-    yPos += 7
-    doc.text(`Instituicao: ${formData.institution}`, 20, yPos)
-    yPos += 12
-
-    // Stationery Items
-    const filledStationery = getSelectedStationeryItems()
-    if (filledStationery.length > 0) {
-      doc.setFontSize(14)
-      doc.setFont("helvetica", "bold")
-      doc.text("ITENS DE PAPELARIA", 20, yPos)
-      yPos += 8
-      doc.setFont("helvetica", "normal")
-      doc.setFontSize(10)
-      filledStationery.forEach((s, i) => {
-        if (yPos > 270) {
-          doc.addPage()
-          yPos = 20
-        }
-        doc.text(`${i + 1}. ${s.item} | Qtd: ${s.quantity}`, 20, yPos)
-        yPos += 6
-      })
-      yPos += 4
+  const validateForm = (): boolean => {
+    if (!formData.name || !formData.matricula || !formData.institution) {
+      alert("Por favor, preencha os campos obrigatorios.")
+      return false
     }
-
-    // Creche Items
-    const filledCreche = getSelectedCrecheItems()
-    if (filledCreche.length > 0) {
-      if (yPos > 250) {
-        doc.addPage()
-        yPos = 20
-      }
-      doc.setFontSize(14)
-      doc.setFont("helvetica", "bold")
-      doc.text("ITENS DE CRECHE", 20, yPos)
-      yPos += 8
-      doc.setFont("helvetica", "normal")
-      doc.setFontSize(10)
-      filledCreche.forEach((c, i) => {
-        if (yPos > 270) {
-          doc.addPage()
-          yPos = 20
-        }
-        doc.text(`${i + 1}. ${c.item} | Qtd: ${c.quantity}`, 20, yPos)
-        yPos += 6
-      })
+    if (cartItems.length === 0) {
+      alert("Por favor, selecione pelo menos um item.")
+      return false
     }
-
-    doc.save(`solicitacao-almoxarifado-${formData.name.replace(/\s+/g, "-")}-${Date.now()}.pdf`)
-    setPdfDownloaded(true)
+    return true
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (selectedStationeryCount === 0 && selectedCrecheCount === 0) {
-      alert("Por favor, selecione pelo menos um item antes de enviar.")
-      return
+    if (validateForm()) {
+      setPdfDownloaded(false)
+      setShowModal(true)
     }
-    
-    setPdfDownloaded(false)
-    setShowConfirmModal(true)
+  }
+
+  const getStationeryForAPI = () => {
+    return Object.entries(stationeryQuantities).map(([item, qty]) => ({
+      item,
+      quantity: qty.toString()
+    }))
+  }
+
+  const getCrecheForAPI = () => {
+    return Object.entries(crecheQuantities).map(([item, qty]) => ({
+      item,
+      quantity: qty.toString()
+    }))
   }
 
   const confirmSubmission = async () => {
@@ -487,357 +451,391 @@ export default function AlmoxarifadoRequestForm() {
 
     setIsSubmitting(true)
     try {
-      const submissionData = {
-        ...formData,
-        submissionType: "almoxarifado",
-        stationeryItems: getSelectedStationeryItems(),
-        crecheItems: getSelectedCrecheItems(),
-      }
-
       const response = await fetch("/api/submissions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(submissionData),
+        body: JSON.stringify({
+          name: formData.name,
+          matricula: formData.matricula,
+          institution: formData.institution,
+          submissionType: "almoxarifado",
+          uniforms: [],
+          shoes: [],
+          stationeryItems: getStationeryForAPI(),
+          crecheItems: getCrecheForAPI(),
+        }),
       })
 
-      if (!response.ok) {
-        throw new Error("Erro ao enviar solicitação")
-      }
+      const result = await response.json()
+      if (!result.success) throw new Error(result.error || "Failed to submit")
 
-      setShowConfirmModal(false)
+      setShowModal(false)
       setShowSuccessModal(true)
 
-      // Reset form
       setFormData({ name: "", matricula: "", institution: "" })
-      setStationeryQuantities({})
-      setCrecheQuantities({})
+      clearCart()
       setPdfDownloaded(false)
     } catch (error) {
       console.error("Error submitting form:", error)
-      alert("Erro ao enviar solicitação. Tente novamente.")
+      alert("Erro ao enviar solicitacao. Tente novamente.")
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  const clearStationerySelection = () => {
-    setStationeryQuantities({})
-  }
+  const downloadPDF = async () => {
+    const { jsPDF } = await import("jspdf")
+    const doc = new jsPDF()
 
-  const clearCrecheSelection = () => {
-    setCrecheQuantities({})
+    doc.setFontSize(18)
+    doc.setFont("helvetica", "bold")
+    doc.text("SOLICITACAO DE ALMOXARIFADO", 105, 20, { align: "center" })
+    doc.setLineWidth(0.5)
+    doc.line(20, 25, 190, 25)
+
+    doc.setFontSize(14)
+    doc.setFont("helvetica", "bold")
+    doc.text("DADOS DO SOLICITANTE", 20, 35)
+
+    doc.setFontSize(11)
+    doc.setFont("helvetica", "normal")
+    let yPos = 42
+    doc.text(`Nome: ${formData.name}`, 20, yPos)
+    yPos += 7
+    doc.text(`Matricula: ${formData.matricula}`, 20, yPos)
+    yPos += 7
+    doc.text(`Instituicao: ${formData.institution}`, 20, yPos)
+    yPos += 12
+
+    if (Object.keys(stationeryQuantities).length > 0) {
+      doc.setFontSize(14)
+      doc.setFont("helvetica", "bold")
+      doc.text("ITENS DE PAPELARIA", 20, yPos)
+      yPos += 7
+
+      doc.setFontSize(10)
+      doc.setFont("helvetica", "normal")
+      Object.entries(stationeryQuantities).forEach(([item, qty], i) => {
+        if (yPos > 270) { doc.addPage(); yPos = 20 }
+        doc.text(`${i + 1}. ${item} | Qtd: ${qty}`, 20, yPos)
+        yPos += 6
+      })
+      yPos += 6
+    }
+
+    if (Object.keys(crecheQuantities).length > 0) {
+      if (yPos > 250) { doc.addPage(); yPos = 20 }
+      doc.setFontSize(14)
+      doc.setFont("helvetica", "bold")
+      doc.text("ITENS DE CRECHE", 20, yPos)
+      yPos += 7
+
+      doc.setFontSize(10)
+      doc.setFont("helvetica", "normal")
+      Object.entries(crecheQuantities).forEach(([item, qty], i) => {
+        if (yPos > 270) { doc.addPage(); yPos = 20 }
+        doc.text(`${i + 1}. ${item} | Qtd: ${qty}`, 20, yPos)
+        yPos += 6
+      })
+    }
+
+    yPos += 10
+    if (yPos > 270) { doc.addPage(); yPos = 20 }
+    doc.setFontSize(9)
+    doc.text(`Data: ${new Date().toLocaleDateString("pt-BR")}`, 20, yPos)
+
+    doc.save(`solicitacao-almoxarifado-${formData.name.replace(/\s+/g, "-")}-${Date.now()}.pdf`)
+    setPdfDownloaded(true)
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Dados do Solicitante</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div className="space-y-2">
-              <Label htmlFor="name">Nome do Solicitante</Label>
-              <Input
-                id="name"
-                name="name"
-                placeholder="Digite seu nome completo"
-                value={formData.name}
-                onChange={handleInputChange}
-                required
-              />
+    <>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Header com Carrinho */}
+        <div className="sticky top-0 z-10 -mx-4 bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-lg font-semibold">Formulario de Requisicao</h2>
+              <p className="text-sm text-muted-foreground">Almoxarifado - Materiais Escolares</p>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="matricula">Matrícula</Label>
-              <Input
-                id="matricula"
-                name="matricula"
-                placeholder="Digite a matrícula"
-                value={formData.matricula}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="institution">Nome da Instituição de Ensino</Label>
-              <Input
-                id="institution"
-                name="institution"
-                placeholder="Digite o nome da instituição"
-                value={formData.institution}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
+            <RequestCart
+              items={cartItems}
+              onRemoveItem={removeCartItem}
+              onClearCart={clearCart}
+              title="Itens Selecionados"
+            />
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      <Tabs defaultValue="papelaria" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="papelaria" className="gap-2">
-            <Package className="h-4 w-4" />
-            Papelaria
-            {selectedStationeryCount > 0 && (
-              <Badge variant="secondary" className="ml-1">{selectedStationeryCount}</Badge>
-            )}
-          </TabsTrigger>
-          <TabsTrigger value="creche" className="gap-2">
-            <Baby className="h-4 w-4" />
-            Creche
-            {selectedCrecheCount > 0 && (
-              <Badge variant="secondary" className="ml-1">{selectedCrecheCount}</Badge>
-            )}
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="papelaria">
-          <Card>
-            <CardHeader>
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <CardTitle>Itens de Papelaria</CardTitle>
-                  <CardDescription className="mt-1">
-                    Preencha apenas a quantidade dos itens que deseja solicitar
-                  </CardDescription>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button type="button" variant="outline" size="sm" onClick={expandAllCategories}>
-                    Expandir Tudo
-                  </Button>
-                  <Button type="button" variant="outline" size="sm" onClick={collapseAllCategories}>
-                    Recolher Tudo
-                  </Button>
-                  {selectedStationeryCount > 0 && (
-                    <Button type="button" variant="destructive" size="sm" onClick={clearStationerySelection}>
-                      Limpar ({selectedStationeryCount})
-                    </Button>
-                  )}
-                </div>
-              </div>
-              <div className="relative mt-4">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar item de papelaria..."
-                  value={stationerySearch}
-                  onChange={(e) => setStationerySearch(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[500px] pr-4">
-                <div className="space-y-4">
-                  {Object.entries(filteredStationeryCategories).map(([category, items]) => (
-                    <div key={category} className="rounded-lg border border-border overflow-hidden">
-                      <button
-                        type="button"
-                        onClick={() => toggleCategory(category)}
-                        className="w-full flex items-center justify-between p-3 bg-muted/50 hover:bg-muted transition-colors text-left"
-                      >
-                        <span className="font-medium">{category}</span>
-                        <div className="flex items-center gap-2">
-                          {items.some(item => stationeryQuantities[item] && parseInt(stationeryQuantities[item]) > 0) && (
-                            <Badge variant="default" className="text-xs">
-                              {items.filter(item => stationeryQuantities[item] && parseInt(stationeryQuantities[item]) > 0).length} selecionado(s)
-                            </Badge>
-                          )}
-                          <span className="text-muted-foreground text-sm">
-                            {expandedCategories[category] ? "▲" : "▼"}
-                          </span>
-                        </div>
-                      </button>
-                      {(expandedCategories[category] || stationerySearch) && (
-                        <div className="p-3 space-y-2 bg-background">
-                          {items.map((item) => (
-                            <div key={item} className="flex items-center gap-3 py-2 border-b border-border/50 last:border-0">
-                              <span className="flex-1 text-sm">{item}</span>
-                              <Input
-                                type="number"
-                                min="0"
-                                placeholder="Qtd"
-                                value={stationeryQuantities[item] || ""}
-                                onChange={(e) => updateStationeryQuantity(item, e.target.value)}
-                                className="w-20 h-8 text-center"
-                              />
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  {Object.keys(filteredStationeryCategories).length === 0 && (
-                    <p className="text-center text-muted-foreground py-8">
-                      Nenhum item encontrado para &quot;{stationerySearch}&quot;
-                    </p>
-                  )}
-                </div>
-              </ScrollArea>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="creche">
-          <Card>
-            <CardHeader>
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <CardTitle>Itens de Creche</CardTitle>
-                  <CardDescription className="mt-1">
-                    Preencha apenas a quantidade dos itens que deseja solicitar
-                  </CardDescription>
-                </div>
-                {selectedCrecheCount > 0 && (
-                  <Button type="button" variant="destructive" size="sm" onClick={clearCrecheSelection}>
-                    Limpar ({selectedCrecheCount})
-                  </Button>
-                )}
-              </div>
-              <div className="relative mt-4">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar item de creche..."
-                  value={crecheSearch}
-                  onChange={(e) => setCrecheSearch(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                {filteredCrecheItems.map((item) => (
-                  <div key={item} className="flex items-center gap-3 py-3 px-4 rounded-lg border border-border bg-muted/30">
-                    <span className="flex-1">{item}</span>
-                    <Input
-                      type="number"
-                      min="0"
-                      placeholder="Qtd"
-                      value={crecheQuantities[item] || ""}
-                      onChange={(e) => updateCrecheQuantity(item, e.target.value)}
-                      className="w-20 h-9 text-center"
-                    />
-                  </div>
-                ))}
-                {filteredCrecheItems.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">
-                    Nenhum item encontrado para &quot;{crecheSearch}&quot;
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {/* Resumo dos itens selecionados */}
-      {(selectedStationeryCount > 0 || selectedCrecheCount > 0) && (
-        <Card className="border-primary/50 bg-primary/5">
-          <CardHeader>
-            <CardTitle className="text-lg">Resumo da Solicitação</CardTitle>
+        {/* Dados do Solicitante */}
+        <Card className="border-primary/10">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Users className="h-5 w-5 text-primary" />
+              Dados do Solicitante
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex flex-wrap gap-4">
-              {selectedStationeryCount > 0 && (
-                <div className="flex items-center gap-2">
-                  <Package className="h-4 w-4 text-primary" />
-                  <span className="font-medium">{selectedStationeryCount} item(ns) de papelaria</span>
-                </div>
-              )}
-              {selectedCrecheCount > 0 && (
-                <div className="flex items-center gap-2">
-                  <Baby className="h-4 w-4 text-primary" />
-                  <span className="font-medium">{selectedCrecheCount} item(ns) de creche</span>
-                </div>
-              )}
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-sm font-medium">Nome do Solicitante</Label>
+                <Input
+                  id="name"
+                  placeholder="Digite seu nome completo"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="h-10"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="matricula" className="text-sm font-medium">Matricula</Label>
+                <Input
+                  id="matricula"
+                  placeholder="Digite a matricula"
+                  value={formData.matricula}
+                  onChange={(e) => setFormData({ ...formData, matricula: e.target.value })}
+                  className="h-10"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="institution" className="text-sm font-medium">Instituicao de Ensino</Label>
+                <Input
+                  id="institution"
+                  placeholder="Nome da instituicao"
+                  value={formData.institution}
+                  onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
+                  className="h-10"
+                  required
+                />
+              </div>
             </div>
           </CardContent>
         </Card>
-      )}
 
-      <Button type="submit" className="w-full" size="lg">
-        Enviar Solicitação
-      </Button>
+        {/* Campo de Busca Global */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar itens em todas as categorias..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="h-11 pl-10"
+          />
+        </div>
 
-      {/* Confirmation Modal */}
-      <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        {/* Abas de Itens */}
+        <Tabs defaultValue="papelaria" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2 h-auto p-1">
+            <TabsTrigger value="papelaria" className="flex items-center gap-2 py-3">
+              <Pencil className="h-4 w-4" />
+              <span>Papelaria</span>
+              {stationeryCount > 0 && <Badge variant="secondary" className="ml-1">{stationeryCount}</Badge>}
+            </TabsTrigger>
+            <TabsTrigger value="creche" className="flex items-center gap-2 py-3">
+              <Baby className="h-4 w-4" />
+              <span>Creche</span>
+              {crecheCount > 0 && <Badge variant="secondary" className="ml-1">{crecheCount}</Badge>}
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Tab Papelaria */}
+          <TabsContent value="papelaria" className="space-y-4">
+            <Card>
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <CardTitle className="text-base">Itens de Papelaria</CardTitle>
+                  <div className="flex gap-2">
+                    <Button type="button" variant="outline" size="sm" onClick={expandAll}>
+                      <ChevronDown className="mr-1 h-3 w-3" /> Expandir
+                    </Button>
+                    <Button type="button" variant="outline" size="sm" onClick={collapseAll}>
+                      <ChevronUp className="mr-1 h-3 w-3" /> Recolher
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {Object.entries(filteredCategories).map(([category, items]) => {
+                  const categoryItemCount = items.reduce((acc, item) => 
+                    acc + (stationeryQuantities[item] || 0), 0
+                  )
+                  
+                  return (
+                    <Collapsible
+                      key={category}
+                      open={expandedCategories[category] || searchTerm !== ""}
+                      onOpenChange={() => toggleCategory(category)}
+                    >
+                      <CollapsibleTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          className="w-full justify-between h-12 px-4 hover:bg-primary/5 border"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Pencil className="h-4 w-4 text-primary" />
+                            <span className="font-medium text-left">{category}</span>
+                            <Badge variant="outline" className="text-xs text-muted-foreground">
+                              {items.length}
+                            </Badge>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {categoryItemCount > 0 && (
+                              <Badge className="bg-primary/10 text-primary">
+                                {categoryItemCount}
+                              </Badge>
+                            )}
+                            {expandedCategories[category] ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                          </div>
+                        </Button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pt-3">
+                        <div className="rounded-lg border bg-card divide-y">
+                          {items.map((item) => {
+                            const qty = stationeryQuantities[item] || 0
+                            return (
+                              <div 
+                                key={item} 
+                                className="flex items-center justify-between p-3 gap-3 hover:bg-muted/50 transition-colors"
+                              >
+                                <span className="text-sm flex-1 min-w-0">{item}</span>
+                                <Input
+                                  type="number"
+                                  min="0"
+                                  placeholder="0"
+                                  value={qty || ""}
+                                  onChange={(e) => updateStationeryQuantity(item, parseInt(e.target.value) || 0)}
+                                  className="h-9 w-20 text-center shrink-0"
+                                />
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </CollapsibleContent>
+                    </Collapsible>
+                  )
+                })}
+                
+                {Object.keys(filteredCategories).length === 0 && searchTerm && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Nenhum item encontrado para &quot;{searchTerm}&quot;
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Tab Creche */}
+          <TabsContent value="creche" className="space-y-4">
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Itens de Creche</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="rounded-lg border bg-card divide-y">
+                  {filteredCrecheItems.map((item) => {
+                    const qty = crecheQuantities[item] || 0
+                    return (
+                      <div 
+                        key={item} 
+                        className="flex items-center justify-between p-4 gap-3 hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-accent/10 shrink-0">
+                            <Baby className="h-4 w-4 text-accent" />
+                          </div>
+                          <span className="font-medium text-sm">{item}</span>
+                        </div>
+                        <Input
+                          type="number"
+                          min="0"
+                          placeholder="0"
+                          value={qty || ""}
+                          onChange={(e) => updateCrecheQuantity(item, parseInt(e.target.value) || 0)}
+                          className="h-9 w-20 text-center shrink-0"
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+                
+                {filteredCrecheItems.length === 0 && searchTerm && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    Nenhum item encontrado para &quot;{searchTerm}&quot;
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+
+        {/* Botao Enviar */}
+        <div className="sticky bottom-4">
+          <Button
+            type="submit"
+            size="lg"
+            className="w-full shadow-lg"
+            disabled={cartItems.length === 0}
+          >
+            <Send className="mr-2 h-4 w-4" />
+            Enviar Solicitacao ({cartItems.reduce((acc, item) => acc + item.quantity, 0)} itens)
+          </Button>
+        </div>
+      </form>
+
+      {/* Modal de Confirmacao */}
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent className="max-w-lg">
           <DialogHeader>
-            <DialogTitle>Confirmar Solicitação</DialogTitle>
+            <DialogTitle>Confirmar Envio</DialogTitle>
             <DialogDescription>
-              Revise os dados abaixo. Você deve baixar o PDF antes de confirmar.
+              Revise sua solicitacao. Voce deve baixar o PDF antes de confirmar o envio.
             </DialogDescription>
           </DialogHeader>
-
-          <div className="space-y-4">
-            <div className="rounded-lg border border-border p-4">
-              <h4 className="font-semibold mb-2">Dados do Solicitante</h4>
-              <p><strong>Nome:</strong> {formData.name}</p>
-              <p><strong>Matrícula:</strong> {formData.matricula}</p>
-              <p><strong>Instituição:</strong> {formData.institution}</p>
+          <div className="space-y-4 py-4">
+            <div className="rounded-lg bg-muted p-4 space-y-2">
+              <p><strong>Solicitante:</strong> {formData.name}</p>
+              <p><strong>Matricula:</strong> {formData.matricula}</p>
+              <p><strong>Instituicao:</strong> {formData.institution}</p>
+              <p><strong>Total de Itens:</strong> {cartItems.reduce((acc, item) => acc + item.quantity, 0)}</p>
             </div>
-
-            {getSelectedStationeryItems().length > 0 && (
-              <div className="rounded-lg border border-border p-4">
-                <h4 className="font-semibold mb-2">Itens de Papelaria ({getSelectedStationeryItems().length})</h4>
-                <div className="max-h-40 overflow-y-auto space-y-1">
-                  {getSelectedStationeryItems().map((item, idx) => (
-                    <p key={idx} className="text-sm">{item.item} - Qtd: {item.quantity}</p>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {getSelectedCrecheItems().length > 0 && (
-              <div className="rounded-lg border border-border p-4">
-                <h4 className="font-semibold mb-2">Itens de Creche ({getSelectedCrecheItems().length})</h4>
-                <div className="max-h-40 overflow-y-auto space-y-1">
-                  {getSelectedCrecheItems().map((item, idx) => (
-                    <p key={idx} className="text-sm">{item.item} - Qtd: {item.quantity}</p>
-                  ))}
-                </div>
-              </div>
-            )}
+            <Button onClick={downloadPDF} variant="outline" className="w-full">
+              <Download className="mr-2 h-4 w-4" />
+              Baixar PDF
+              {pdfDownloaded && <Badge className="ml-2 bg-green-500">Baixado</Badge>}
+            </Button>
           </div>
-
-          <DialogFooter className="flex-col gap-2 sm:flex-row">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={downloadPDF}
-              className="gap-2"
-            >
-              <Download className="h-4 w-4" />
-              {pdfDownloaded ? "PDF Baixado" : "Baixar PDF"}
-              {pdfDownloaded && <CheckCircle className="h-4 w-4 text-green-500" />}
+          <div className="flex gap-3">
+            <Button variant="outline" className="flex-1" onClick={() => setShowModal(false)}>
+              Cancelar
             </Button>
             <Button
-              type="button"
+              className="flex-1"
               onClick={confirmSubmission}
               disabled={!pdfDownloaded || isSubmitting}
             >
               {isSubmitting ? "Enviando..." : "Confirmar Envio"}
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 
-      {/* Success Modal */}
+      {/* Modal de Sucesso */}
       <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-green-600">
-              <CheckCircle className="h-6 w-6" />
-              Solicitação Enviada!
-            </DialogTitle>
+            <DialogTitle className="text-green-600">Solicitacao Enviada!</DialogTitle>
             <DialogDescription>
-              Sua solicitação de almoxarifado foi registrada com sucesso.
+              Sua solicitacao foi enviada com sucesso e sera processada em breve.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
-            <Button onClick={() => setShowSuccessModal(false)}>Fechar</Button>
-          </DialogFooter>
+          <Button onClick={() => setShowSuccessModal(false)} className="w-full">
+            Fechar
+          </Button>
         </DialogContent>
       </Dialog>
-    </form>
+    </>
   )
 }
