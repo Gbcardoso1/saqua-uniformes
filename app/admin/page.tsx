@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt } from "lucide-react"
+import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt, MessageSquare } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 
@@ -52,6 +52,15 @@ type Submission = {
   status?: string
 }
 
+type Feedback = {
+  id: string
+  institution: string
+  message: string
+  category: string
+  status: string
+  created_at: string
+}
+
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [submissions, setSubmissions] = useState<Submission[]>([])
@@ -65,11 +74,12 @@ export default function AdminPage() {
   const [monthFilter, setMonthFilter] = useState<string>("all")
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes">("almoxarifado")
+  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "feedbacks">("almoxarifado")
   const [institutions, setInstitutions] = useState<string[]>([])
   const [months, setMonths] = useState<{ value: string; label: string }[]>([])
   const [isDeleting, setIsDeleting] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
   const router = useRouter()
 
   useEffect(() => {
@@ -77,6 +87,7 @@ export default function AdminPage() {
     if (auth === "true") {
       setIsAuthenticated(true)
       fetchSubmissions()
+      fetchFeedbacks()
     } else {
       router.push("/")
     }
@@ -145,6 +156,18 @@ export default function AdminPage() {
       console.error("Error fetching submissions:", error)
       setSubmissions([])
       setFilteredSubmissions([])
+    }
+  }
+
+  const fetchFeedbacks = async () => {
+    try {
+      const response = await fetch("/api/feedbacks")
+      const data = await response.json()
+      if (Array.isArray(data)) {
+        setFeedbacks(data)
+      }
+    } catch (error) {
+      console.error("Error fetching feedbacks:", error)
     }
   }
 
@@ -231,8 +254,9 @@ export default function AdminPage() {
 
   const almoxarifadoCount = submissions.filter((s) => s.submissionType === "almoxarifado").length
   const uniformesCount = submissions.filter((s) => (s.submissionType || "uniformes") === "uniformes").length
+  const feedbacksCount = feedbacks.length
 
-  const handleTabChange = (tab: "almoxarifado" | "uniformes") => {
+  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "feedbacks") => {
     setActiveTab(tab)
     setInstitutionFilter("all")
     setSegmentFilter("all")
@@ -247,6 +271,43 @@ export default function AdminPage() {
     setMonthFilter("all")
     setTypeFilter("all")
     setStatusFilter("all")
+  }
+
+  const updateFeedbackStatus = async (feedbackId: string, newStatus: string) => {
+    try {
+      const response = await fetch("/api/feedbacks", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: feedbackId, status: newStatus }),
+      })
+      if (response.ok) {
+        setFeedbacks((prev) =>
+          prev.map((f) => (f.id === feedbackId ? { ...f, status: newStatus } : f))
+        )
+      }
+    } catch (error) {
+      console.error("Error updating feedback:", error)
+    }
+  }
+
+  const getCategoryLabel = (category: string) => {
+    const labels: Record<string, string> = {
+      sugestao: "Sugestao",
+      problema: "Problema",
+      elogio: "Elogio",
+      duvida: "Duvida",
+    }
+    return labels[category] || category
+  }
+
+  const getCategoryColor = (category: string) => {
+    const colors: Record<string, string> = {
+      sugestao: "bg-blue-100 text-blue-800",
+      problema: "bg-red-100 text-red-800",
+      elogio: "bg-green-100 text-green-800",
+      duvida: "bg-yellow-100 text-yellow-800",
+    }
+    return colors[category] || "bg-gray-100 text-gray-800"
   }
 
   const updateStatus = async (submission: Submission, newStatus: string) => {
@@ -527,8 +588,80 @@ export default function AdminPage() {
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
             )}
           </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange("feedbacks")}
+            className={`relative flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
+              activeTab === "feedbacks"
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <MessageSquare className="h-4 w-4" />
+            <span>Feedbacks</span>
+            {feedbacksCount > 0 && (
+              <span className={`ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+                activeTab === "feedbacks"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground"
+              }`}>
+                {feedbacksCount}
+              </span>
+            )}
+            {activeTab === "feedbacks" && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
+            )}
+          </button>
         </div>
 
+        {activeTab === "feedbacks" ? (
+          <Card>
+            <CardHeader>
+              <CardTitle>Feedbacks e Sugestoes ({feedbacks.length})</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {feedbacks.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Nenhum feedback recebido ainda.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {feedbacks.map((feedback) => (
+                    <div key={feedback.id} className="rounded-lg border p-4 space-y-3">
+                      <div className="flex flex-wrap items-start justify-between gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(feedback.category)}`}>
+                            {getCategoryLabel(feedback.category)}
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            {new Date(feedback.created_at).toLocaleString("pt-BR")}
+                          </span>
+                        </div>
+                        <Select
+                          value={feedback.status}
+                          onValueChange={(value) => updateFeedbackStatus(feedback.id, value)}
+                        >
+                          <SelectTrigger className="h-8 w-[120px] text-xs">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pendente">Pendente</SelectItem>
+                            <SelectItem value="lido">Lido</SelectItem>
+                            <SelectItem value="resolvido">Resolvido</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">{feedback.institution}</p>
+                        <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">{feedback.message}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
         <Card>
           <CardHeader>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -695,7 +828,7 @@ export default function AdminPage() {
             )}
           </CardContent>
         </Card>
-      </div>
+        )}
 
       <Dialog open={showDetailModal} onOpenChange={setShowDetailModal}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
