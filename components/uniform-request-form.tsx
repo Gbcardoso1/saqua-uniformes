@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Download, Search, ChevronDown, ChevronUp, Shirt, Package, Users, Backpack, Footprints, Plus, Minus } from "lucide-react"
+import { Download, Search, ChevronDown, ChevronUp, Shirt, Package, Users, Backpack, Footprints } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
@@ -507,28 +507,17 @@ export default function UniformRequestForm() {
                                       className={`flex items-center justify-between rounded-md border p-2 ${qty > 0 ? 'border-primary bg-primary/5' : ''}`}
                                     >
                                       <span className="text-sm font-medium">{size}</span>
-                                      <div className="flex items-center gap-1">
-                                        <Button
-                                          type="button"
-                                          variant="outline"
-                                          size="icon"
-                                          className="h-8 w-8"
-                                          onClick={() => setUniformQuantities((prev) => ({ ...prev, [key]: Math.max(0, (prev[key] || 0) - 1) }))}
-                                          disabled={qty === 0}
-                                        >
-                                          <Minus className="h-4 w-4" />
-                                        </Button>
-                                        <span className="w-8 text-center text-sm font-medium">{qty}</span>
-                                        <Button
-                                          type="button"
-                                          variant="outline"
-                                          size="icon"
-                                          className="h-8 w-8"
-                                          onClick={() => setUniformQuantities((prev) => ({ ...prev, [key]: (prev[key] || 0) + 1 }))}
-                                        >
-                                          <Plus className="h-4 w-4" />
-                                        </Button>
-                                      </div>
+                                      <Input
+                                        type="number"
+                                        min="0"
+                                        value={qty || ""}
+                                        onChange={(e) => {
+                                          const val = parseInt(e.target.value) || 0
+                                          setUniformQuantities((prev) => ({ ...prev, [key]: val }))
+                                        }}
+                                        className="w-16 h-8 text-center text-sm"
+                                        placeholder="0"
+                                      />
                                     </div>
                                   )
                                 })}
@@ -563,28 +552,17 @@ export default function UniformRequestForm() {
                         className={`flex flex-col items-center rounded-md border p-3 ${qty > 0 ? 'border-primary bg-primary/5' : ''}`}
                       >
                         <span className="text-sm font-medium mb-2">Tam. {size}</span>
-                        <div className="flex items-center gap-1">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => setShoeQuantities((prev) => ({ ...prev, [size]: Math.max(0, (prev[size] || 0) - 1) }))}
-                            disabled={qty === 0}
-                          >
-                            <Minus className="h-3 w-3" />
-                          </Button>
-                          <span className="w-6 text-center text-sm font-medium">{qty}</span>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            className="h-7 w-7"
-                            onClick={() => setShoeQuantities((prev) => ({ ...prev, [size]: (prev[size] || 0) + 1 }))}
-                          >
-                            <Plus className="h-3 w-3" />
-                          </Button>
-                        </div>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={qty || ""}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value) || 0
+                            setShoeQuantities((prev) => ({ ...prev, [size]: val }))
+                          }}
+                          className="w-16 h-8 text-center text-sm"
+                          placeholder="0"
+                        />
                       </div>
                     )
                   })}
@@ -612,28 +590,17 @@ export default function UniformRequestForm() {
                         className={`flex items-center justify-between rounded-lg border p-4 ${qty > 0 ? 'border-primary bg-primary/5' : ''}`}
                       >
                         <span className="font-medium">{kit}</span>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            className="h-9 w-9"
-                            onClick={() => setKitQuantities((prev) => ({ ...prev, [kit]: Math.max(0, (prev[kit] || 0) - 1) }))}
-                            disabled={qty === 0}
-                          >
-                            <Minus className="h-4 w-4" />
-                          </Button>
-                          <span className="w-8 text-center font-medium">{qty}</span>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            className="h-9 w-9"
-                            onClick={() => setKitQuantities((prev) => ({ ...prev, [kit]: (prev[kit] || 0) + 1 }))}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={qty || ""}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value) || 0
+                            setKitQuantities((prev) => ({ ...prev, [kit]: val }))
+                          }}
+                          className="w-20 h-9 text-center"
+                          placeholder="0"
+                        />
                       </div>
                     )
                   })}
@@ -654,28 +621,14 @@ export default function UniformRequestForm() {
               <CardContent className="space-y-6">
                 <div className={`flex items-center justify-between rounded-lg border p-4 ${kitPoloQuantity > 0 ? 'border-primary bg-primary/5' : ''}`}>
                   <span className="font-medium">Kit de Professor (Completo)</span>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-9 w-9"
-                      onClick={() => setKitPoloQuantity(Math.max(0, kitPoloQuantity - 1))}
-                      disabled={kitPoloQuantity === 0}
-                    >
-                      <Minus className="h-4 w-4" />
-                    </Button>
-                    <span className="w-8 text-center font-medium">{kitPoloQuantity}</span>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-9 w-9"
-                      onClick={() => setKitPoloQuantity(kitPoloQuantity + 1)}
-                    >
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={kitPoloQuantity || ""}
+                    onChange={(e) => setKitPoloQuantity(parseInt(e.target.value) || 0)}
+                    className="w-20 h-9 text-center"
+                    placeholder="0"
+                  />
                 </div>
 
                 <div>
@@ -689,28 +642,17 @@ export default function UniformRequestForm() {
                           className={`flex items-center justify-between rounded-lg border p-3 ${qty > 0 ? 'border-primary bg-primary/5' : ''}`}
                         >
                           <span className="font-medium">{size}</span>
-                          <div className="flex items-center gap-1">
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => setPoloQuantities((prev) => ({ ...prev, [size]: Math.max(0, (prev[size] || 0) - 1) }))}
-                              disabled={qty === 0}
-                            >
-                              <Minus className="h-4 w-4" />
-                            </Button>
-                            <span className="w-6 text-center text-sm font-medium">{qty}</span>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => setPoloQuantities((prev) => ({ ...prev, [size]: (prev[size] || 0) + 1 }))}
-                            >
-                              <Plus className="h-4 w-4" />
-                            </Button>
-                          </div>
+                          <Input
+                            type="number"
+                            min="0"
+                            value={qty || ""}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || 0
+                              setPoloQuantities((prev) => ({ ...prev, [size]: val }))
+                            }}
+                            className="w-16 h-8 text-center text-sm"
+                            placeholder="0"
+                          />
                         </div>
                       )
                     })}
@@ -739,28 +681,17 @@ export default function UniformRequestForm() {
                         className={`flex items-center justify-between rounded-lg border p-4 ${qty > 0 ? 'border-primary bg-primary/5' : ''}`}
                       >
                         <span className="font-medium">{type}</span>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            className="h-9 w-9"
-                            onClick={() => setBackpackQuantities((prev) => ({ ...prev, [type]: Math.max(0, (prev[type] || 0) - 1) }))}
-                            disabled={qty === 0}
-                          >
-                            <Minus className="h-4 w-4" />
-                          </Button>
-                          <span className="w-8 text-center font-medium">{qty}</span>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            className="h-9 w-9"
-                            onClick={() => setBackpackQuantities((prev) => ({ ...prev, [type]: (prev[type] || 0) + 1 }))}
-                          >
-                            <Plus className="h-4 w-4" />
-                          </Button>
-                        </div>
+                        <Input
+                          type="number"
+                          min="0"
+                          value={qty || ""}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value) || 0
+                            setBackpackQuantities((prev) => ({ ...prev, [type]: val }))
+                          }}
+                          className="w-20 h-9 text-center"
+                          placeholder="0"
+                        />
                       </div>
                     )
                   })}
