@@ -14,7 +14,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { CheckCircle, Download, Search, Package, Baby } from "lucide-react"
+import { CheckCircle, Download, Search, Package, Baby, Plus, Minus } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -649,19 +649,36 @@ export default function AlmoxarifadoRequestForm() {
                       </button>
                       {(expandedCategories[category] || stationerySearch) && (
                         <div className="p-3 space-y-2 bg-background">
-                          {items.map((item) => (
-                            <div key={item} className="flex items-center gap-3 py-2 border-b border-border/50 last:border-0">
-                              <span className="flex-1 text-sm">{item}</span>
-                              <Input
-                                type="number"
-                                min="0"
-                                placeholder="Qtd"
-                                value={stationeryQuantities[item] || ""}
-                                onChange={(e) => updateStationeryQuantity(item, e.target.value)}
-                                className="w-20 h-8 text-center"
-                              />
-                            </div>
-                          ))}
+                          {items.map((item) => {
+                            const qty = stationeryQuantities[item] || 0
+                            return (
+                              <div key={item} className={`flex items-center gap-3 py-2 px-2 rounded-md border-b border-border/50 last:border-0 ${qty > 0 ? 'bg-primary/5' : ''}`}>
+                                <span className="flex-1 text-sm">{item}</span>
+                                <div className="flex items-center gap-1">
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => updateStationeryQuantity(item, String(Math.max(0, qty - 1)))}
+                                    disabled={qty === 0}
+                                  >
+                                    <Minus className="h-4 w-4" />
+                                  </Button>
+                                  <span className="w-8 text-center text-sm font-medium">{qty}</span>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8"
+                                    onClick={() => updateStationeryQuantity(item, String(qty + 1))}
+                                  >
+                                    <Plus className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            )
+                          })}
                         </div>
                       )}
                     </div>
@@ -705,19 +722,36 @@ export default function AlmoxarifadoRequestForm() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {filteredCrecheItems.map((item) => (
-                  <div key={item} className="flex items-center gap-3 py-3 px-4 rounded-lg border border-border bg-muted/30">
-                    <span className="flex-1">{item}</span>
-                    <Input
-                      type="number"
-                      min="0"
-                      placeholder="Qtd"
-                      value={crecheQuantities[item] || ""}
-                      onChange={(e) => updateCrecheQuantity(item, e.target.value)}
-                      className="w-20 h-9 text-center"
-                    />
-                  </div>
-                ))}
+                {filteredCrecheItems.map((item) => {
+                  const qty = crecheQuantities[item] || 0
+                  return (
+                    <div key={item} className={`flex items-center gap-3 py-3 px-4 rounded-lg border border-border ${qty > 0 ? 'bg-primary/5 border-primary' : 'bg-muted/30'}`}>
+                      <span className="flex-1">{item}</span>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-9 w-9"
+                          onClick={() => updateCrecheQuantity(item, String(Math.max(0, qty - 1)))}
+                          disabled={qty === 0}
+                        >
+                          <Minus className="h-4 w-4" />
+                        </Button>
+                        <span className="w-8 text-center font-medium">{qty}</span>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-9 w-9"
+                          onClick={() => updateCrecheQuantity(item, String(qty + 1))}
+                        >
+                          <Plus className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )
+                })}
                 {filteredCrecheItems.length === 0 && (
                   <p className="text-center text-muted-foreground py-8">
                     Nenhum item encontrado para &quot;{crecheSearch}&quot;
