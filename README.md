@@ -1,10 +1,10 @@
-#Sistema de Gestão de Patrimônio e Almoxarifado
+# Sistema de Gestão de Patrimônio e Almoxarifado
 
 Este projeto foi desenvolvido para atender às demandas do setor de Patrimônio e Almoxarifado da Prefeitura de Saquarema, com o objetivo de modernizar e centralizar processos que antes eram realizados manualmente.
 
 Durante minha atuação no setor de TI da prefeitura, identifiquei diversas falhas operacionais no fluxo de pedidos, entregas, controle de materiais e inventários. A partir dessa análise, realizei o levantamento de requisitos junto às equipes responsáveis e desenvolvi um sistema web capaz de integrar e organizar todas essas operações em um único ambiente.
 
-O sistema permite o gerenciamento de:
+# O sistema permite o gerenciamento de:
 
 Solicitações de patrimônio
 Pedidos de almoxarifado
@@ -25,7 +25,7 @@ Testes e validações
 Correção de bugs
 Melhorias contínuas
 
-Atualmente, o sistema está em funcionamento em toda a rede municipal de Saquarema, contribuindo para:
+# Atualmente, o sistema está em funcionamento em toda a rede municipal de Saquarema, contribuindo para:
 
 Maior organização dos processos
 Padronização das solicitações
