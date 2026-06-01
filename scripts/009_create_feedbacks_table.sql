@@ -34,3 +34,9 @@ CREATE POLICY "Allow anon update" ON feedbacks
   FOR UPDATE
   TO anon
   USING (true);
+
+-- Policy to allow anonymous delete (for admin panel)
+CREATE POLICY "Allow anon delete" ON feedbacks
+  FOR DELETE
+  TO anon
+  USING (true);
