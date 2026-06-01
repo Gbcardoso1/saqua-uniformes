@@ -1027,6 +1027,7 @@ export default function AdminPage() {
           </CardContent>
         </Card>
         )}
+      </div>
 
       <Dialog open={showDetailModal} onOpenChange={setShowDetailModal}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
