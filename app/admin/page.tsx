@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt } from "lucide-react"
+import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt, MessageSquare } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 
@@ -52,6 +52,15 @@ type Submission = {
   status?: string
 }
 
+type Feedback = {
+  id: string
+  institution: string
+  message: string
+  category: string
+  status: string
+  created_at: string
+}
+
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [submissions, setSubmissions] = useState<Submission[]>([])
@@ -65,11 +74,22 @@ export default function AdminPage() {
   const [monthFilter, setMonthFilter] = useState<string>("all")
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes">("almoxarifado")
+  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "feedbacks">("almoxarifado")
   const [institutions, setInstitutions] = useState<string[]>([])
   const [months, setMonths] = useState<{ value: string; label: string }[]>([])
   const [isDeleting, setIsDeleting] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
+  const [filteredFeedbacks, setFilteredFeedbacks] = useState<Feedback[]>([])
+  const [feedbackInstitutionFilter, setFeedbackInstitutionFilter] = useState<string>("all")
+  const [feedbackCategoryFilter, setFeedbackCategoryFilter] = useState<string>("all")
+  const [feedbackStatusFilter, setFeedbackStatusFilter] = useState<string>("all")
+  const [feedbackInstitutions, setFeedbackInstitutions] = useState<string[]>([])
+  const [selectedFeedback, setSelectedFeedback] = useState<Feedback | null>(null)
+  const [showFeedbackDetailModal, setShowFeedbackDetailModal] = useState(false)
+  const [showDeleteFeedbackModal, setShowDeleteFeedbackModal] = useState(false)
+  const [feedbackToDelete, setFeedbackToDelete] = useState<Feedback | null>(null)
+  const [isDeletingFeedback, setIsDeletingFeedback] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -77,6 +97,7 @@ export default function AdminPage() {
     if (auth === "true") {
       setIsAuthenticated(true)
       fetchSubmissions()
+      fetchFeedbacks()
     } else {
       router.push("/")
     }
@@ -96,6 +117,29 @@ export default function AdminPage() {
       return { value: m, label: `${monthNames[Number(month) - 1]} ${year}` }
     }))
   }, [submissions])
+
+  useEffect(() => {
+    const uniqueFeedbackInstitutions = [...new Set(feedbacks.map((f) => f.institution))].sort()
+    setFeedbackInstitutions(uniqueFeedbackInstitutions)
+  }, [feedbacks])
+
+  useEffect(() => {
+    let filtered = feedbacks
+
+    if (feedbackInstitutionFilter !== "all") {
+      filtered = filtered.filter((f) => f.institution === feedbackInstitutionFilter)
+    }
+
+    if (feedbackCategoryFilter !== "all") {
+      filtered = filtered.filter((f) => f.category === feedbackCategoryFilter)
+    }
+
+    if (feedbackStatusFilter !== "all") {
+      filtered = filtered.filter((f) => (f.status || "pendente") === feedbackStatusFilter)
+    }
+
+    setFilteredFeedbacks(filtered)
+  }, [feedbacks, feedbackInstitutionFilter, feedbackCategoryFilter, feedbackStatusFilter])
 
   useEffect(() => {
     let filtered = submissions
@@ -145,6 +189,18 @@ export default function AdminPage() {
       console.error("Error fetching submissions:", error)
       setSubmissions([])
       setFilteredSubmissions([])
+    }
+  }
+
+  const fetchFeedbacks = async () => {
+    try {
+      const response = await fetch("/api/feedbacks")
+      const data = await response.json()
+      if (Array.isArray(data)) {
+        setFeedbacks(data)
+      }
+    } catch (error) {
+      console.error("Error fetching feedbacks:", error)
     }
   }
 
@@ -231,8 +287,9 @@ export default function AdminPage() {
 
   const almoxarifadoCount = submissions.filter((s) => s.submissionType === "almoxarifado").length
   const uniformesCount = submissions.filter((s) => (s.submissionType || "uniformes") === "uniformes").length
+  const pendingFeedbacksCount = feedbacks.filter((f) => (f.status || "pendente") === "pendente").length
 
-  const handleTabChange = (tab: "almoxarifado" | "uniformes") => {
+  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "feedbacks") => {
     setActiveTab(tab)
     setInstitutionFilter("all")
     setSegmentFilter("all")
@@ -247,6 +304,107 @@ export default function AdminPage() {
     setMonthFilter("all")
     setTypeFilter("all")
     setStatusFilter("all")
+  }
+
+  const clearFeedbackFilters = () => {
+    setFeedbackInstitutionFilter("all")
+    setFeedbackCategoryFilter("all")
+    setFeedbackStatusFilter("all")
+  }
+
+  const viewFeedbackDetails = (feedback: Feedback) => {
+    setSelectedFeedback(feedback)
+    setShowFeedbackDetailModal(true)
+  }
+
+  const confirmDeleteFeedback = (feedback: Feedback) => {
+    setFeedbackToDelete(feedback)
+    setShowDeleteFeedbackModal(true)
+  }
+
+  const deleteFeedback = async () => {
+    if (!feedbackToDelete) return
+
+    setIsDeletingFeedback(true)
+    try {
+      const response = await fetch(`/api/feedbacks/${feedbackToDelete.id}`, {
+        method: "DELETE",
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setFeedbacks(feedbacks.filter((f) => f.id !== feedbackToDelete.id))
+        setShowDeleteFeedbackModal(false)
+        setFeedbackToDelete(null)
+      } else {
+        alert("Erro ao excluir feedback. Tente novamente.")
+      }
+    } catch (error) {
+      console.error("Error deleting feedback:", error)
+      alert("Erro ao excluir feedback. Tente novamente.")
+    } finally {
+      setIsDeletingFeedback(false)
+    }
+  }
+
+  const exportFeedbacksToCSV = () => {
+    if (filteredFeedbacks.length === 0) return
+
+    let csv = "Data/Hora,Instituicao,Categoria,Status,Mensagem\n"
+
+    filteredFeedbacks.forEach((feedback) => {
+      const date = new Date(feedback.created_at).toLocaleString("pt-BR")
+      const message = feedback.message.replace(/"/g, '""').replace(/\n/g, ' ')
+      csv += `"${date}","${feedback.institution}","${getCategoryLabel(feedback.category)}","${feedback.status || 'pendente'}","${message}"\n`
+    })
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" })
+    const link = document.createElement("a")
+    const url = URL.createObjectURL(blob)
+    link.setAttribute("href", url)
+    link.setAttribute("download", `feedbacks_${Date.now()}.csv`)
+    link.style.visibility = "hidden"
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  const updateFeedbackStatus = async (feedbackId: string, newStatus: string) => {
+    try {
+      const response = await fetch("/api/feedbacks", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: feedbackId, status: newStatus }),
+      })
+      if (response.ok) {
+        setFeedbacks((prev) =>
+          prev.map((f) => (f.id === feedbackId ? { ...f, status: newStatus } : f))
+        )
+      }
+    } catch (error) {
+      console.error("Error updating feedback:", error)
+    }
+  }
+
+  const getCategoryLabel = (category: string) => {
+    const labels: Record<string, string> = {
+      sugestao: "Sugestao",
+      problema: "Problema",
+      elogio: "Elogio",
+      duvida: "Duvida",
+    }
+    return labels[category] || category
+  }
+
+  const getCategoryColor = (category: string) => {
+    const colors: Record<string, string> = {
+      sugestao: "bg-blue-100 text-blue-800",
+      problema: "bg-red-100 text-red-800",
+      elogio: "bg-green-100 text-green-800",
+      duvida: "bg-yellow-100 text-yellow-800",
+    }
+    return colors[category] || "bg-gray-100 text-gray-800"
   }
 
   const updateStatus = async (submission: Submission, newStatus: string) => {
@@ -527,8 +685,181 @@ export default function AdminPage() {
               <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
             )}
           </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange("feedbacks")}
+            className={`relative flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
+              activeTab === "feedbacks"
+                ? "text-primary"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <MessageSquare className="h-4 w-4" />
+            <span>Feedbacks</span>
+            {pendingFeedbacksCount > 0 && (
+              <span className={`ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+                activeTab === "feedbacks"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground"
+              }`}>
+                {pendingFeedbacksCount}
+              </span>
+            )}
+            {activeTab === "feedbacks" && (
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
+            )}
+          </button>
         </div>
 
+        {activeTab === "feedbacks" ? (
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <CardTitle>Feedbacks e Sugestoes ({filteredFeedbacks.length})</CardTitle>
+                <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                  <div className="space-y-2 sm:space-y-0 sm:w-44">
+                    <Label className="sm:sr-only">Instituicao</Label>
+                    <Select value={feedbackInstitutionFilter} onValueChange={setFeedbackInstitutionFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Todas Instituicoes" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todas Instituicoes</SelectItem>
+                        {feedbackInstitutions.map((inst) => (
+                          <SelectItem key={inst} value={inst}>
+                            {inst}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2 sm:space-y-0 sm:w-36">
+                    <Label className="sm:sr-only">Categoria</Label>
+                    <Select value={feedbackCategoryFilter} onValueChange={setFeedbackCategoryFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Todas Categorias" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todas Categorias</SelectItem>
+                        <SelectItem value="sugestao">Sugestao</SelectItem>
+                        <SelectItem value="problema">Problema</SelectItem>
+                        <SelectItem value="elogio">Elogio</SelectItem>
+                        <SelectItem value="duvida">Duvida</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2 sm:space-y-0 sm:w-32">
+                    <Label className="sm:sr-only">Status</Label>
+                    <Select value={feedbackStatusFilter} onValueChange={setFeedbackStatusFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Todos Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos Status</SelectItem>
+                        <SelectItem value="pendente">Pendente</SelectItem>
+                        <SelectItem value="lido">Lido</SelectItem>
+                        <SelectItem value="resolvido">Resolvido</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button onClick={clearFeedbackFilters} variant="outline" size="sm">
+                    Limpar
+                  </Button>
+                  <Button onClick={exportFeedbacksToCSV} variant="outline" size="sm" disabled={filteredFeedbacks.length === 0}>
+                    <Download className="mr-2 h-4 w-4" />
+                    CSV
+                  </Button>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {filteredFeedbacks.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  {feedbacks.length === 0
+                    ? "Nenhum feedback recebido ainda."
+                    : "Nenhum feedback encontrado com os filtros selecionados."}
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Data/Hora</TableHead>
+                        <TableHead>Categoria</TableHead>
+                        <TableHead>Instituicao</TableHead>
+                        <TableHead>Mensagem</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Acoes</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredFeedbacks.map((feedback) => (
+                        <TableRow key={feedback.id}>
+                          <TableCell className="whitespace-nowrap">
+                            {new Date(feedback.created_at).toLocaleString("pt-BR")}
+                          </TableCell>
+                          <TableCell>
+                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(feedback.category)}`}>
+                              {getCategoryLabel(feedback.category)}
+                            </span>
+                          </TableCell>
+                          <TableCell className="font-medium">{feedback.institution}</TableCell>
+                          <TableCell className="max-w-xs">
+                            <p className="truncate text-sm text-muted-foreground">{feedback.message}</p>
+                          </TableCell>
+                          <TableCell>
+                            {(() => {
+                              const status = feedback.status || "pendente"
+                              const config = {
+                                pendente: { bg: "bg-yellow-100 text-yellow-800", icon: <Clock className="h-3 w-3" />, label: "Pendente" },
+                                lido: { bg: "bg-blue-100 text-blue-800", icon: <Eye className="h-3 w-3" />, label: "Lido" },
+                                resolvido: { bg: "bg-green-100 text-green-800", icon: <CheckCircle2 className="h-3 w-3" />, label: "Resolvido" },
+                              }[status] || { bg: "bg-yellow-100 text-yellow-800", icon: <Clock className="h-3 w-3" />, label: "Pendente" }
+                              return (
+                                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg}`}>
+                                  {config.icon}
+                                  {config.label}
+                                </span>
+                              )
+                            })()}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end gap-1">
+                              <Select
+                                value={feedback.status || "pendente"}
+                                onValueChange={(value) => updateFeedbackStatus(feedback.id, value)}
+                              >
+                                <SelectTrigger className="h-8 w-[110px] text-xs">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="pendente">Pendente</SelectItem>
+                                  <SelectItem value="lido">Lido</SelectItem>
+                                  <SelectItem value="resolvido">Resolvido</SelectItem>
+                                </SelectContent>
+                              </Select>
+                              <Button variant="ghost" size="sm" onClick={() => viewFeedbackDetails(feedback)}>
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => confirmDeleteFeedback(feedback)}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ) : (
         <Card>
           <CardHeader>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -695,6 +1026,7 @@ export default function AdminPage() {
             )}
           </CardContent>
         </Card>
+        )}
       </div>
 
       <Dialog open={showDetailModal} onOpenChange={setShowDetailModal}>
@@ -991,6 +1323,79 @@ export default function AdminPage() {
             </Button>
             <Button variant="destructive" onClick={deleteSubmission} disabled={isDeleting}>
               {isDeleting ? "Excluindo..." : "Excluir"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showFeedbackDetailModal} onOpenChange={setShowFeedbackDetailModal}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <DialogTitle>Detalhes do Feedback</DialogTitle>
+                <DialogDescription>
+                  Enviado em {selectedFeedback && new Date(selectedFeedback.created_at).toLocaleString("pt-BR")}
+                </DialogDescription>
+              </div>
+              {selectedFeedback && (
+                <Select
+                  value={selectedFeedback.status || "pendente"}
+                  onValueChange={(value) => {
+                    updateFeedbackStatus(selectedFeedback.id, value)
+                    setSelectedFeedback({ ...selectedFeedback, status: value })
+                  }}
+                >
+                  <SelectTrigger className="w-[130px]">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pendente">Pendente</SelectItem>
+                    <SelectItem value="lido">Lido</SelectItem>
+                    <SelectItem value="resolvido">Resolvido</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          </DialogHeader>
+          {selectedFeedback && (
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="rounded-lg bg-muted p-3">
+                  <p className="text-xs text-muted-foreground mb-1">Instituicao</p>
+                  <p className="font-medium">{selectedFeedback.institution}</p>
+                </div>
+                <div className="rounded-lg bg-muted p-3">
+                  <p className="text-xs text-muted-foreground mb-1">Categoria</p>
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getCategoryColor(selectedFeedback.category)}`}>
+                    {getCategoryLabel(selectedFeedback.category)}
+                  </span>
+                </div>
+              </div>
+              <div className="rounded-lg border p-4">
+                <p className="text-xs text-muted-foreground mb-2">Mensagem</p>
+                <p className="text-sm whitespace-pre-wrap">{selectedFeedback.message}</p>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDeleteFeedbackModal} onOpenChange={setShowDeleteFeedbackModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Exclusão</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir o feedback de{" "}
+              <span className="font-semibold">{feedbackToDelete?.institution}</span>? Esta ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="outline" onClick={() => setShowDeleteFeedbackModal(false)} disabled={isDeletingFeedback}>
+              Cancelar
+            </Button>
+            <Button variant="destructive" onClick={deleteFeedback} disabled={isDeletingFeedback}>
+              {isDeletingFeedback ? "Excluindo..." : "Excluir"}
             </Button>
           </div>
         </DialogContent>

@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Lock, Shirt, Package } from "lucide-react"
 import Image from "next/image"
+import { FeedbackButton } from "@/components/feedback-button"
 
 export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false)
@@ -105,6 +106,9 @@ export default function Home() {
           
           {activeTab === "uniformes" ? <UniformRequestForm /> : <AlmoxarifadoRequestForm />}
         </div>
+
+        {/* Botão de Feedback */}
+        <FeedbackButton />
       </main>
 
       <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
