@@ -1,30 +1,17 @@
-# Uniform request form
+# Sistema de Almoxarifado e Uniformes
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+Este projeto foi desenvolvido para otimizar o controle de solicitações relacionadas ao almoxarifado e à distribuição de uniformes dentro da rede municipal.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/kayosmoker-6566s-projects/v0-uniform-request-form)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/bXhXVDhUPFX)
+O sistema centraliza os processos de pedidos, acompanhamento de entregas e gerenciamento de solicitações, proporcionando mais organização e eficiência para os setores responsáveis.
 
-## Overview
+Entre as principais funcionalidades, destacam-se:
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+Solicitação de itens do almoxarifado
+Controle e distribuição de uniformes
+Acompanhamento de pedidos e entregas
+Painel administrativo para gestão das solicitações
+Organização e padronização dos processos
 
-## Deployment
+O desenvolvimento do projeto contribuiu para reduzir erros operacionais, melhorar o controle das demandas e facilitar a comunicação entre os setores envolvidos.
 
-Your project is live at:
-
-**[https://vercel.com/kayosmoker-6566s-projects/v0-uniform-request-form](https://vercel.com/kayosmoker-6566s-projects/v0-uniform-request-form)**
-
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.app/chat/bXhXVDhUPFX](https://v0.app/chat/bXhXVDhUPFX)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+O sistema trouxe mais agilidade e praticidade para a rotina administrativa, garantindo um gerenciamento mais eficiente das solicitações e materiais.

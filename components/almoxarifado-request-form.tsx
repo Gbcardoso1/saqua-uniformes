@@ -270,6 +270,7 @@ const stationeryCategories = {
 const crecheItemsList = [
   "BANHEIRA PARA BEBE",
   "BEBE CONFORTO ATE 13 KG",
+  "LENÇO UMEDECIDO C/ 100 UND",
   "CAPA PARA BEBE CONFORTO 96CMX65CM",
   "COLCHONETE CASAL",
   "EDREDOM 1,80M X 2,40M",
