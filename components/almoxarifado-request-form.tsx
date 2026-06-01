@@ -22,6 +22,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 // Itens de Papelaria organizados por categoria
 const stationeryCategories = {
   "Pincéis e Arte": [
+    "ALGODÃO EM BOLA 100G SACO C/30 PCT",
     "PINCEL CHATO LONGO 815-0 - 12 UND",
     "PINCEL CHATO LONGO 815-2 - 12 UND",
     "PINCEL CHATO LONGO 815-4 - 12 UND",
@@ -272,6 +273,7 @@ const crecheItemsList = [
   "CAPA PARA BEBE CONFORTO 96CMX65CM",
   "COLCHONETE CASAL",
   "EDREDOM 1,80M X 2,40M",
+  "LENÇO UMEDECIDO C/ 100 UND",
   "LENCOL DE BERCO C/ ELASTICO LISO 70CM X 1.30M X 15CM UND.",
   "LENCOL DE CASAL C/ ELASTICO UND.",
   "LENCOL DE CASAL S/ ELASTICO UND.",
@@ -292,14 +294,14 @@ export default function AlmoxarifadoRequestForm() {
 
   // Estado para quantidades de papelaria (chave = nome do item, valor = quantidade)
   const [stationeryQuantities, setStationeryQuantities] = useState<Record<string, string>>({})
-  
+
   // Estado para quantidades de creche
   const [crecheQuantities, setCrecheQuantities] = useState<Record<string, string>>({})
-  
+
   // Estado para busca
   const [stationerySearch, setStationerySearch] = useState("")
   const [crecheSearch, setCrecheSearch] = useState("")
-  
+
   // Estado para categoria expandida
   const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({})
 
@@ -349,19 +351,19 @@ export default function AlmoxarifadoRequestForm() {
   // Filtrar itens de papelaria por busca
   const filteredStationeryCategories = useMemo(() => {
     if (!stationerySearch.trim()) return stationeryCategories
-    
+
     const search = stationerySearch.toLowerCase()
     const filtered: Record<string, string[]> = {}
-    
+
     Object.entries(stationeryCategories).forEach(([category, items]) => {
-      const matchedItems = items.filter(item => 
+      const matchedItems = items.filter(item =>
         item.toLowerCase().includes(search)
       )
       if (matchedItems.length > 0) {
         filtered[category] = matchedItems
       }
     })
-    
+
     return filtered
   }, [stationerySearch])
 
@@ -469,12 +471,12 @@ export default function AlmoxarifadoRequestForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (selectedStationeryCount === 0 && selectedCrecheCount === 0) {
       alert("Por favor, selecione pelo menos um item antes de enviar.")
       return
     }
-    
+
     setPdfDownloaded(false)
     setShowConfirmModal(true)
   }
