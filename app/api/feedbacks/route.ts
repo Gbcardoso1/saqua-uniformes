@@ -1,12 +1,10 @@
-import { createClient } from "@supabase/supabase-js"
+import { createClient } from "@/lib/supabase/server"
 import { NextResponse } from "next/server"
-
-const supabaseUrl = process.env.SUPABASE_URL!
-const supabaseKey = process.env.SUPABASE_ANON_KEY!
-const supabase = createClient(supabaseUrl, supabaseKey)
 
 export async function GET() {
   try {
+    const supabase = await createClient()
+    
     const { data, error } = await supabase
       .from("feedbacks")
       .select("*")
@@ -17,7 +15,7 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json(data)
+    return NextResponse.json(data || [])
   } catch (error) {
     console.error("Server error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
@@ -26,6 +24,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const supabase = await createClient()
     const body = await request.json()
     const { institution, category, message } = body
 
@@ -60,6 +59,7 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
+    const supabase = await createClient()
     const body = await request.json()
     const { id, status } = body
 
