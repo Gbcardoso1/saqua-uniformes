@@ -629,7 +629,7 @@ export default function AdminPage() {
   return (
     <main className="min-h-screen bg-muted/30">
       <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
+        <div className="flex w-full flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
           <div className="flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
               <LayoutDashboard className="h-5 w-5" />
@@ -652,7 +652,7 @@ export default function AdminPage() {
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-8 md:py-8">
+      <div className="w-full px-4 py-6 md:px-8 md:py-8">
         {/* Resumo */}
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <button
