@@ -1002,7 +1002,7 @@ export default function AdminPage() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <Table>
+                <Table className="[&_td]:py-4 [&_th]:h-12 [&_td]:px-4 [&_th]:px-4">
                   <TableHeader>
                     <TableRow>
                       <TableHead>Data/Hora</TableHead>
