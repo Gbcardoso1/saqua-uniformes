@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt, MessageSquare } from "lucide-react"
+import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt, MessageSquare, LayoutDashboard } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 
@@ -627,97 +627,131 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background p-4 md:p-8">
-      <div className="w-full">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Painel Administrativo</h1>
-            <p className="text-muted-foreground">Gerencie todas as solicitações recebidas</p>
+    <main className="min-h-screen bg-muted/30">
+      <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+              <LayoutDashboard className="h-5 w-5" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold leading-tight text-foreground md:text-2xl">Painel Administrativo</h1>
+              <p className="text-sm text-muted-foreground">Gerencie todas as solicitações recebidas</p>
+            </div>
           </div>
           <div className="flex gap-2">
-            <Button onClick={exportToCSV} variant="outline" disabled={filteredSubmissions.length === 0}>
+            <Button onClick={exportToCSV} variant="outline" size="sm" disabled={filteredSubmissions.length === 0}>
               <Download className="mr-2 h-4 w-4" />
               Exportar CSV
             </Button>
-            <Button onClick={handleLogout} variant="outline">
+            <Button onClick={handleLogout} variant="outline" size="sm">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Voltar
             </Button>
           </div>
         </div>
+      </header>
 
-        {/* Tabs */}
-        <div className="flex border-b border-border mb-6">
+      <div className="mx-auto w-full max-w-7xl px-4 py-6 md:px-8 md:py-8">
+        {/* Resumo */}
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <button
             type="button"
             onClick={() => handleTabChange("almoxarifado")}
-            className={`relative flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
-              activeTab === "almoxarifado"
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground"
+            className={`flex items-center gap-4 rounded-xl border bg-card p-4 text-left transition-all hover:shadow-md ${
+              activeTab === "almoxarifado" ? "border-primary ring-1 ring-primary/30" : "border-border"
             }`}
           >
-            <Package className="h-4 w-4" />
-            <span>Almoxarifado</span>
-            {almoxarifadoCount > 0 && (
-              <span className={`ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold ${
-                activeTab === "almoxarifado"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
-              }`}>
-                {almoxarifadoCount}
-              </span>
-            )}
-            {activeTab === "almoxarifado" && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
-            )}
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Package className="h-6 w-6" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-2xl font-bold leading-none text-foreground">{almoxarifadoCount}</p>
+              <p className="mt-1 truncate text-sm text-muted-foreground">Almoxarifado</p>
+            </div>
           </button>
           <button
             type="button"
             onClick={() => handleTabChange("uniformes")}
-            className={`relative flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
-              activeTab === "uniformes"
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground"
+            className={`flex items-center gap-4 rounded-xl border bg-card p-4 text-left transition-all hover:shadow-md ${
+              activeTab === "uniformes" ? "border-primary ring-1 ring-primary/30" : "border-border"
             }`}
           >
-            <Shirt className="h-4 w-4" />
-            <span>Uniformes e Kits</span>
-            {uniformesCount > 0 && (
-              <span className={`ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold ${
-                activeTab === "uniformes"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
-              }`}>
-                {uniformesCount}
-              </span>
-            )}
-            {activeTab === "uniformes" && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
-            )}
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Shirt className="h-6 w-6" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-2xl font-bold leading-none text-foreground">{uniformesCount}</p>
+              <p className="mt-1 truncate text-sm text-muted-foreground">Uniformes e Kits</p>
+            </div>
           </button>
           <button
             type="button"
             onClick={() => handleTabChange("feedbacks")}
-            className={`relative flex items-center gap-2 px-6 py-3 text-sm font-medium transition-colors ${
+            className={`flex items-center gap-4 rounded-xl border bg-card p-4 text-left transition-all hover:shadow-md ${
+              activeTab === "feedbacks" ? "border-primary ring-1 ring-primary/30" : "border-border"
+            }`}
+          >
+            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <MessageSquare className="h-6 w-6" />
+              {pendingFeedbacksCount > 0 && (
+                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground">
+                  {pendingFeedbacksCount}
+                </span>
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-2xl font-bold leading-none text-foreground">{feedbacks.length}</p>
+              <p className="mt-1 truncate text-sm text-muted-foreground">Feedbacks</p>
+            </div>
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="mb-6 flex flex-wrap gap-2 rounded-xl border border-border bg-card p-1.5">
+          <button
+            type="button"
+            onClick={() => handleTabChange("almoxarifado")}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${
+              activeTab === "almoxarifado"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            }`}
+          >
+            <Package className="h-4 w-4" />
+            <span>Almoxarifado</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange("uniformes")}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${
+              activeTab === "uniformes"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            }`}
+          >
+            <Shirt className="h-4 w-4" />
+            <span>Uniformes e Kits</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange("feedbacks")}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${
               activeTab === "feedbacks"
-                ? "text-primary"
-                : "text-muted-foreground hover:text-foreground"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
             <MessageSquare className="h-4 w-4" />
             <span>Feedbacks</span>
             {pendingFeedbacksCount > 0 && (
-              <span className={`ml-1 inline-flex items-center justify-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+              <span className={`ml-0.5 inline-flex items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-semibold ${
                 activeTab === "feedbacks"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
+                  ? "bg-primary-foreground/20 text-primary-foreground"
+                  : "bg-destructive text-destructive-foreground"
               }`}>
                 {pendingFeedbacksCount}
               </span>
-            )}
-            {activeTab === "feedbacks" && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
             )}
           </button>
         </div>
