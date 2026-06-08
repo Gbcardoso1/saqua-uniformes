@@ -153,27 +153,27 @@ export default function UniformRequestForm() {
       }
     })
 
+    // Kit de Professor (completo) - adicionado como uma única linha
     if (kitPoloQuantity > 0) {
-      Object.entries(poloQuantities).forEach(([size, qty]) => {
-        if (qty > 0) {
-          teacherPolos.push({
-            kit: "Kit de Professor",
-            kitQuantity: kitPoloQuantity.toString(),
-            size,
-            quantity: qty.toString(),
-          })
-        }
+      teacherPolos.push({
+        kit: "Kit de Professor",
+        kitQuantity: kitPoloQuantity.toString(),
+        size: "",
+        quantity: "0",
       })
-      // Se não tem polo mas tem kit, adiciona só o kit
-      if (teacherPolos.length === 0) {
+    }
+
+    // Polos avulsas - adicionadas independentemente do kit
+    Object.entries(poloQuantities).forEach(([size, qty]) => {
+      if (qty > 0) {
         teacherPolos.push({
-          kit: "Kit de Professor",
-          kitQuantity: kitPoloQuantity.toString(),
-          size: "",
-          quantity: "0",
+          kit: "",
+          kitQuantity: "0",
+          size,
+          quantity: qty.toString(),
         })
       }
-    }
+    })
 
     Object.entries(backpackQuantities).forEach(([type, qty]) => {
       if (qty > 0) {
