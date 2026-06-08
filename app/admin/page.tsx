@@ -74,8 +74,10 @@ export default function AdminPage() {
   const [monthFilter, setMonthFilter] = useState<string>("all")
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
+  const [nameFilter, setNameFilter] = useState<string>("all")
   const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "feedbacks">("almoxarifado")
   const [institutions, setInstitutions] = useState<string[]>([])
+  const [names, setNames] = useState<string[]>([])
   const [months, setMonths] = useState<{ value: string; label: string }[]>([])
   const [isDeleting, setIsDeleting] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
@@ -106,6 +108,9 @@ export default function AdminPage() {
   useEffect(() => {
     const uniqueInstitutions = [...new Set(submissions.map((s) => s.institution))].sort()
     setInstitutions(uniqueInstitutions)
+
+    const uniqueNames = [...new Set(submissions.map((s) => s.name).filter(Boolean))].sort()
+    setNames(uniqueNames)
 
     const monthNames = ["Janeiro", "Fevereiro", "Marco", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"]
     const uniqueMonths = [...new Set(submissions.map((s) => {
@@ -159,6 +164,10 @@ export default function AdminPage() {
       filtered = filtered.filter((s) => s.institution === institutionFilter)
     }
 
+    if (nameFilter !== "all") {
+      filtered = filtered.filter((s) => s.name === nameFilter)
+    }
+
     if (segmentFilter !== "all") {
       filtered = filtered.filter((s) => s.uniforms.some((u) => u.gender === segmentFilter))
     }
@@ -171,7 +180,7 @@ export default function AdminPage() {
     }
 
     setFilteredSubmissions(filtered)
-  }, [submissions, institutionFilter, segmentFilter, monthFilter, typeFilter, statusFilter, activeTab])
+  }, [submissions, institutionFilter, nameFilter, segmentFilter, monthFilter, typeFilter, statusFilter, activeTab])
 
   const fetchSubmissions = async () => {
     try {
@@ -292,6 +301,7 @@ export default function AdminPage() {
   const handleTabChange = (tab: "almoxarifado" | "uniformes" | "feedbacks") => {
     setActiveTab(tab)
     setInstitutionFilter("all")
+    setNameFilter("all")
     setSegmentFilter("all")
     setMonthFilter("all")
     setTypeFilter("all")
@@ -300,6 +310,7 @@ export default function AdminPage() {
 
   const clearFilters = () => {
     setInstitutionFilter("all")
+    setNameFilter("all")
     setSegmentFilter("all")
     setMonthFilter("all")
     setTypeFilter("all")
@@ -876,6 +887,22 @@ export default function AdminPage() {
                       {institutions.map((inst) => (
                         <SelectItem key={inst} value={inst}>
                           {inst}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2 sm:space-y-0 sm:w-48">
+                  <Label className="sm:sr-only">Solicitante</Label>
+                  <Select value={nameFilter} onValueChange={setNameFilter}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Todos os Solicitantes" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos os Solicitantes</SelectItem>
+                      {names.map((n) => (
+                        <SelectItem key={n} value={n}>
+                          {n}
                         </SelectItem>
                       ))}
                     </SelectContent>
