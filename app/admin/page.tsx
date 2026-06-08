@@ -627,7 +627,16 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-muted/30">
+    <main
+      className="min-h-screen bg-muted/30"
+      style={
+        {
+          "--primary": "oklch(0.56 0.085 192)",
+          "--primary-foreground": "oklch(0.99 0 0)",
+          "--ring": "oklch(0.56 0.085 192)",
+        } as React.CSSProperties
+      }
+    >
       <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <div className="flex w-full flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
           <div className="flex items-center gap-3">
