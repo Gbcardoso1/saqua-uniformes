@@ -17,6 +17,7 @@ type Submission = {
   shoes: Array<{
     size: string
     quantity: string
+    type?: string
   }>
   studentKits?: Array<{
     size: string
