@@ -41,8 +41,11 @@ const uniformCategories = {
   },
 }
 
-// Calçados - tamanhos disponíveis
+// Calçados (Tênis) - tamanhos disponíveis
 const shoeSizes = ["14/15", "16/17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45"]
+
+// Calçados (Crocs) - tamanhos disponíveis (14/15 até 34)
+const crocsSizes = ["14/15", "16/17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34"]
 
 // Kits de Aluno
 const studentKitTypes = [
@@ -77,6 +80,8 @@ export default function UniformRequestForm() {
   // Estado para quantidades - chave: "categoria|genero|tamanho"
   const [uniformQuantities, setUniformQuantities] = useState<Record<string, number>>({})
   const [shoeQuantities, setShoeQuantities] = useState<Record<string, number>>({})
+  const [crocsQuantities, setCrocsQuantities] = useState<Record<string, number>>({})
+  const [footwearType, setFootwearType] = useState<"tenis" | "crocs">("tenis")
   const [kitQuantities, setKitQuantities] = useState<Record<string, number>>({})
   const [poloQuantities, setPoloQuantities] = useState<Record<string, number>>({})
   const [kitPoloQuantity, setKitPoloQuantity] = useState<number>(0)
@@ -87,12 +92,13 @@ export default function UniformRequestForm() {
     let total = 0
     Object.values(uniformQuantities).forEach(qty => { if (qty > 0) total += qty })
     Object.values(shoeQuantities).forEach(qty => { if (qty > 0) total += qty })
+    Object.values(crocsQuantities).forEach(qty => { if (qty > 0) total += qty })
     Object.values(kitQuantities).forEach(qty => { if (qty > 0) total += qty })
     if (kitPoloQuantity > 0) total += kitPoloQuantity
     Object.values(poloQuantities).forEach(qty => { if (qty > 0) total += qty })
     Object.values(backpackQuantities).forEach(qty => { if (qty > 0) total += qty })
     return total
-  }, [uniformQuantities, shoeQuantities, kitQuantities, poloQuantities, kitPoloQuantity, backpackQuantities])
+  }, [uniformQuantities, shoeQuantities, crocsQuantities, kitQuantities, poloQuantities, kitPoloQuantity, backpackQuantities])
 
   const toggleCategory = (category: string) => {
     const newExpanded = new Set(expandedCategories)
@@ -129,7 +135,7 @@ export default function UniformRequestForm() {
 
   const prepareSubmissionData = () => {
     const uniforms: Array<{ type: string; gender: string; size: string; quantity: string }> = []
-    const shoes: Array<{ size: string; quantity: string }> = []
+    const shoes: Array<{ size: string; quantity: string; type: string }> = []
     const studentKits: Array<{ size: string; quantity: string }> = []
     const teacherPolos: Array<{ kit: string; kitQuantity: string; size: string; quantity: string }> = []
     const backpacks: Array<{ size: string; quantity: string }> = []
@@ -143,7 +149,13 @@ export default function UniformRequestForm() {
 
     Object.entries(shoeQuantities).forEach(([size, qty]) => {
       if (qty > 0) {
-        shoes.push({ size, quantity: qty.toString() })
+        shoes.push({ size, quantity: qty.toString(), type: "tenis" })
+      }
+    })
+
+    Object.entries(crocsQuantities).forEach(([size, qty]) => {
+      if (qty > 0) {
+        shoes.push({ size, quantity: qty.toString(), type: "crocs" })
       }
     })
 
@@ -219,6 +231,7 @@ export default function UniformRequestForm() {
       setFormData({ name: "", matricula: "", institution: "" })
       setUniformQuantities({})
       setShoeQuantities({})
+      setCrocsQuantities({})
       setKitQuantities({})
       setPoloQuantities({})
       setKitPoloQuantity(0)
@@ -273,14 +286,32 @@ export default function UniformRequestForm() {
       yPos += 6
     }
 
-    if (shoes.length > 0) {
+    const tenisShoes = shoes.filter((s) => s.type !== "crocs")
+    const crocsShoes = shoes.filter((s) => s.type === "crocs")
+
+    if (tenisShoes.length > 0) {
       doc.setFontSize(14)
       doc.setFont("helvetica", "bold")
       doc.text("CALÇADOS (TÊNIS)", 20, yPos)
       yPos += 7
       doc.setFontSize(10)
       doc.setFont("helvetica", "normal")
-      shoes.forEach((s, i) => {
+      tenisShoes.forEach((s, i) => {
+        if (yPos > 270) { doc.addPage(); yPos = 20 }
+        doc.text(`${i + 1}. Tamanho: ${s.size} | Quantidade: ${s.quantity}`, 20, yPos)
+        yPos += 6
+      })
+      yPos += 6
+    }
+
+    if (crocsShoes.length > 0) {
+      doc.setFontSize(14)
+      doc.setFont("helvetica", "bold")
+      doc.text("CALÇADOS (CROCS)", 20, yPos)
+      yPos += 7
+      doc.setFontSize(10)
+      doc.setFont("helvetica", "normal")
+      crocsShoes.forEach((s, i) => {
         if (yPos > 270) { doc.addPage(); yPos = 20 }
         doc.text(`${i + 1}. Tamanho: ${s.size} | Quantidade: ${s.quantity}`, 20, yPos)
         yPos += 6
@@ -398,8 +429,8 @@ export default function UniformRequestForm() {
             <TabsTrigger value="calcados" className="flex flex-col gap-1 py-3">
               <Footprints className="h-4 w-4" />
               <span className="text-xs">Calçados</span>
-              {Object.values(shoeQuantities).some(q => q > 0) && (
-                <Badge variant="secondary" className="text-xs">{Object.values(shoeQuantities).filter(q => q > 0).length}</Badge>
+              {(Object.values(shoeQuantities).some(q => q > 0) || Object.values(crocsQuantities).some(q => q > 0)) && (
+                <Badge variant="secondary" className="text-xs">{Object.values(shoeQuantities).filter(q => q > 0).length + Object.values(crocsQuantities).filter(q => q > 0).length}</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="kits" className="flex flex-col gap-1 py-3">
@@ -538,35 +569,91 @@ export default function UniformRequestForm() {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <span className="text-xl">👟</span>
-                  Calçados (Tênis)
+                  <Footprints className="h-5 w-5" />
+                  Calçados
                 </CardTitle>
+                {/* Seletor entre Tênis e Crocs */}
+                <div className="flex gap-2 pt-2">
+                  <Button
+                    type="button"
+                    variant={footwearType === "tenis" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setFootwearType("tenis")}
+                  >
+                    Tênis
+                    {Object.values(shoeQuantities).some((q) => q > 0) && (
+                      <Badge variant="secondary" className="ml-2">
+                        {Object.values(shoeQuantities).filter((q) => q > 0).length}
+                      </Badge>
+                    )}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={footwearType === "crocs" ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setFootwearType("crocs")}
+                  >
+                    Crocs
+                    {Object.values(crocsQuantities).some((q) => q > 0) && (
+                      <Badge variant="secondary" className="ml-2">
+                        {Object.values(crocsQuantities).filter((q) => q > 0).length}
+                      </Badge>
+                    )}
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
-                  {shoeSizes.map((size) => {
-                    const qty = shoeQuantities[size] || 0
-                    return (
-                      <div
-                        key={size}
-                        className={`flex flex-col items-center rounded-md border p-3 ${qty > 0 ? 'border-primary bg-primary/5' : ''}`}
-                      >
-                        <span className="text-sm font-medium mb-2">Tam. {size}</span>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={qty || ""}
-                          onChange={(e) => {
-                            const val = parseInt(e.target.value) || 0
-                            setShoeQuantities((prev) => ({ ...prev, [size]: val }))
-                          }}
-                          className="w-16 h-8 text-center text-sm"
-                          placeholder="0"
-                        />
-                      </div>
-                    )
-                  })}
-                </div>
+                {footwearType === "tenis" ? (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+                    {shoeSizes.map((size) => {
+                      const qty = shoeQuantities[size] || 0
+                      return (
+                        <div
+                          key={size}
+                          className={`flex flex-col items-center rounded-md border p-3 ${qty > 0 ? 'border-primary bg-primary/5' : ''}`}
+                        >
+                          <span className="text-sm font-medium mb-2">Tam. {size}</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            value={qty || ""}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || 0
+                              setShoeQuantities((prev) => ({ ...prev, [size]: val }))
+                            }}
+                            className="w-16 h-8 text-center text-sm"
+                            placeholder="0"
+                          />
+                        </div>
+                      )
+                    })}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+                    {crocsSizes.map((size) => {
+                      const qty = crocsQuantities[size] || 0
+                      return (
+                        <div
+                          key={size}
+                          className={`flex flex-col items-center rounded-md border p-3 ${qty > 0 ? 'border-primary bg-primary/5' : ''}`}
+                        >
+                          <span className="text-sm font-medium mb-2">Tam. {size}</span>
+                          <Input
+                            type="number"
+                            min="0"
+                            value={qty || ""}
+                            onChange={(e) => {
+                              const val = parseInt(e.target.value) || 0
+                              setCrocsQuantities((prev) => ({ ...prev, [size]: val }))
+                            }}
+                            className="w-16 h-8 text-center text-sm"
+                            placeholder="0"
+                          />
+                        </div>
+                      )
+                    })}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -746,13 +833,26 @@ export default function UniformRequestForm() {
                     </div>
                   )
                 })}
-                {/* Calçados */}
+                {/* Calçados - Tênis */}
                 {Object.entries(shoeQuantities).filter(([, qty]) => qty > 0).map(([size, qty]) => (
                   <div key={`shoe-${size}`} className="rounded-lg bg-muted p-3 text-sm">
                     <div className="flex items-center justify-between">
                       <div>
                         <Badge variant="outline" className="mr-2">Calçados</Badge>
                         <span className="font-medium">Tênis</span>
+                        <span className="text-muted-foreground"> - Tam. {size}</span>
+                      </div>
+                      <Badge>Qtd: {qty}</Badge>
+                    </div>
+                  </div>
+                ))}
+                {/* Calçados - Crocs */}
+                {Object.entries(crocsQuantities).filter(([, qty]) => qty > 0).map(([size, qty]) => (
+                  <div key={`crocs-${size}`} className="rounded-lg bg-muted p-3 text-sm">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <Badge variant="outline" className="mr-2">Calçados</Badge>
+                        <span className="font-medium">Crocs</span>
                         <span className="text-muted-foreground"> - Tam. {size}</span>
                       </div>
                       <Badge>Qtd: {qty}</Badge>

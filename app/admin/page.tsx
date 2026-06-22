@@ -26,6 +26,7 @@ type Submission = {
   shoes: Array<{
     size: string
     quantity: string
+    type?: string
   }>
   studentKits?: Array<{
     size: string
@@ -262,7 +263,8 @@ export default function AdminPage() {
       })
 
       sub.shoes.forEach((shoe) => {
-        csv += `"${date}","${sub.name}","${sub.matricula}","${sub.institution}","N/A","Tênis","N/A","${shoe.size}","${shoe.quantity}"\n`
+        const shoeLabel = shoe.type === "crocs" ? "Crocs" : "Tênis"
+        csv += `"${date}","${sub.name}","${sub.matricula}","${sub.institution}","N/A","${shoeLabel}","N/A","${shoe.size}","${shoe.quantity}"\n`
       })
 
       sub.studentKits?.forEach((kit) => {
@@ -533,8 +535,11 @@ export default function AdminPage() {
         yPos += 6
       }
 
-      // Calcados
-      if (submission.shoes.length > 0) {
+      // Calcados (Tenis)
+      const tenisShoes = submission.shoes.filter((s) => s.type !== "crocs")
+      const crocsShoes = submission.shoes.filter((s) => s.type === "crocs")
+
+      if (tenisShoes.length > 0) {
         if (yPos > 250) { doc.addPage(); yPos = 20 }
         doc.setFontSize(14)
         doc.setFont("helvetica", "bold")
@@ -542,7 +547,24 @@ export default function AdminPage() {
         yPos += 7
         doc.setFontSize(10)
         doc.setFont("helvetica", "normal")
-        submission.shoes.forEach((s, i) => {
+        tenisShoes.forEach((s, i) => {
+          if (yPos > 270) { doc.addPage(); yPos = 20 }
+          doc.text(`${i + 1}. Tamanho: ${s.size} | Quantidade: ${s.quantity}`, 20, yPos)
+          yPos += 6
+        })
+        yPos += 6
+      }
+
+      // Calcados (Crocs)
+      if (crocsShoes.length > 0) {
+        if (yPos > 250) { doc.addPage(); yPos = 20 }
+        doc.setFontSize(14)
+        doc.setFont("helvetica", "bold")
+        doc.text("CALCADOS (CROCS)", 20, yPos)
+        yPos += 7
+        doc.setFontSize(10)
+        doc.setFont("helvetica", "normal")
+        crocsShoes.forEach((s, i) => {
           if (yPos > 270) { doc.addPage(); yPos = 20 }
           doc.text(`${i + 1}. Tamanho: ${s.size} | Quantidade: ${s.quantity}`, 20, yPos)
           yPos += 6
@@ -1260,25 +1282,49 @@ export default function AdminPage() {
                     </div>
                   </div>
 
-                  <div>
-                    <h3 className="font-semibold mb-3 text-lg">Calçados Solicitados (Tênis)</h3>
-                    <div className="space-y-2">
-                      {selectedSubmission.shoes.map((shoe, index) => (
-                        <div key={index} className="rounded-lg border border-border p-4">
-                          <div className="grid gap-3 sm:grid-cols-2">
-                            <div>
-                              <p className="text-xs text-muted-foreground mb-1">Tamanho</p>
-                              <p className="font-medium">{shoe.size}</p>
-                            </div>
-                            <div>
-                              <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
-                              <p className="font-medium">{shoe.quantity}</p>
+                  {selectedSubmission.shoes.some((s) => s.type !== "crocs") && (
+                    <div>
+                      <h3 className="font-semibold mb-3 text-lg">Calçados Solicitados (Tênis)</h3>
+                      <div className="space-y-2">
+                        {selectedSubmission.shoes.filter((s) => s.type !== "crocs").map((shoe, index) => (
+                          <div key={index} className="rounded-lg border border-border p-4">
+                            <div className="grid gap-3 sm:grid-cols-2">
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Tamanho</p>
+                                <p className="font-medium">{shoe.size}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
+                                <p className="font-medium">{shoe.quantity}</p>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {selectedSubmission.shoes.some((s) => s.type === "crocs") && (
+                    <div>
+                      <h3 className="font-semibold mb-3 text-lg">Calçados Solicitados (Crocs)</h3>
+                      <div className="space-y-2">
+                        {selectedSubmission.shoes.filter((s) => s.type === "crocs").map((shoe, index) => (
+                          <div key={index} className="rounded-lg border border-border p-4">
+                            <div className="grid gap-3 sm:grid-cols-2">
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Tamanho</p>
+                                <p className="font-medium">{shoe.size}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs text-muted-foreground mb-1">Quantidade</p>
+                                <p className="font-medium">{shoe.quantity}</p>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {selectedSubmission.studentKits && selectedSubmission.studentKits.length > 0 && (
                     <div>
