@@ -22,7 +22,7 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 // Itens de Papelaria organizados por categoria
 const stationeryCategories = {
   "Pincéis e Arte": [
-    "ALGODÃO EM BOLA 100G SACO C/30 PCT",
+    "BOLAS DE ALGODÃO 100G - SACO C/ 30 PCT",
     "PINCEL CHATO LONGO 815-0 - 12 UND",
     "PINCEL CHATO LONGO 815-2 - 12 UND",
     "PINCEL CHATO LONGO 815-4 - 12 UND",
@@ -251,7 +251,6 @@ const stationeryCategories = {
   "Outros Materiais": [
     "APONTADOR BLOCO - 4CM UND.",
     "AVENTAL INFANTIL (KIT ESCOLAR)",
-    "Bolas de algodão pct com 100g",
     "COMPASSO (KIT ESCOLAR 2025 )",
     "CONJ. DE REGUAS (KIT ESCOLAR)",
     "CORRETIVO LIQUIDO 18 ML UND.",
@@ -269,6 +268,7 @@ const stationeryCategories = {
 // Itens de Creche
 const crecheItemsList = [
   "BANHEIRA PARA BEBE",
+  "POMADA PARA ASSADURAS",
   "BEBE CONFORTO ATE 13 KG",
   "LENÇO UMEDECIDO C/ 100 UND",
   "CAPA PARA BEBE CONFORTO 96CMX65CM",

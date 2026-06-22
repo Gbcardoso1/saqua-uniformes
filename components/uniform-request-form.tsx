@@ -580,7 +580,7 @@ export default function UniformRequestForm() {
                     size="sm"
                     onClick={() => setFootwearType("tenis")}
                   >
-                    Tênis
+                    Ed.infantil
                     {Object.values(shoeQuantities).some((q) => q > 0) && (
                       <Badge variant="secondary" className="ml-2">
                         {Object.values(shoeQuantities).filter((q) => q > 0).length}
@@ -593,7 +593,7 @@ export default function UniformRequestForm() {
                     size="sm"
                     onClick={() => setFootwearType("crocs")}
                   >
-                    Crocs
+                    Fund. & EJA
                     {Object.values(crocsQuantities).some((q) => q > 0) && (
                       <Badge variant="secondary" className="ml-2">
                         {Object.values(crocsQuantities).filter((q) => q > 0).length}
