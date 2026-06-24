@@ -46,6 +46,10 @@ type Submission = {
     item: string
     quantity: string
   }>
+  kitchenItems?: Array<{
+    item: string
+    quantity: string
+  }>
   crecheItems?: Array<{
     item: string
     quantity: string
@@ -497,6 +501,23 @@ export default function AdminPage() {
         submission.stationeryItems.forEach((s, i) => {
           if (yPos > 270) { doc.addPage(); yPos = 20 }
           doc.text(`${i + 1}. ${s.item} | Qtd: ${s.quantity}`, 20, yPos)
+          yPos += 6
+        })
+        yPos += 5
+      }
+
+      // Kitchen Items
+      if (submission.kitchenItems && submission.kitchenItems.length > 0) {
+        if (yPos > 250) { doc.addPage(); yPos = 20 }
+        doc.setFontSize(14)
+        doc.setFont("helvetica", "bold")
+        doc.text("ITENS DE COZINHA", 20, yPos)
+        yPos += 8
+        doc.setFont("helvetica", "normal")
+        doc.setFontSize(10)
+        submission.kitchenItems.forEach((k, i) => {
+          if (yPos > 270) { doc.addPage(); yPos = 20 }
+          doc.text(`${i + 1}. ${k.item} | Qtd: ${k.quantity}`, 20, yPos)
           yPos += 6
         })
         yPos += 5
