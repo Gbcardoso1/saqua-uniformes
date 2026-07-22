@@ -292,7 +292,7 @@ export default function UniformRequestForm() {
     if (tenisShoes.length > 0) {
       doc.setFontSize(14)
       doc.setFont("helvetica", "bold")
-      doc.text("CALÇADOS (TÊNIS)", 20, yPos)
+      doc.text("CALÇADOS (FUND. & EJA)", 20, yPos)
       yPos += 7
       doc.setFontSize(10)
       doc.setFont("helvetica", "normal")
@@ -307,7 +307,7 @@ export default function UniformRequestForm() {
     if (crocsShoes.length > 0) {
       doc.setFontSize(14)
       doc.setFont("helvetica", "bold")
-      doc.text("CALÇADOS (CROCS)", 20, yPos)
+      doc.text("CALÇADOS (ED. INFANTIL)", 20, yPos)
       yPos += 7
       doc.setFontSize(10)
       doc.setFont("helvetica", "normal")
@@ -833,26 +833,26 @@ export default function UniformRequestForm() {
                     </div>
                   )
                 })}
-                {/* Calçados - Tênis */}
+                {/* Calçados - Fund. & EJA */}
                 {Object.entries(shoeQuantities).filter(([, qty]) => qty > 0).map(([size, qty]) => (
                   <div key={`shoe-${size}`} className="rounded-lg bg-muted p-3 text-sm">
                     <div className="flex items-center justify-between">
                       <div>
                         <Badge variant="outline" className="mr-2">Calçados</Badge>
-                        <span className="font-medium">Tênis</span>
+                        <span className="font-medium">Fund. &amp; EJA</span>
                         <span className="text-muted-foreground"> - Tam. {size}</span>
                       </div>
                       <Badge>Qtd: {qty}</Badge>
                     </div>
                   </div>
                 ))}
-                {/* Calçados - Crocs */}
+                {/* Calçados - Ed. Infantil */}
                 {Object.entries(crocsQuantities).filter(([, qty]) => qty > 0).map(([size, qty]) => (
                   <div key={`crocs-${size}`} className="rounded-lg bg-muted p-3 text-sm">
                     <div className="flex items-center justify-between">
                       <div>
                         <Badge variant="outline" className="mr-2">Calçados</Badge>
-                        <span className="font-medium">Crocs</span>
+                        <span className="font-medium">Ed. Infantil</span>
                         <span className="text-muted-foreground"> - Tam. {size}</span>
                       </div>
                       <Badge>Qtd: {qty}</Badge>
