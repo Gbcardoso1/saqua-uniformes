@@ -374,6 +374,12 @@ const crecheItemsList = [
   "TOALHA DE BANHO C/ CAPUZ BRANCA 65CM X 80 CM UND.",
   "TOALHA DE ROSTO BRANCA UND.",
   "TOALHINHA LAVABO UND.",
+  "FRALDA - P",
+  "FRALDA - M",
+  "FRALDA - G",
+  "FRALDA - XG",
+  "SHAMPOO",
+  "CONDICIONADOR",
 ]
 
 export default function AlmoxarifadoRequestForm() {
