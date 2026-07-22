@@ -14,7 +14,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog"
-import { CheckCircle, Download, Search, Package, Baby } from "lucide-react"
+import { CheckCircle, Download, Search, Package, Baby, UtensilsCrossed } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -265,6 +265,96 @@ const stationeryCategories = {
   ],
 }
 
+// Itens de Cozinha
+const kitchenItemsList = [
+  "FACA DE MESA INOX UND.",
+  "GARFO DE MESA INOX UND.",
+  "ASSADEIRA RETANG INOX (30X40) UND.",
+  "CAÇAROLA ALUMINIO C/ TAMPA Nº 28",
+  "CAÇAROLA ALUMINIO C/ TAMPA Nº 32",
+  "CAIXA ORGANIZADORA PRETA - 30 LTS",
+  "CAIXA TERMICA 500 LTS",
+  "CANECA CALDA PLASTICA 270 ML - UND.",
+  "ESPATULA INOX C/ FUNDO VAZADO - UND.",
+  "FRIGIDEIRA - Nº 40",
+  "FRIGIDEIRA C/ TAMPA Nº30",
+  "GARFO GRANDE INOX",
+  "GARRAFA TERMICA 1 LTS.",
+  "GARRAFA TERMICA 1,8 LTS.",
+  "JARRA TRANSPARENTE PLÁSTICA 4 LTS.",
+  "LIVRO APRENDENDO A COMER E A COZINHAR.",
+  "PEGADOR MULTIUSO EM INOX",
+  "ACENDEDOR DE FOGÃO.",
+  "BACIA PLASTICA - 30 LTS",
+  "BATEDOR DE CLARAS.",
+  "COLHER DE MESA INOX UND.",
+  "COLHER DE SILICONE INFANTIL.",
+  "ESCORREDOR DE ARROZ DE ALUMINIO.",
+  "ESCUMADEIRA ( GRANDE )",
+  "FACA DE MESA P/ CHURRASCO COLOR PRETO UND.",
+  "POTE DE PLASTICO QUADRADO 5 LTS.",
+  "POTE PLASTICO C/ TRAVA 1,5 LTS.",
+  "POTE PLASTICO C/ TRAVA 2,8 LTS.",
+  "POTE PLASTICO C/ TRAVA 3 LTS.",
+  "PRATO DE SILICONE INFANTIL C/ VENTOSA UND.",
+  "PRATO PLASTICO INFANTIL UND.",
+  "ABRIDOR DE LATA UND.",
+  "ASSADEIRA RETANG BAIXA INOX (28X40) UND.",
+  "BACIA BOWL INOX C/TAMPA - 20 CM UND.",
+  "BACIA BOWL INOX C/TAMPA - 23,6 CM UND.",
+  "BACIA BOWL INOX C/TAMPA - 29,6 CM UND.",
+  "BACIA BOWL INOX C/TAMPA DE VIDRO - 32 CM UND.",
+  "BACIA PLASTICA 36CM",
+  "BACIA PLASTICA 48CM",
+  "CAÇAROLA ALUMINIO C/ TAMPA Nº 20",
+  "CAÇAROLA ALUMINIO C/ TAMPA Nº 34",
+  "CAÇAROLA ALUMINIO C/ TAMPA Nº 36",
+  "CAÇAROLA ALUMINIO C/ TAMPA Nº 40",
+  "CAÇAROLA ALUMINIO C/ TAMPA Nº 50",
+  "CAIXA ORGANIZADORA 12 LTS.",
+  "CAIXA ORGANIZADORA 50 LTS.",
+  "CAIXA ORGANIZADORA - PRETA 17 LTS.",
+  "CAIXA ORGANIZADORA - PRETA 50 LTS.",
+  "CHALEIRA - 7,0 LTS",
+  "COLHER DE ARROZ INOX",
+  "COLHER DE SILICONE",
+  "CONCHA ( MEDIA )",
+  "CONCHA Nº 14",
+  "DESCASCADOR DE LEGUMES INOX UND.",
+  "ESCORREDOR DE PRATOS",
+  "ESCUMADEIRA ( MÉDIA)",
+  "FACA DE COZINHA INOX Nº 03 UND.",
+  "FACA DE COZINHA INOX Nº 07 UND.",
+  "FACA DE COZINHA INOX Nº 6 UND.",
+  "FACA DE COZINHA INOX Nº 8A",
+  "FACA DE COZINHA INOX Nº10 UND.",
+  "FACA REFEICAO - CX/C 12 UND.",
+  "FUNIL DE PLASTICO 12,5CM.",
+  "GARRAFA P/ ÁGUA 2LTS.",
+  "LEITEIRA/CANECAO Nº 18",
+  "PANELA DE PRESSAO 12 L",
+  "PANELA DE PRESSÃO 24L",
+  "PANELA DE PRESSÃO EM ALUMINIO 20 LITROS.",
+  "PANQUEQUEIRA",
+  "PEGADOR DE MACARRAO INOX UND.",
+  "PEGADOR DE SALADA INOX UND.",
+  "PENEIRA INOX 14CM UND.",
+  "PENEIRA INOX 18CM UND.",
+  "PENEIRA INOX 20CM UND.",
+  "POTE MANTIMENTO AVULSO 2000 ML.",
+  "PRATO DE VIDRO UND.",
+  "RALADOR INOX 4 FACES.",
+  "SALEIRO",
+  "SOCADOR DE FEIJAO.",
+  "TABUA P/ CORTE XG.",
+  "TABUA P/ FRIOS PEQUENA.",
+  "ESPREMEDOR DE BATATA - EM AÇO INOXIDÁVEL MEDINDO 27CM TOTAL",
+  "FRIGIDEIRA - REVESTIMENTO INTERNO ANTIADERENTE, E EXTERNO EM ALUMÍNIO GROSSO 32 CM.",
+  "LIXEIRA PLÁSTICA - COM TAMPA E PEDAL, INJETADO EM PLÁSTICO POLIPROPILENO CAPACIDADE 100L",
+  "PANELA - CAÇAROLA ANTIADERENTE TEFLON COM TAMPA 28 CM",
+  "PANELA - CAÇAROLA PROFISSIONAL EM ALUMÍNIO COM TAMPA 32 CM"
+]
+
 // Itens de Creche
 const crecheItemsList = [
   "BANHEIRA PARA BEBE",
@@ -284,6 +374,12 @@ const crecheItemsList = [
   "TOALHA DE BANHO C/ CAPUZ BRANCA 65CM X 80 CM UND.",
   "TOALHA DE ROSTO BRANCA UND.",
   "TOALHINHA LAVABO UND.",
+  "FRALDA - P",
+  "FRALDA - M",
+  "FRALDA - G",
+  "FRALDA - XG",
+  "SHAMPOO",
+  "CONDICIONADOR",
 ]
 
 export default function AlmoxarifadoRequestForm() {
@@ -296,11 +392,15 @@ export default function AlmoxarifadoRequestForm() {
   // Estado para quantidades de papelaria (chave = nome do item, valor = quantidade)
   const [stationeryQuantities, setStationeryQuantities] = useState<Record<string, string>>({})
 
+  // Estado para quantidades de cozinha
+  const [kitchenQuantities, setKitchenQuantities] = useState<Record<string, string>>({})
+
   // Estado para quantidades de creche
   const [crecheQuantities, setCrecheQuantities] = useState<Record<string, string>>({})
 
   // Estado para busca
   const [stationerySearch, setStationerySearch] = useState("")
+  const [kitchenSearch, setKitchenSearch] = useState("")
   const [crecheSearch, setCrecheSearch] = useState("")
 
   // Estado para categoria expandida
@@ -318,6 +418,13 @@ export default function AlmoxarifadoRequestForm() {
 
   const updateStationeryQuantity = (item: string, quantity: string) => {
     setStationeryQuantities(prev => ({
+      ...prev,
+      [item]: quantity
+    }))
+  }
+
+  const updateKitchenQuantity = (item: string, quantity: string) => {
+    setKitchenQuantities(prev => ({
       ...prev,
       [item]: quantity
     }))
@@ -368,6 +475,13 @@ export default function AlmoxarifadoRequestForm() {
     return filtered
   }, [stationerySearch])
 
+  // Filtrar itens de cozinha por busca
+  const filteredKitchenItems = useMemo(() => {
+    if (!kitchenSearch.trim()) return kitchenItemsList
+    const search = kitchenSearch.toLowerCase()
+    return kitchenItemsList.filter(item => item.toLowerCase().includes(search))
+  }, [kitchenSearch])
+
   // Filtrar itens de creche por busca
   const filteredCrecheItems = useMemo(() => {
     if (!crecheSearch.trim()) return crecheItemsList
@@ -377,11 +491,18 @@ export default function AlmoxarifadoRequestForm() {
 
   // Contar itens selecionados
   const selectedStationeryCount = Object.values(stationeryQuantities).filter(q => q && parseInt(q) > 0).length
+  const selectedKitchenCount = Object.values(kitchenQuantities).filter(q => q && parseInt(q) > 0).length
   const selectedCrecheCount = Object.values(crecheQuantities).filter(q => q && parseInt(q) > 0).length
 
   // Obter itens selecionados para exibição
   const getSelectedStationeryItems = () => {
     return Object.entries(stationeryQuantities)
+      .filter(([, qty]) => qty && parseInt(qty) > 0)
+      .map(([item, quantity]) => ({ item, quantity }))
+  }
+
+  const getSelectedKitchenItems = () => {
+    return Object.entries(kitchenQuantities)
       .filter(([, qty]) => qty && parseInt(qty) > 0)
       .map(([item, quantity]) => ({ item, quantity }))
   }
@@ -443,6 +564,30 @@ export default function AlmoxarifadoRequestForm() {
       yPos += 4
     }
 
+    // Kitchen Items
+    const filledKitchen = getSelectedKitchenItems()
+    if (filledKitchen.length > 0) {
+      if (yPos > 250) {
+        doc.addPage()
+        yPos = 20
+      }
+      doc.setFontSize(14)
+      doc.setFont("helvetica", "bold")
+      doc.text("ITENS DE COZINHA", 20, yPos)
+      yPos += 8
+      doc.setFont("helvetica", "normal")
+      doc.setFontSize(10)
+      filledKitchen.forEach((k, i) => {
+        if (yPos > 270) {
+          doc.addPage()
+          yPos = 20
+        }
+        doc.text(`${i + 1}. ${k.item} | Qtd: ${k.quantity}`, 20, yPos)
+        yPos += 6
+      })
+      yPos += 4
+    }
+
     // Creche Items
     const filledCreche = getSelectedCrecheItems()
     if (filledCreche.length > 0) {
@@ -473,7 +618,7 @@ export default function AlmoxarifadoRequestForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (selectedStationeryCount === 0 && selectedCrecheCount === 0) {
+    if (selectedStationeryCount === 0 && selectedKitchenCount === 0 && selectedCrecheCount === 0) {
       alert("Por favor, selecione pelo menos um item antes de enviar.")
       return
     }
@@ -494,6 +639,7 @@ export default function AlmoxarifadoRequestForm() {
         ...formData,
         submissionType: "almoxarifado",
         stationeryItems: getSelectedStationeryItems(),
+        kitchenItems: getSelectedKitchenItems(),
         crecheItems: getSelectedCrecheItems(),
       }
 
@@ -513,6 +659,7 @@ export default function AlmoxarifadoRequestForm() {
       // Reset form
       setFormData({ name: "", matricula: "", institution: "" })
       setStationeryQuantities({})
+      setKitchenQuantities({})
       setCrecheQuantities({})
       setPdfDownloaded(false)
     } catch (error) {
@@ -525,6 +672,10 @@ export default function AlmoxarifadoRequestForm() {
 
   const clearStationerySelection = () => {
     setStationeryQuantities({})
+  }
+
+  const clearKitchenSelection = () => {
+    setKitchenQuantities({})
   }
 
   const clearCrecheSelection = () => {
@@ -577,12 +728,19 @@ export default function AlmoxarifadoRequestForm() {
       </Card>
 
       <Tabs defaultValue="papelaria" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 h-auto">
+        <TabsList className="grid w-full grid-cols-3 h-auto">
           <TabsTrigger value="papelaria" className="flex flex-col gap-1 py-3">
             <Package className="h-4 w-4" />
             <span className="text-xs">Papelaria</span>
             {selectedStationeryCount > 0 && (
               <Badge variant="secondary" className="text-xs">{selectedStationeryCount}</Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="cozinha" className="flex flex-col gap-1 py-3">
+            <UtensilsCrossed className="h-4 w-4" />
+            <span className="text-xs">Cozinha</span>
+            {selectedKitchenCount > 0 && (
+              <Badge variant="secondary" className="text-xs">{selectedKitchenCount}</Badge>
             )}
           </TabsTrigger>
           <TabsTrigger value="creche" className="flex flex-col gap-1 py-3">
@@ -680,6 +838,59 @@ export default function AlmoxarifadoRequestForm() {
           </Card>
         </TabsContent>
 
+        <TabsContent value="cozinha">
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <CardTitle>Itens de Cozinha</CardTitle>
+                  <CardDescription className="mt-1">
+                    Preencha apenas a quantidade dos itens que deseja solicitar
+                  </CardDescription>
+                </div>
+                {selectedKitchenCount > 0 && (
+                  <Button type="button" variant="destructive" size="sm" onClick={clearKitchenSelection}>
+                    Limpar ({selectedKitchenCount})
+                  </Button>
+                )}
+              </div>
+              <div className="relative mt-4">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Buscar item de cozinha..."
+                  value={kitchenSearch}
+                  onChange={(e) => setKitchenSearch(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ScrollArea className="h-[500px] pr-4">
+                <div className="space-y-2">
+                  {filteredKitchenItems.map((item) => (
+                    <div key={item} className="flex items-center gap-3 py-3 px-4 rounded-lg border border-border bg-muted/30">
+                      <span className="flex-1">{item}</span>
+                      <Input
+                        type="number"
+                        min="0"
+                        placeholder="Qtd"
+                        value={kitchenQuantities[item] || ""}
+                        onChange={(e) => updateKitchenQuantity(item, e.target.value)}
+                        className="w-20 h-9 text-center"
+                      />
+                    </div>
+                  ))}
+                  {filteredKitchenItems.length === 0 && (
+                    <p className="text-center text-muted-foreground py-8">
+                      Nenhum item encontrado para &quot;{kitchenSearch}&quot;
+                    </p>
+                  )}
+                </div>
+              </ScrollArea>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="creche">
           <Card>
             <CardHeader>
@@ -759,6 +970,17 @@ export default function AlmoxarifadoRequestForm() {
                 <h4 className="font-semibold mb-2">Itens de Papelaria ({getSelectedStationeryItems().length})</h4>
                 <div className="max-h-40 overflow-y-auto space-y-1">
                   {getSelectedStationeryItems().map((item, idx) => (
+                    <p key={idx} className="text-sm">{item.item} - Qtd: {item.quantity}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {getSelectedKitchenItems().length > 0 && (
+              <div className="rounded-lg border border-border p-4">
+                <h4 className="font-semibold mb-2">Itens de Cozinha ({getSelectedKitchenItems().length})</h4>
+                <div className="max-h-40 overflow-y-auto space-y-1">
+                  {getSelectedKitchenItems().map((item, idx) => (
                     <p key={idx} className="text-sm">{item.item} - Qtd: {item.quantity}</p>
                   ))}
                 </div>
