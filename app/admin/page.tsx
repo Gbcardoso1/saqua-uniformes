@@ -267,7 +267,7 @@ export default function AdminPage() {
       })
 
       sub.shoes.forEach((shoe) => {
-        const shoeLabel = shoe.type === "crocs" ? "Crocs" : "Tênis"
+        const shoeLabel = shoe.type === "crocs" ? "Ed. Infantil" : "Fund. & EJA"
         csv += `"${date}","${sub.name}","${sub.matricula}","${sub.institution}","N/A","${shoeLabel}","N/A","${shoe.size}","${shoe.quantity}"\n`
       })
 
@@ -564,7 +564,7 @@ export default function AdminPage() {
         if (yPos > 250) { doc.addPage(); yPos = 20 }
         doc.setFontSize(14)
         doc.setFont("helvetica", "bold")
-        doc.text("CALCADOS (TENIS)", 20, yPos)
+        doc.text("CALCADOS (FUND. & EJA)", 20, yPos)
         yPos += 7
         doc.setFontSize(10)
         doc.setFont("helvetica", "normal")
@@ -581,7 +581,7 @@ export default function AdminPage() {
         if (yPos > 250) { doc.addPage(); yPos = 20 }
         doc.setFontSize(14)
         doc.setFont("helvetica", "bold")
-        doc.text("CALCADOS (CROCS)", 20, yPos)
+        doc.text("CALCADOS (ED. INFANTIL)", 20, yPos)
         yPos += 7
         doc.setFontSize(10)
         doc.setFont("helvetica", "normal")
@@ -1305,7 +1305,7 @@ export default function AdminPage() {
 
                   {selectedSubmission.shoes.some((s) => s.type !== "crocs") && (
                     <div>
-                      <h3 className="font-semibold mb-3 text-lg">Calçados Solicitados (Tênis)</h3>
+                      <h3 className="font-semibold mb-3 text-lg">Calçados Solicitados (Fund. &amp; EJA)</h3>
                       <div className="space-y-2">
                         {selectedSubmission.shoes.filter((s) => s.type !== "crocs").map((shoe, index) => (
                           <div key={index} className="rounded-lg border border-border p-4">
@@ -1327,7 +1327,7 @@ export default function AdminPage() {
 
                   {selectedSubmission.shoes.some((s) => s.type === "crocs") && (
                     <div>
-                      <h3 className="font-semibold mb-3 text-lg">Calçados Solicitados (Crocs)</h3>
+                      <h3 className="font-semibold mb-3 text-lg">Calçados Solicitados (Ed. Infantil)</h3>
                       <div className="space-y-2">
                         {selectedSubmission.shoes.filter((s) => s.type === "crocs").map((shoe, index) => (
                           <div key={index} className="rounded-lg border border-border p-4">
