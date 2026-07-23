@@ -21,9 +21,8 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 
 // Itens de Papelaria organizados por categoria
 const stationeryCategories = {
-  "Pincéis e Arte": [
-    "BOLAS DE ALGODÃO 100G - SACO C/ 30 PCT",
-    "PINCEL CHATO LONGO 815-0 - 12 UND",
+"Pincéis e Arte": [
+  "PINCEL CHATO LONGO 815-0 - 12 UND",
     "PINCEL CHATO LONGO 815-2 - 12 UND",
     "PINCEL CHATO LONGO 815-4 - 12 UND",
     "PINCEL CHATO LONGO 815-6 - 12 UND",
@@ -357,6 +356,7 @@ const kitchenItemsList = [
 
 // Itens de Creche
 const crecheItemsList = [
+  "BOLAS DE ALGODÃO 100G - SACO C/ 30 PCT",
   "BANHEIRA PARA BEBE",
   "POMADA PARA ASSADURAS",
   "BEBE CONFORTO ATE 13 KG",
