@@ -19,30 +19,55 @@ export function BeachDecorations({
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
       >
-        {/* Gaivota discreta cruzando o topo, bem devagar */}
+        {/* Nuvens leves atravessando o céu */}
         <div
-          className="animate-gull-fly absolute top-28 left-0"
-          style={{ animationDuration: "48s" }}
+          className="animate-cloud-drift absolute top-24 left-0"
+          style={{ animationDuration: "55s" }}
         >
-          <Gull className="w-8 text-primary/30" />
+          <Cloud className="w-24 text-primary/15" />
+        </div>
+        <div
+          className="animate-cloud-drift absolute top-44 left-0"
+          style={{ animationDuration: "80s", animationDelay: "-30s" }}
+        >
+          <Cloud className="w-16 text-primary/10" />
         </div>
 
-        {/* Ondas suaves no rodapé, em tom da cor primária */}
-        <div className="absolute bottom-0 left-0 right-0 h-28">
+        {/* Gaivotas cruzando devagar */}
+        <div
+          className="animate-gull-fly absolute top-28 left-0"
+          style={{ animationDuration: "40s" }}
+        >
+          <Gull className="w-9 text-primary/40" />
+        </div>
+        <div
+          className="animate-gull-fly absolute top-40 left-0"
+          style={{ animationDuration: "52s", animationDelay: "-20s" }}
+        >
+          <Gull className="w-7 text-primary/30" />
+        </div>
+
+        {/* Prancha de surfe boiando no canto */}
+        <div className="absolute bottom-24 right-6 animate-bob-float md:right-12">
+          <Surfboard className="w-10 opacity-70 md:w-12" />
+        </div>
+
+        {/* Ondas no rodapé, em tom da cor primária (bem mais visíveis) */}
+        <div className="absolute bottom-0 left-0 right-0 h-32">
           <WaveLayer
-            className="text-primary/[0.06]"
+            className="text-primary/20"
             durationSeconds={16}
-            heightClass="h-24"
+            heightClass="h-28"
           />
           <WaveLayer
-            className="text-primary/[0.08]"
+            className="text-primary/30"
             durationSeconds={11}
-            heightClass="h-16"
+            heightClass="h-20"
           />
           <WaveLayer
-            className="text-primary/10"
+            className="text-primary/40"
             durationSeconds={8}
-            heightClass="h-10"
+            heightClass="h-12"
           />
         </div>
       </div>
@@ -70,19 +95,19 @@ export function BeachDecorations({
         className="animate-cloud-drift absolute top-24 left-0"
         style={{ animationDuration: "42s" }}
       >
-        <Cloud className="w-28 opacity-80" />
+        <Cloud className="w-28 text-white opacity-80" />
       </div>
       <div
         className="animate-cloud-drift absolute top-44 left-0"
         style={{ animationDuration: "60s", animationDelay: "-15s" }}
       >
-        <Cloud className="w-20 opacity-60" />
+        <Cloud className="w-20 text-white opacity-60" />
       </div>
       <div
         className="animate-cloud-drift absolute top-14 left-0"
         style={{ animationDuration: "75s", animationDelay: "-40s" }}
       >
-        <Cloud className="w-36 opacity-50" />
+        <Cloud className="w-36 text-white opacity-50" />
       </div>
 
       {/* Gaivotas voando */}
@@ -145,7 +170,7 @@ function SunRays() {
 
 function Cloud({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 120 60" className={className} fill="white">
+    <svg viewBox="0 0 120 60" className={className} fill="currentColor">
       <ellipse cx="40" cy="40" rx="30" ry="18" />
       <ellipse cx="65" cy="32" rx="26" ry="22" />
       <ellipse cx="88" cy="42" rx="24" ry="16" />
