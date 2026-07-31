@@ -3,8 +3,52 @@
 /**
  * Camada decorativa com tema da praia de Saquarema (capital do surfe).
  * Fica atrás de todo o conteúdo, sem capturar cliques.
+ *
+ * variant="full"   -> home: sol, nuvens, gaivotas, prancha e ondas.
+ * variant="subtle" -> painel admin: apenas ondas discretas no rodapé e
+ *                     uma gaivota ocasional, para não atrapalhar a leitura.
  */
-export function BeachDecorations() {
+export function BeachDecorations({
+  variant = "full",
+}: {
+  variant?: "full" | "subtle"
+}) {
+  if (variant === "subtle") {
+    return (
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+      >
+        {/* Gaivota discreta cruzando o topo, bem devagar */}
+        <div
+          className="animate-gull-fly absolute top-28 left-0"
+          style={{ animationDuration: "48s" }}
+        >
+          <Gull className="w-8 text-primary/30" />
+        </div>
+
+        {/* Ondas suaves no rodapé, em tom da cor primária */}
+        <div className="absolute bottom-0 left-0 right-0 h-28">
+          <WaveLayer
+            className="text-primary/[0.06]"
+            durationSeconds={16}
+            heightClass="h-24"
+          />
+          <WaveLayer
+            className="text-primary/[0.08]"
+            durationSeconds={11}
+            heightClass="h-16"
+          />
+          <WaveLayer
+            className="text-primary/10"
+            durationSeconds={8}
+            heightClass="h-10"
+          />
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div
       aria-hidden="true"

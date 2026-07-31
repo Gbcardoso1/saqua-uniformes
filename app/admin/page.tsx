@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt, MessageSquare, LayoutDashboard } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import { BeachDecorations } from "@/components/beach-decorations"
 
 type Submission = {
   id: string
@@ -671,7 +672,7 @@ export default function AdminPage() {
 
   return (
     <main
-      className="min-h-screen bg-muted/30"
+      className="relative min-h-screen bg-muted/30"
       style={
         {
           "--primary": "oklch(0.56 0.085 192)",
@@ -680,6 +681,7 @@ export default function AdminPage() {
         } as React.CSSProperties
       }
     >
+      <BeachDecorations variant="subtle" />
       <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <div className="flex w-full flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
           <div className="flex items-center gap-3">
@@ -704,7 +706,7 @@ export default function AdminPage() {
         </div>
       </header>
 
-      <div className="w-full px-4 py-6 md:px-8 md:py-8">
+      <div className="relative z-10 w-full px-4 py-6 md:px-8 md:py-8">
         {/* Resumo */}
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <button
