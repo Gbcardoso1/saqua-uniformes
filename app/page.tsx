@@ -68,7 +68,7 @@ export default function Home() {
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-white mb-2 text-balance">
               {activeTab === "uniformes"
-                ? "Formulário de Solicitação de Uniformes e Calçados"
+                ? "ormulário de Solicitação de Uniformes e Calçados"
                 : "Formulário de Solicitação de Almoxarifado"}
             </h1>
             <p className="text-white/90 text-pretty mb-6">
