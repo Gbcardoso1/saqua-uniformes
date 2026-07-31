@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Lock, Shirt, Package } from "lucide-react"
 import Image from "next/image"
 import { FeedbackButton } from "@/components/feedback-button"
+import { BeachDecorations } from "@/components/beach-decorations"
 
 export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false)
@@ -61,8 +62,9 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="min-h-screen bg-[#1a8b8b] pt-24 pb-8 px-4">
-        <div className="mx-auto max-w-4xl">
+      <main className="relative min-h-screen bg-[#1a8b8b] pt-24 pb-8 px-4">
+        <BeachDecorations />
+        <div className="relative z-10 mx-auto max-w-4xl">
           <div className="mb-8 text-center">
             <h1 className="text-3xl font-bold text-white mb-2 text-balance">
               {activeTab === "uniformes"
