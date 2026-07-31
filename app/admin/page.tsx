@@ -671,7 +671,7 @@ export default function AdminPage() {
 
   return (
     <main
-      className="min-h-screen bg-muted/30"
+      className="relative min-h-screen bg-muted/30"
       style={
         {
           "--primary": "oklch(0.56 0.085 192)",
@@ -680,6 +680,7 @@ export default function AdminPage() {
         } as React.CSSProperties
       }
     >
+      
       <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
         <div className="flex w-full flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
           <div className="flex items-center gap-3">
@@ -704,15 +705,14 @@ export default function AdminPage() {
         </div>
       </header>
 
-      <div className="w-full px-4 py-6 md:px-8 md:py-8">
+      <div className="relative z-10 w-full px-4 py-6 md:px-8 md:py-8">
         {/* Resumo */}
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <button
             type="button"
             onClick={() => handleTabChange("almoxarifado")}
-            className={`flex items-center gap-4 rounded-xl border bg-card p-4 text-left transition-all hover:shadow-md ${
-              activeTab === "almoxarifado" ? "border-primary ring-1 ring-primary/30" : "border-border"
-            }`}
+            className={`flex items-center gap-4 rounded-xl border bg-card p-4 text-left transition-all hover:shadow-md ${activeTab === "almoxarifado" ? "border-primary ring-1 ring-primary/30" : "border-border"
+              }`}
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Package className="h-6 w-6" />
@@ -725,9 +725,8 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("uniformes")}
-            className={`flex items-center gap-4 rounded-xl border bg-card p-4 text-left transition-all hover:shadow-md ${
-              activeTab === "uniformes" ? "border-primary ring-1 ring-primary/30" : "border-border"
-            }`}
+            className={`flex items-center gap-4 rounded-xl border bg-card p-4 text-left transition-all hover:shadow-md ${activeTab === "uniformes" ? "border-primary ring-1 ring-primary/30" : "border-border"
+              }`}
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <Shirt className="h-6 w-6" />
@@ -740,9 +739,8 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("feedbacks")}
-            className={`flex items-center gap-4 rounded-xl border bg-card p-4 text-left transition-all hover:shadow-md ${
-              activeTab === "feedbacks" ? "border-primary ring-1 ring-primary/30" : "border-border"
-            }`}
+            className={`flex items-center gap-4 rounded-xl border bg-card p-4 text-left transition-all hover:shadow-md ${activeTab === "feedbacks" ? "border-primary ring-1 ring-primary/30" : "border-border"
+              }`}
           >
             <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
               <MessageSquare className="h-6 w-6" />
@@ -764,11 +762,10 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("almoxarifado")}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${
-              activeTab === "almoxarifado"
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "almoxarifado"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
+              }`}
           >
             <Package className="h-4 w-4" />
             <span>Almoxarifado</span>
@@ -776,11 +773,10 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("uniformes")}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${
-              activeTab === "uniformes"
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "uniformes"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
+              }`}
           >
             <Shirt className="h-4 w-4" />
             <span>Uniformes e Kits</span>
@@ -788,20 +784,18 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("feedbacks")}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${
-              activeTab === "feedbacks"
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "feedbacks"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
+              }`}
           >
             <MessageSquare className="h-4 w-4" />
             <span>Feedbacks</span>
             {pendingFeedbacksCount > 0 && (
-              <span className={`ml-0.5 inline-flex items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-semibold ${
-                activeTab === "feedbacks"
+              <span className={`ml-0.5 inline-flex items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-semibold ${activeTab === "feedbacks"
                   ? "bg-primary-foreground/20 text-primary-foreground"
                   : "bg-destructive text-destructive-foreground"
-              }`}>
+                }`}>
                 {pendingFeedbacksCount}
               </span>
             )}
@@ -957,188 +951,188 @@ export default function AdminPage() {
             </CardContent>
           </Card>
         ) : (
-        <Card>
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <CardTitle>Solicitações Recebidas ({filteredSubmissions.length})</CardTitle>
-              <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-                <div className="space-y-2 sm:space-y-0 sm:w-48">
-                  <Label className="sm:sr-only">Instituição</Label>
-                  <Select value={institutionFilter} onValueChange={setInstitutionFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Todas Instituições" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todas Instituições</SelectItem>
-                      {institutions.map((inst) => (
-                        <SelectItem key={inst} value={inst}>
-                          {inst}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2 sm:space-y-0 sm:w-48">
-                  <Label className="sm:sr-only">Solicitante</Label>
-                  <Select value={nameFilter} onValueChange={setNameFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Todos os Solicitantes" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos os Solicitantes</SelectItem>
-                      {names.map((n) => (
-                        <SelectItem key={n} value={n}>
-                          {n}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                {activeTab === "uniformes" && (
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <CardTitle>Solicitações Recebidas ({filteredSubmissions.length})</CardTitle>
+                <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
                   <div className="space-y-2 sm:space-y-0 sm:w-48">
-                    <Label className="sm:sr-only">Genero</Label>
-                    <Select value={segmentFilter} onValueChange={setSegmentFilter}>
+                    <Label className="sm:sr-only">Instituição</Label>
+                    <Select value={institutionFilter} onValueChange={setInstitutionFilter}>
                       <SelectTrigger>
-                        <SelectValue placeholder="Todos os Generos" />
+                        <SelectValue placeholder="Todas Instituições" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all">Todos os Generos</SelectItem>
-                        <SelectItem value="Masculino">Masculino</SelectItem>
-                        <SelectItem value="Feminino">Feminino</SelectItem>
+                        <SelectItem value="all">Todas Instituições</SelectItem>
+                        {institutions.map((inst) => (
+                          <SelectItem key={inst} value={inst}>
+                            {inst}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
-                )}
-                <div className="space-y-2 sm:space-y-0 sm:w-44">
-                  <Label className="sm:sr-only">Mes</Label>
-                  <Select value={monthFilter} onValueChange={setMonthFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Todos os Meses" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos os Meses</SelectItem>
-                      {months.map((month) => (
-                        <SelectItem key={month.value} value={month.value}>
-                          {month.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="space-y-2 sm:space-y-0 sm:w-48">
+                    <Label className="sm:sr-only">Solicitante</Label>
+                    <Select value={nameFilter} onValueChange={setNameFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Todos os Solicitantes" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os Solicitantes</SelectItem>
+                        {names.map((n) => (
+                          <SelectItem key={n} value={n}>
+                            {n}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {activeTab === "uniformes" && (
+                    <div className="space-y-2 sm:space-y-0 sm:w-48">
+                      <Label className="sm:sr-only">Genero</Label>
+                      <Select value={segmentFilter} onValueChange={setSegmentFilter}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Todos os Generos" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos os Generos</SelectItem>
+                          <SelectItem value="Masculino">Masculino</SelectItem>
+                          <SelectItem value="Feminino">Feminino</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+                  <div className="space-y-2 sm:space-y-0 sm:w-44">
+                    <Label className="sm:sr-only">Mes</Label>
+                    <Select value={monthFilter} onValueChange={setMonthFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Todos os Meses" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os Meses</SelectItem>
+                        {months.map((month) => (
+                          <SelectItem key={month.value} value={month.value}>
+                            {month.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2 sm:space-y-0 sm:w-36">
+                    <Label className="sm:sr-only">Status</Label>
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Todos os Status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">Todos os Status</SelectItem>
+                        <SelectItem value="pendente">Pendente</SelectItem>
+                        <SelectItem value="processando">Processando</SelectItem>
+                        <SelectItem value="finalizado">Finalizado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button onClick={clearFilters} variant="outline" size="sm">
+                    Limpar
+                  </Button>
                 </div>
-                <div className="space-y-2 sm:space-y-0 sm:w-36">
-                  <Label className="sm:sr-only">Status</Label>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Todos os Status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Todos os Status</SelectItem>
-                      <SelectItem value="pendente">Pendente</SelectItem>
-                      <SelectItem value="processando">Processando</SelectItem>
-                      <SelectItem value="finalizado">Finalizado</SelectItem>
-                    </SelectContent>
-                  </Select>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {filteredSubmissions.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  {submissions.length === 0
+                    ? "Nenhuma solicitação recebida ainda."
+                    : "Nenhuma solicitação encontrada com os filtros selecionados."}
                 </div>
-                <Button onClick={clearFilters} variant="outline" size="sm">
-                  Limpar
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {filteredSubmissions.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                {submissions.length === 0
-                  ? "Nenhuma solicitação recebida ainda."
-                  : "Nenhuma solicitação encontrada com os filtros selecionados."}
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Data/Hora</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Nome</TableHead>
-                      <TableHead>Matrícula</TableHead>
-                      <TableHead>Instituição</TableHead>
-                      <TableHead>Itens</TableHead>
-                      <TableHead className="text-right">Ações</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredSubmissions.map((submission) => {
-                      const isAlmoxarifado = submission.submissionType === "almoxarifado"
-                      const itemCount = isAlmoxarifado
-                        ? (submission.stationeryItems?.length || 0) + (submission.kitchenItems?.length || 0) + (submission.crecheItems?.length || 0)
-                        : submission.uniforms.length + submission.shoes.length + (submission.studentKits?.length || 0) + (submission.teacherPolos?.length || 0) + (submission.backpacks?.length || 0)
-                      
-                      return (
-                        <TableRow key={submission.id}>
-                          <TableCell className="whitespace-nowrap">
-                            {new Date(submission.timestamp).toLocaleString("pt-BR")}
-                          </TableCell>
-                          <TableCell>
-                            {(() => {
-                              const status = submission.status || "pendente"
-                              const config = {
-                                pendente: { bg: "bg-yellow-100 text-yellow-800", icon: <Clock className="h-3 w-3" />, label: "Pendente" },
-                                processando: { bg: "bg-blue-100 text-blue-800", icon: <Loader2 className="h-3 w-3" />, label: "Processando" },
-                                finalizado: { bg: "bg-green-100 text-green-800", icon: <CheckCircle2 className="h-3 w-3" />, label: "Finalizado" },
-                              }[status] || { bg: "bg-yellow-100 text-yellow-800", icon: <Clock className="h-3 w-3" />, label: "Pendente" }
-                              return (
-                                <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg}`}>
-                                  {config.icon}
-                                  {config.label}
-                                </span>
-                              )
-                            })()}
-                          </TableCell>
-                          <TableCell className="font-medium">{submission.name}</TableCell>
-                          <TableCell>{submission.matricula}</TableCell>
-                          <TableCell>{submission.institution}</TableCell>
-                          <TableCell>{itemCount} itens</TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end gap-1">
-                              <Select
-                                value={submission.status || "pendente"}
-                                onValueChange={(value) => updateStatus(submission, value)}
-                                disabled={isUpdating}
-                              >
-                                <SelectTrigger className="h-8 w-[130px] text-xs">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="pendente">Pendente</SelectItem>
-                                  <SelectItem value="processando">Processando</SelectItem>
-                                  <SelectItem value="finalizado">Finalizado</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <Button variant="ghost" size="sm" onClick={() => downloadSubmissionPDF(submission)} title="Baixar PDF">
-                                <FileDown className="h-4 w-4" />
-                              </Button>
-                              <Button variant="ghost" size="sm" onClick={() => viewDetails(submission)}>
-                                <Eye className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => confirmDelete(submission)}
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      )
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Data/Hora</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Nome</TableHead>
+                        <TableHead>Matrícula</TableHead>
+                        <TableHead>Instituição</TableHead>
+                        <TableHead>Itens</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredSubmissions.map((submission) => {
+                        const isAlmoxarifado = submission.submissionType === "almoxarifado"
+                        const itemCount = isAlmoxarifado
+                          ? (submission.stationeryItems?.length || 0) + (submission.kitchenItems?.length || 0) + (submission.crecheItems?.length || 0)
+                          : submission.uniforms.length + submission.shoes.length + (submission.studentKits?.length || 0) + (submission.teacherPolos?.length || 0) + (submission.backpacks?.length || 0)
+
+                        return (
+                          <TableRow key={submission.id}>
+                            <TableCell className="whitespace-nowrap">
+                              {new Date(submission.timestamp).toLocaleString("pt-BR")}
+                            </TableCell>
+                            <TableCell>
+                              {(() => {
+                                const status = submission.status || "pendente"
+                                const config = {
+                                  pendente: { bg: "bg-yellow-100 text-yellow-800", icon: <Clock className="h-3 w-3" />, label: "Pendente" },
+                                  processando: { bg: "bg-blue-100 text-blue-800", icon: <Loader2 className="h-3 w-3" />, label: "Processando" },
+                                  finalizado: { bg: "bg-green-100 text-green-800", icon: <CheckCircle2 className="h-3 w-3" />, label: "Finalizado" },
+                                }[status] || { bg: "bg-yellow-100 text-yellow-800", icon: <Clock className="h-3 w-3" />, label: "Pendente" }
+                                return (
+                                  <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg}`}>
+                                    {config.icon}
+                                    {config.label}
+                                  </span>
+                                )
+                              })()}
+                            </TableCell>
+                            <TableCell className="font-medium">{submission.name}</TableCell>
+                            <TableCell>{submission.matricula}</TableCell>
+                            <TableCell>{submission.institution}</TableCell>
+                            <TableCell>{itemCount} itens</TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex justify-end gap-1">
+                                <Select
+                                  value={submission.status || "pendente"}
+                                  onValueChange={(value) => updateStatus(submission, value)}
+                                  disabled={isUpdating}
+                                >
+                                  <SelectTrigger className="h-8 w-[130px] text-xs">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="pendente">Pendente</SelectItem>
+                                    <SelectItem value="processando">Processando</SelectItem>
+                                    <SelectItem value="finalizado">Finalizado</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Button variant="ghost" size="sm" onClick={() => downloadSubmissionPDF(submission)} title="Baixar PDF">
+                                  <FileDown className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm" onClick={() => viewDetails(submission)}>
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => confirmDelete(submission)}
+                                  className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        )
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         )}
       </div>
 
