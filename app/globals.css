@@ -89,3 +89,117 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ===== Animações tema praia de Saquarema ===== */
+
+/* Ondas deslizando horizontalmente */
+@keyframes wave-slide {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Nuvens atravessando o céu */
+@keyframes cloud-drift {
+  0% {
+    transform: translateX(-20vw);
+  }
+  100% {
+    transform: translateX(120vw);
+  }
+}
+
+/* Brilho pulsante do sol */
+@keyframes sun-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+
+/* Raios de sol girando */
+@keyframes sun-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Gaivota voando em arco suave */
+@keyframes gull-fly {
+  0% {
+    transform: translate(-10vw, 0) scale(0.8);
+  }
+  50% {
+    transform: translate(45vw, -30px) scale(0.9);
+  }
+  100% {
+    transform: translate(110vw, 10px) scale(0.8);
+  }
+}
+
+/* Batida de asa da gaivota */
+@keyframes gull-flap {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  50% {
+    transform: scaleY(0.55);
+  }
+}
+
+/* Flutuar suave (prancha de surfe / boia) */
+@keyframes bob-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-8deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(-4deg);
+  }
+}
+
+.animate-wave-slide {
+  animation: wave-slide linear infinite;
+}
+.animate-cloud-drift {
+  animation: cloud-drift linear infinite;
+}
+.animate-sun-pulse {
+  animation: sun-pulse 5s ease-in-out infinite;
+}
+.animate-sun-spin {
+  animation: sun-spin 60s linear infinite;
+}
+.animate-gull-fly {
+  animation: gull-fly linear infinite;
+}
+.animate-gull-flap {
+  animation: gull-flap 0.5s ease-in-out infinite;
+}
+.animate-bob-float {
+  animation: bob-float 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-wave-slide,
+  .animate-cloud-drift,
+  .animate-sun-pulse,
+  .animate-sun-spin,
+  .animate-gull-fly,
+  .animate-gull-flap,
+  .animate-bob-float {
+    animation: none;
+  }
+}
