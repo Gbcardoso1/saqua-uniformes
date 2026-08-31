@@ -4,8 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.975 0.012 210);
-  --foreground: oklch(0.2 0.035 220);
+  --background: oklch(0.985 0.006 90);
+  --foreground: oklch(0.22 0.025 220);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.2 0.035 220);
   --popover: oklch(1 0 0);
@@ -14,8 +14,8 @@
   --primary-foreground: oklch(0.98 0.01 100);
   --secondary: oklch(0.94 0.025 210);
   --secondary-foreground: oklch(0.3 0.06 220);
-  --muted: oklch(0.95 0.018 210);
-  --muted-foreground: oklch(0.48 0.035 220);
+  --muted: oklch(0.965 0.012 90);
+  --muted-foreground: oklch(0.49 0.025 220);
   --accent: oklch(0.78 0.14 88);
   --accent-foreground: oklch(0.25 0.05 70);
   --destructive: oklch(0.58 0.2 25);
@@ -90,7 +90,7 @@
   }
 }
 
-/* ===== Animações tema praia de Saquarema ===== */
+/* Movimento reduzido e discreto para preservar foco no formulário. */
 
 /* Ondas deslizando horizontalmente */
 @keyframes wave-slide {
