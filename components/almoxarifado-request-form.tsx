@@ -46,6 +46,7 @@ const stationeryCategories = {
     "CANETA ESFEROGRAFICA SIMPLES PRETA - CX/50 UND.",
     "CANETA ESFEROGRAFICA SIMPLES VERMELHA - CX/50 UND.",
     "CANETA VERMELHA EMB. C/10 UND (KIT ESCOLAR).",
+     "LAPIS DE COR CAIXA COM 12 CORES",
     "LAPIS PRETO HB Nº 2 - 10 UND.",
     "LAPIS PRETO HB Nº 2 - CX /C 144UND.",
     "GRAFITE 0,9MM (KIT ESCOLAR)",
@@ -63,10 +64,6 @@ const stationeryCategories = {
     "MARCADOR RETROPROJETOR E CD - PONTA DUPLA 1 E 2 MM - PRETO - CX/12 UND",
   ],
   "Cadernos, Agendas e Blocos": [
-    "LAPIS DE COR CAIXA COM 12 CORES ECO - SEXTAVADO",
-    "LAPIS PRETO HB Nº 2 - 10 UND.",
-    "LAPIS PRETO HB Nº 2 - CX /C 144UND.",
-    "GRAFITE 0,9MM (KIT ESCOLAR)",
   ],
   "Papéis - Cartolina e Chamequinho": [
   ],
