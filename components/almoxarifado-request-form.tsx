@@ -192,7 +192,6 @@ const stationeryCategories = {
 
 // Itens de Cozinha
 const kitchenItemsList = [
-  [
   "FACA DE MESA INOX UND.",
   "GARFO DE MESA INOX UND.",
   "ACENDEDOR DE FOGÃO.",
