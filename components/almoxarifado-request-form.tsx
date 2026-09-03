@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
+import { fetchFormItems, groupItems } from "@/lib/form-items"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -257,6 +258,8 @@ export default function AlmoxarifadoRequestForm() {
     matricula: "",
     institution: "",
   })
+  const [catalogItems, setCatalogItems] = useState<{ form_type: string; group_name: string; label: string; sort_order: number }[]>([])
+  useEffect(() => { fetchFormItems().then(setCatalogItems).catch(() => undefined) }, [])
 
   // Estado para quantidades de papelaria (chave = nome do item, valor = quantidade)
   const [stationeryQuantities, setStationeryQuantities] = useState<Record<string, string>>({})
@@ -327,7 +330,9 @@ export default function AlmoxarifadoRequestForm() {
 
   // Filtrar itens de papelaria por busca
   const filteredStationeryCategories = useMemo(() => {
-    if (!stationerySearch.trim()) return stationeryCategories
+    const persisted = catalogItems.filter((item) => item.form_type === "almoxarifado" && item.group_name !== "Cozinha" && item.group_name !== "Creche")
+    const sourceCategories = persisted.length ? persisted.reduce<Record<string, string[]>>((acc, item) => { (acc[item.group_name] ??= []).push(item.label); return acc }, {}) : stationeryCategories
+    if (!stationerySearch.trim()) return sourceCategories
 
     const search = stationerySearch.toLowerCase()
     const filtered: Record<string, string[]> = {}
@@ -342,21 +347,25 @@ export default function AlmoxarifadoRequestForm() {
     })
 
     return filtered
-  }, [stationerySearch])
+  }, [stationerySearch, catalogItems])
 
   // Filtrar itens de cozinha por busca
   const filteredKitchenItems = useMemo(() => {
-    if (!kitchenSearch.trim()) return kitchenItemsList
+    const sourceItems = catalogItems.filter((item) => item.form_type === "almoxarifado" && item.group_name === "Cozinha").sort((a, b) => a.sort_order - b.sort_order).map((item) => item.label)
+    const list = sourceItems.length ? sourceItems : kitchenItemsList
+    if (!kitchenSearch.trim()) return list
     const search = kitchenSearch.toLowerCase()
-    return kitchenItemsList.filter(item => item.toLowerCase().includes(search))
-  }, [kitchenSearch])
+    return list.filter(item => item.toLowerCase().includes(search))
+  }, [kitchenSearch, catalogItems])
 
   // Filtrar itens de creche por busca
   const filteredCrecheItems = useMemo(() => {
-    if (!crecheSearch.trim()) return crecheItemsList
+    const sourceItems = catalogItems.filter((item) => item.form_type === "almoxarifado" && item.group_name === "Creche").sort((a, b) => a.sort_order - b.sort_order).map((item) => item.label)
+    const list = sourceItems.length ? sourceItems : crecheItemsList
+    if (!crecheSearch.trim()) return list
     const search = crecheSearch.toLowerCase()
-    return crecheItemsList.filter(item => item.toLowerCase().includes(search))
-  }, [crecheSearch])
+    return list.filter(item => item.toLowerCase().includes(search))
+  }, [crecheSearch, catalogItems])
 
   // Contar itens selecionados
   const selectedStationeryCount = Object.values(stationeryQuantities).filter(q => q && parseInt(q) > 0).length

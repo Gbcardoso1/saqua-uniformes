@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt, MessageSquare, LayoutDashboard } from "lucide-react"
+import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt, MessageSquare, LayoutDashboard, Pencil } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import AdminFormItems from "@/components/admin-form-items"
 
 type Submission = {
   id: string
@@ -80,7 +81,7 @@ export default function AdminPage() {
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [nameFilter, setNameFilter] = useState<string>("all")
-  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "feedbacks">("almoxarifado")
+  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "feedbacks" | "edicoes">("almoxarifado")
   const [institutions, setInstitutions] = useState<string[]>([])
   const [names, setNames] = useState<string[]>([])
   const [months, setMonths] = useState<{ value: string; label: string }[]>([])
@@ -783,6 +784,17 @@ export default function AdminPage() {
           </button>
           <button
             type="button"
+            onClick={() => setActiveTab("edicoes")}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "edicoes"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+          >
+            <Pencil className="h-4 w-4" />
+            <span>Edições</span>
+          </button>
+          <button
+            type="button"
             onClick={() => handleTabChange("feedbacks")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "feedbacks"
                 ? "bg-primary text-primary-foreground shadow-sm"
@@ -802,7 +814,9 @@ export default function AdminPage() {
           </button>
         </div>
 
-        {activeTab === "feedbacks" ? (
+        {activeTab === "edicoes" ? (
+          <AdminFormItems />
+        ) : activeTab === "feedbacks" ? (
           <Card>
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
