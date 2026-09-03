@@ -330,7 +330,7 @@ export default function AlmoxarifadoRequestForm() {
 
   // Filtrar itens de papelaria por busca
   const filteredStationeryCategories = useMemo(() => {
-    const persisted = catalogItems.filter((item) => item.form_type === "almoxarifado" && item.group_name !== "Cozinha" && item.group_name !== "Creche")
+    const persisted = catalogItems.filter((item) => item.form_type === "almoxarifado" && item.group_name !== "itens cozinha" && item.group_name !== "itens creche")
     const sourceCategories = persisted.length ? persisted.reduce<Record<string, string[]>>((acc, item) => { (acc[item.group_name] ??= []).push(item.label); return acc }, {}) : stationeryCategories
     if (!stationerySearch.trim()) return sourceCategories
 
@@ -351,7 +351,7 @@ export default function AlmoxarifadoRequestForm() {
 
   // Filtrar itens de cozinha por busca
   const filteredKitchenItems = useMemo(() => {
-    const sourceItems = catalogItems.filter((item) => item.form_type === "almoxarifado" && item.group_name === "Cozinha").sort((a, b) => a.sort_order - b.sort_order).map((item) => item.label)
+    const sourceItems = catalogItems.filter((item) => item.form_type === "almoxarifado" && item.group_name === "itens cozinha").sort((a, b) => a.sort_order - b.sort_order).map((item) => item.label)
     const list = sourceItems.length ? sourceItems : kitchenItemsList
     if (!kitchenSearch.trim()) return list
     const search = kitchenSearch.toLowerCase()
@@ -360,7 +360,7 @@ export default function AlmoxarifadoRequestForm() {
 
   // Filtrar itens de creche por busca
   const filteredCrecheItems = useMemo(() => {
-    const sourceItems = catalogItems.filter((item) => item.form_type === "almoxarifado" && item.group_name === "Creche").sort((a, b) => a.sort_order - b.sort_order).map((item) => item.label)
+    const sourceItems = catalogItems.filter((item) => item.form_type === "almoxarifado" && item.group_name === "itens creche").sort((a, b) => a.sort_order - b.sort_order).map((item) => item.label)
     const list = sourceItems.length ? sourceItems : crecheItemsList
     if (!crecheSearch.trim()) return list
     const search = crecheSearch.toLowerCase()

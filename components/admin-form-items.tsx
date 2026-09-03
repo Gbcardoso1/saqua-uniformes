@@ -17,8 +17,9 @@ const catalogs = [
 export default function AdminFormItems() {
   const [items, setItems] = useState<Item[]>([])
   const [catalog, setCatalog] = useState("almoxarifado")
-  const [group, setGroup] = useState("Geral")
-  const [groupFilter, setGroupFilter] = useState("todos")
+  const categoryMap: Record<string, string[]> = { almoxarifado: ["itens papelaria", "itens cozinha", "itens creche"], uniformes: ["uniformes", "calçados", "kits de aluno", "professor", "mochilas"] }
+  const [group, setGroup] = useState(categoryMap.almoxarifado[0])
+  const [groupFilter, setGroupFilter] = useState(categoryMap.almoxarifado[0])
   const [newLabel, setNewLabel] = useState("")
   const [editing, setEditing] = useState<string | null>(null)
   const [editValue, setEditValue] = useState("")
@@ -32,7 +33,7 @@ export default function AdminFormItems() {
   }
   useEffect(() => { load().catch((error) => toast.error(error.message)) }, [])
 
-  const groups = useMemo(() => Array.from(new Set(items.filter((item) => item.form_type === catalog).map((item) => item.group_name))), [items, catalog])
+  const groups = categoryMap[catalog] ?? []
   const visible = useMemo(() => items.filter((item) => item.form_type === catalog && (groupFilter === "todos" || item.group_name === groupFilter)).sort((a, b) => a.group_name.localeCompare(b.group_name) || a.sort_order - b.sort_order), [items, catalog, groupFilter])
   const request = async (body: object, method = "POST") => {
     setBusy(true)
@@ -63,8 +64,8 @@ export default function AdminFormItems() {
   const remove = async (item: Item) => { if (window.confirm(`Remover “${item.label}” dos novos pedidos?`)) await request({ id: item.id, label: item.label, group_name: item.group_name, sort_order: item.sort_order, is_active: false }, "PATCH") }
 
   return <Card>
-    <CardHeader><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><CardTitle>Edições dos formulários</CardTitle><Select value={catalog} onValueChange={(value) => { setCatalog(value); setGroupFilter("todos") }}><SelectTrigger className="w-full sm:w-56"><SelectValue /></SelectTrigger><SelectContent>{catalogs.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent></Select></div></CardHeader>
-    <CardContent className="flex flex-col gap-4"><Select value={groupFilter} onValueChange={setGroupFilter}><SelectTrigger className="w-full sm:w-72"><SelectValue placeholder="Filtrar por categoria" /></SelectTrigger><SelectContent><SelectItem value="todos">Todas as categorias</SelectItem>{groups.map((itemGroup) => <SelectItem key={itemGroup} value={itemGroup}>{itemGroup}</SelectItem>)}</SelectContent></Select><div className="grid gap-2 sm:grid-cols-[1fr_180px_auto]"><Input value={newLabel} onChange={(event) => setNewLabel(event.target.value)} placeholder="Nome do novo item" onKeyDown={(event) => { if (event.key === "Enter" && !event.nativeEvent.isComposing && event.keyCode !== 229) add() }} /><Input value={group} onChange={(event) => setGroup(event.target.value)} placeholder="Grupo / categoria" /><Button onClick={add} disabled={busy}><Plus data-icon="inline-start" />Adicionar</Button></div>
+    <CardHeader><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><CardTitle>Edições dos formulários</CardTitle><Select value={catalog} onValueChange={(value) => { setCatalog(value); setGroupFilter(categoryMap[value][0]); setGroup(categoryMap[value][0]) }}><SelectTrigger className="w-full sm:w-56"><SelectValue /></SelectTrigger><SelectContent>{catalogs.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent></Select></div></CardHeader>
+    <CardContent className="flex flex-col gap-4"><div className="flex flex-wrap gap-2" role="tablist" aria-label="Categorias do formulário">{groups.map((itemGroup) => <Button key={itemGroup} type="button" variant={groupFilter === itemGroup ? "default" : "outline"} onClick={() => { setGroupFilter(itemGroup); setGroup(itemGroup) }}>{itemGroup}</Button>)}</div><div className="grid gap-2 sm:grid-cols-[1fr_180px_auto]"><Input value={newLabel} onChange={(event) => setNewLabel(event.target.value)} placeholder="Nome do novo item" onKeyDown={(event) => { if (event.key === "Enter" && !event.nativeEvent.isComposing && event.keyCode !== 229) add() }} /><Input value={group} onChange={(event) => setGroup(event.target.value)} placeholder="Grupo / categoria" /><Button onClick={add} disabled={busy}><Plus data-icon="inline-start" />Adicionar</Button></div>
       {visible.length === 0 ? <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">Nenhum item cadastrado. Adicione o primeiro item acima.</p> : <div className="flex flex-col gap-2">{visible.map((item, index) => <div key={item.id} className="flex items-center gap-2 rounded-lg border p-2"><div className="min-w-0 flex-1">{editing === item.id ? <Input value={editValue} autoFocus onChange={(event) => setEditValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.nativeEvent.isComposing && event.keyCode !== 229) update(item) }} /> : <><p className="truncate text-sm">{item.label}</p><p className="text-xs text-muted-foreground">{item.group_name}</p></>}</div><Button size="icon" variant="ghost" onClick={() => { setEditing(editing === item.id ? null : item.id); setEditValue(item.label) }} aria-label="Editar item">{editing === item.id ? <Save /> : <Pencil />}</Button><Button size="icon" variant="ghost" disabled={index === 0 || busy} onClick={() => move(item, -1)} aria-label="Mover para cima"><ArrowUp /></Button><Button size="icon" variant="ghost" disabled={index === visible.length - 1 || busy} onClick={() => move(item, 1)} aria-label="Mover para baixo"><ArrowDown /></Button><Button size="icon" variant="ghost" onClick={() => remove(item)} aria-label="Remover item"><Trash2 /></Button></div>)}</div>}
     </CardContent>
   </Card>
