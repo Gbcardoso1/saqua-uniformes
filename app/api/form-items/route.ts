@@ -6,7 +6,7 @@ export async function GET() {
   const supabase = createAdminClient()
   const { data, error } = await supabase.from("form_items").select("*").eq("is_active", true).order("form_type").order("group_name").order("sort_order")
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  const expectedGroups = new Set(["itens papelaria", "itens cozinha", "itens creche", "uniformes", "calçados", "kits de aluno", "professor", "mochilas"])
+  const expectedGroups = new Set(["Pincéis e Arte", "Canetas e Lápis", "Marcadores e Marca-texto", "itens cozinha", "itens creche", "uniformes", "calçados", "kits de aluno", "professor", "mochilas"])
   if (!data?.length || !Array.from(expectedGroups).every((group) => data.some((item) => item.group_name === group))) {
     await supabase.from("form_items").delete().eq("is_active", true)
     const seeded = await supabase.from("form_items").insert(defaultFormItems).select("*")

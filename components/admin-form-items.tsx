@@ -17,7 +17,10 @@ const catalogs = [
 export default function AdminFormItems() {
   const [items, setItems] = useState<Item[]>([])
   const [catalog, setCatalog] = useState("almoxarifado")
-  const categoryMap: Record<string, string[]> = { almoxarifado: ["itens papelaria", "itens cozinha", "itens creche"], uniformes: ["uniformes", "calçados", "kits de aluno", "professor", "mochilas"] }
+  const categoryMap: Record<string, string[]> = {
+    almoxarifado: ["itens papelaria", "itens cozinha", "itens creche"],
+    uniformes: ["uniformes", "calçados", "kits de aluno", "professor", "mochilas"],
+  }
   const [group, setGroup] = useState(categoryMap.almoxarifado[0])
   const [groupFilter, setGroupFilter] = useState(categoryMap.almoxarifado[0])
   const [newLabel, setNewLabel] = useState("")
@@ -34,7 +37,10 @@ export default function AdminFormItems() {
   useEffect(() => { load().catch((error) => toast.error(error.message)) }, [])
 
   const groups = categoryMap[catalog] ?? []
-  const visible = useMemo(() => items.filter((item) => item.form_type === catalog && (groupFilter === "todos" || item.group_name === groupFilter)).sort((a, b) => a.group_name.localeCompare(b.group_name) || a.sort_order - b.sort_order), [items, catalog, groupFilter])
+  const stationeryGroups = ["Pincéis e Arte", "Canetas e Lápis", "Marcadores e Marca-texto", "Cadernos, Agendas e Blocos", "Papéis - Cartolina e Chamequinho", "EVA Glitter", "Papel Crepom", "Papel Camurça", "Papel Cartão e Couché", "Papel Celofane", "Papel Laminado", "Papel Micro Ondulado", "Papel Seda", "TNT", "Fitas e Colas", "Grampeadores e Grampos", "Pastas e Arquivos", "Etiquetas e Envelopes", "Tintas e Carimbos"]
+  const labels: Record<string, string> = { "itens papelaria": "Papelaria", "itens cozinha": "Itens Cozinha", "itens creche": "Itens Creche", "kits de aluno": "Kits de Aluno" }
+  const editorGroups = catalog === "almoxarifado" && groupFilter === "itens papelaria" ? stationeryGroups : [groupFilter]
+  const visible = useMemo(() => items.filter((item) => item.form_type === catalog && editorGroups.includes(item.group_name)).sort((a, b) => a.sort_order - b.sort_order), [items, catalog, groupFilter, editorGroups])
   const request = async (body: object, method = "POST") => {
     setBusy(true)
     try {
@@ -48,7 +54,7 @@ export default function AdminFormItems() {
   const add = async () => {
     const label = newLabel.trim()
     if (!label) return
-    await request({ form_type: catalog, group_name: group.trim() || "Geral", label, sort_order: visible.length })
+    await request({ form_type: catalog, group_name: group.trim() === "itens papelaria" && catalog === "almoxarifado" ? "Pincéis e Arte" : group.trim() || groupFilter, label, sort_order: visible.length })
     setNewLabel("")
   }
   const update = async (item: Item, label = editValue) => {
@@ -65,7 +71,7 @@ export default function AdminFormItems() {
 
   return <Card>
     <CardHeader><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><CardTitle>Edições dos formulários</CardTitle><Select value={catalog} onValueChange={(value) => { setCatalog(value); setGroupFilter(categoryMap[value][0]); setGroup(categoryMap[value][0]) }}><SelectTrigger className="w-full sm:w-56"><SelectValue /></SelectTrigger><SelectContent>{catalogs.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent></Select></div></CardHeader>
-    <CardContent className="flex flex-col gap-4"><div className="flex flex-wrap gap-2" role="tablist" aria-label="Categorias do formulário">{groups.map((itemGroup) => <Button key={itemGroup} type="button" variant={groupFilter === itemGroup ? "default" : "outline"} onClick={() => { setGroupFilter(itemGroup); setGroup(itemGroup) }}>{itemGroup}</Button>)}</div><div className="grid gap-2 sm:grid-cols-[1fr_180px_auto]"><Input value={newLabel} onChange={(event) => setNewLabel(event.target.value)} placeholder="Nome do novo item" onKeyDown={(event) => { if (event.key === "Enter" && !event.nativeEvent.isComposing && event.keyCode !== 229) add() }} /><Input value={group} onChange={(event) => setGroup(event.target.value)} placeholder="Grupo / categoria" /><Button onClick={add} disabled={busy}><Plus data-icon="inline-start" />Adicionar</Button></div>
+    <CardContent className="flex flex-col gap-4"><div className="flex flex-wrap gap-2" role="tablist" aria-label="Categorias do formulário">{groups.map((itemGroup) => <Button key={itemGroup} type="button" variant={groupFilter === itemGroup ? "default" : "outline"} onClick={() => { setGroupFilter(itemGroup); setGroup(itemGroup) }}>{labels[itemGroup] ?? itemGroup}</Button>)}{catalog === "almoxarifado" && groupFilter === "itens papelaria" && <div className="flex flex-wrap gap-2 border-l pl-3">{stationeryGroups.map((itemGroup) => <Button key={itemGroup} type="button" size="sm" variant={groupFilter === itemGroup ? "default" : "outline"} onClick={() => { setGroupFilter(itemGroup); setGroup(itemGroup) }}>{itemGroup}</Button>)}</div>}</div><div className="grid gap-2 sm:grid-cols-[1fr_180px_auto]"><Input value={newLabel} onChange={(event) => setNewLabel(event.target.value)} placeholder="Nome do novo item" onKeyDown={(event) => { if (event.key === "Enter" && !event.nativeEvent.isComposing && event.keyCode !== 229) add() }} /><Input value={group} onChange={(event) => setGroup(event.target.value)} placeholder="Categoria selecionada" aria-label="Categoria selecionada" /><Button onClick={add} disabled={busy}><Plus data-icon="inline-start" />Adicionar</Button></div>
       {visible.length === 0 ? <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">Nenhum item cadastrado. Adicione o primeiro item acima.</p> : <div className="flex flex-col gap-2">{visible.map((item, index) => <div key={item.id} className="flex items-center gap-2 rounded-lg border p-2"><div className="min-w-0 flex-1">{editing === item.id ? <Input value={editValue} autoFocus onChange={(event) => setEditValue(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && !event.nativeEvent.isComposing && event.keyCode !== 229) update(item) }} /> : <><p className="truncate text-sm">{item.label}</p><p className="text-xs text-muted-foreground">{item.group_name}</p></>}</div><Button size="icon" variant="ghost" onClick={() => { setEditing(editing === item.id ? null : item.id); setEditValue(item.label) }} aria-label="Editar item">{editing === item.id ? <Save /> : <Pencil />}</Button><Button size="icon" variant="ghost" disabled={index === 0 || busy} onClick={() => move(item, -1)} aria-label="Mover para cima"><ArrowUp /></Button><Button size="icon" variant="ghost" disabled={index === visible.length - 1 || busy} onClick={() => move(item, 1)} aria-label="Mover para baixo"><ArrowDown /></Button><Button size="icon" variant="ghost" onClick={() => remove(item)} aria-label="Remover item"><Trash2 /></Button></div>)}</div>}
     </CardContent>
   </Card>

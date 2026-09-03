@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
+import { fetchFormItems } from "@/lib/form-items"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -69,15 +70,12 @@ export default function UniformRequestForm() {
     matricula: "",
     institution: "",
   })
-
   const [showModal, setShowModal] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [pdfDownloaded, setPdfDownloaded] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(Object.keys(uniformCategories)))
-
-  // Estado para quantidades - chave: "categoria|genero|tamanho"
   const [uniformQuantities, setUniformQuantities] = useState<Record<string, number>>({})
   const [shoeQuantities, setShoeQuantities] = useState<Record<string, number>>({})
   const [crocsQuantities, setCrocsQuantities] = useState<Record<string, number>>({})
@@ -86,6 +84,16 @@ export default function UniformRequestForm() {
   const [poloQuantities, setPoloQuantities] = useState<Record<string, number>>({})
   const [kitPoloQuantity, setKitPoloQuantity] = useState<number>(0)
   const [backpackQuantities, setBackpackQuantities] = useState<Record<string, number>>({})
+  const [catalogItems, setCatalogItems] = useState<{ group_name: string; label: string; sort_order: number }[]>([])
+  useEffect(() => { fetchFormItems().then((items) => setCatalogItems(items.filter((item) => item.form_type === "uniformes"))).catch(() => undefined) }, [])
+  const catalog = (group: string, fallback: string[]) => { const values = catalogItems.filter((item) => item.group_name === group).sort((a, b) => a.sort_order - b.sort_order).map((item) => item.label); return values.length ? values : fallback }
+  const editableUniformSizes = catalog("uniformes", [])
+  const uniformOptions = Object.fromEntries(Object.entries(uniformCategories).map(([key, value]) => [key, { ...value, sizes: editableUniformSizes.length ? editableUniformSizes : value.sizes }])) as typeof uniformCategories
+  const editableShoeSizes = catalog("calçados", shoeSizes)
+  const editableCrocsSizes = editableShoeSizes.filter((size) => Number.parseInt(size) <= 34 || size.includes("/"))
+  const editableKitTypes = catalog("kits de aluno", studentKitTypes)
+  const editableTeacherSizes = catalog("professor", teacherPoloSizes)
+  const editableBackpacks = catalog("mochilas", backpackTypes)
 
   // Calcular total de itens
   const totalItems = useMemo(() => {
@@ -110,7 +118,7 @@ export default function UniformRequestForm() {
     setExpandedCategories(newExpanded)
   }
 
-  const expandAll = () => setExpandedCategories(new Set(Object.keys(uniformCategories)))
+  const expandAll = () => setExpandedCategories(new Set(Object.keys(uniformOptions)))
   const collapseAll = () => setExpandedCategories(new Set())
 
   const validateForm = (): boolean => {
@@ -485,7 +493,7 @@ export default function UniformRequestForm() {
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
-                {Object.entries(uniformCategories).map(([category, config]) => {
+                {Object.entries(uniformOptions).map(([category, config]) => {
                   const isExpanded = expandedCategories.has(category)
                   const categoryItems = config.genders.flatMap((gender) =>
                     config.sizes.map((size) => ({ gender, size, key: `${category}|${gender}|${size}` }))
@@ -605,7 +613,7 @@ export default function UniformRequestForm() {
               <CardContent>
                 {footwearType === "tenis" ? (
                   <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
-                    {shoeSizes.map((size) => {
+                    {editableShoeSizes.map((size) => {
                       const qty = shoeQuantities[size] || 0
                       return (
                         <div
@@ -630,7 +638,7 @@ export default function UniformRequestForm() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
-                    {crocsSizes.map((size) => {
+                    {editableCrocsSizes.map((size) => {
                       const qty = crocsQuantities[size] || 0
                       return (
                         <div
@@ -669,7 +677,7 @@ export default function UniformRequestForm() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  {studentKitTypes.map((kit) => {
+                  {editableKitTypes.map((kit) => {
                     const qty = kitQuantities[kit] || 0
                     return (
                       <div
@@ -721,7 +729,7 @@ export default function UniformRequestForm() {
                 <div>
                   <h4 className="font-medium mb-3">Polos Avulsas (Tamanhos)</h4>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                    {teacherPoloSizes.map((size) => {
+                    {editableTeacherSizes.map((size) => {
                       const qty = poloQuantities[size] || 0
                       return (
                         <div
@@ -760,7 +768,7 @@ export default function UniformRequestForm() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {backpackTypes.map((type) => {
+                  {editableBackpacks.map((type) => {
                     const qty = backpackQuantities[type] || 0
                     return (
                       <div
