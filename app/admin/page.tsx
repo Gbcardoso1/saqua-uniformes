@@ -809,7 +809,7 @@ export default function AdminPage() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <CardTitle>Feedbacks e Sugestoes ({filteredFeedbacks.length})</CardTitle>
                 <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-  <div className="space-y-2 sm:space-y-0 sm:w-44">
+  <div className="space-y-2 sm:space-y-0 sm:w-72">
   <Label className="sr-only">Instituicao</Label>
   <InstitutionPicker value={feedbackInstitutionFilter} onChange={setFeedbackInstitutionFilter} includeAll />
   </div>
@@ -945,7 +945,7 @@ export default function AdminPage() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <CardTitle>Solicitações Recebidas ({filteredSubmissions.length})</CardTitle>
                 <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-  <div className="space-y-2 sm:space-y-0 sm:w-48">
+  <div className="space-y-2 sm:space-y-0 sm:w-72">
   <Label className="sr-only">Instituição</Label>
   <InstitutionPicker value={institutionFilter} onChange={setInstitutionFilter} includeAll />
   </div>

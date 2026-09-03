@@ -36,7 +36,7 @@ export function InstitutionPicker({ value, onChange, required, includeAll = fals
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+      <PopoverContent className="w-[min(28rem,calc(100vw-2rem))] p-0" align="start">
         <Command>
           <CommandInput placeholder="Buscar instituição..." />
           <CommandList>
@@ -56,7 +56,7 @@ export function InstitutionPicker({ value, onChange, required, includeAll = fals
                   setOpen(false)
                 }}>
                 <Check className={cn("mr-2 h-4 w-4", value === institution ? "opacity-100" : "opacity-0")} />
-                <span className="truncate">{institution}</span>
+                <span className="whitespace-normal leading-5">{institution}</span>
               </CommandItem>
             ))}
           </CommandList>
