@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Download, Search, ChevronDown, ChevronUp, Shirt, Package, Users, Backpack, Footprints } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { InstitutionPicker } from "@/components/institution-picker"
 
 type FormData = {
   name: string
@@ -404,11 +405,9 @@ export default function UniformRequestForm() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="institution">Nome da Instituição de Ensino</Label>
-                <Input
-                  id="institution"
-                  placeholder="Nome da instituição"
+                <InstitutionPicker
                   value={formData.institution}
-                  onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
+                  onChange={(institution) => setFormData({ ...formData, institution })}
                   required
                 />
               </div>

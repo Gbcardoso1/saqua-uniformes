@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { CheckCircle, Download, Search, Package, Baby, UtensilsCrossed } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { InstitutionPicker } from "@/components/institution-picker"
 import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
@@ -583,12 +584,9 @@ export default function AlmoxarifadoRequestForm() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="institution">Nome da Instituição de Ensino</Label>
-              <Input
-                id="institution"
-                name="institution"
-                placeholder="Digite o nome da instituição"
+              <InstitutionPicker
                 value={formData.institution}
-                onChange={handleInputChange}
+                onChange={(institution) => setFormData({ ...formData, institution })}
                 required
               />
             </div>
