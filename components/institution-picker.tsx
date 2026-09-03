@@ -12,9 +12,10 @@ type InstitutionPickerProps = {
   value: string
   onChange: (value: string) => void
   required?: boolean
+  includeAll?: boolean
 }
 
-export function InstitutionPicker({ value, onChange, required }: InstitutionPickerProps) {
+export function InstitutionPicker({ value, onChange, required, includeAll = false }: InstitutionPickerProps) {
   const [open, setOpen] = useState(false)
 
   return (
@@ -26,27 +27,36 @@ export function InstitutionPicker({ value, onChange, required }: InstitutionPick
           type="button"
           variant="outline"
           role="combobox"
-          aria-expanded={false}
+          aria-expanded={open}
           className="w-full justify-between font-normal"
         >
           <span className={cn("truncate", !value && "text-muted-foreground")}>
-            {value || "Selecione a instituição"}
+            {value === "all" ? "Todas as instituições" : value || "Selecione a instituição"}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
+      <PopoverContent className="w-[min(34rem,calc(100vw-2rem))] p-0" align="start">
         <Command>
           <CommandInput placeholder="Buscar instituição..." />
           <CommandList>
             <CommandEmpty>Nenhuma instituição encontrada.</CommandEmpty>
+            {includeAll && (
+              <CommandItem value="all" onSelect={() => {
+                onChange("all")
+                setOpen(false)
+              }}>
+                <Check className={cn("mr-2 h-4 w-4", value === "all" ? "opacity-100" : "opacity-0")} />
+                <span>Todas as instituições</span>
+              </CommandItem>
+            )}
             {institutions.map((institution) => (
               <CommandItem key={institution} value={institution} onSelect={() => {
                   onChange(institution)
                   setOpen(false)
                 }}>
                 <Check className={cn("mr-2 h-4 w-4", value === institution ? "opacity-100" : "opacity-0")} />
-                <span className="truncate">{institution}</span>
+                <span className="whitespace-normal leading-5">{institution}</span>
               </CommandItem>
             ))}
           </CommandList>

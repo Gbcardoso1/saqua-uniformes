@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt, MessageSquare, LayoutDashboard } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import { InstitutionPicker } from "@/components/institution-picker"
 
 type Submission = {
   id: string
@@ -808,22 +809,10 @@ export default function AdminPage() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <CardTitle>Feedbacks e Sugestoes ({filteredFeedbacks.length})</CardTitle>
                 <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-                  <div className="space-y-2 sm:space-y-0 sm:w-44">
-                    <Label className="sm:sr-only">Instituicao</Label>
-                    <Select value={feedbackInstitutionFilter} onValueChange={setFeedbackInstitutionFilter}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Todas Instituicoes" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Todas Instituicoes</SelectItem>
-                        {feedbackInstitutions.map((inst) => (
-                          <SelectItem key={inst} value={inst}>
-                            {inst}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+  <div className="space-y-2 sm:space-y-0 sm:w-72">
+  <Label className="sr-only">Instituicao</Label>
+  <InstitutionPicker value={feedbackInstitutionFilter} onChange={setFeedbackInstitutionFilter} includeAll />
+  </div>
                   <div className="space-y-2 sm:space-y-0 sm:w-36">
                     <Label className="sm:sr-only">Categoria</Label>
                     <Select value={feedbackCategoryFilter} onValueChange={setFeedbackCategoryFilter}>
@@ -956,22 +945,10 @@ export default function AdminPage() {
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <CardTitle>Solicitações Recebidas ({filteredSubmissions.length})</CardTitle>
                 <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
-                  <div className="space-y-2 sm:space-y-0 sm:w-48">
-                    <Label className="sm:sr-only">Instituição</Label>
-                    <Select value={institutionFilter} onValueChange={setInstitutionFilter}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Todas Instituições" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Todas Instituições</SelectItem>
-                        {institutions.map((inst) => (
-                          <SelectItem key={inst} value={inst}>
-                            {inst}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+  <div className="space-y-2 sm:space-y-0 sm:w-72">
+  <Label className="sr-only">Instituição</Label>
+  <InstitutionPicker value={institutionFilter} onChange={setInstitutionFilter} includeAll />
+  </div>
                   <div className="space-y-2 sm:space-y-0 sm:w-48">
                     <Label className="sm:sr-only">Solicitante</Label>
                     <Select value={nameFilter} onValueChange={setNameFilter}>
