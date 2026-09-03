@@ -36,7 +36,7 @@ export function InstitutionPicker({ value, onChange, required, includeAll = fals
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[min(28rem,calc(100vw-2rem))] p-0" align="start">
+      <PopoverContent className="w-[min(34rem,calc(100vw-2rem))] p-0" align="start">
         <Command>
           <CommandInput placeholder="Buscar instituição..." />
           <CommandList>

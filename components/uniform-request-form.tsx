@@ -405,11 +405,13 @@ export default function UniformRequestForm() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="institution">Nome da Instituição de Ensino</Label>
+                <div className="w-full sm:max-w-xl">
                 <InstitutionPicker
                   value={formData.institution}
                   onChange={(institution) => setFormData({ ...formData, institution })}
                   required
                 />
+                </div>
               </div>
             </div>
           </CardContent>
