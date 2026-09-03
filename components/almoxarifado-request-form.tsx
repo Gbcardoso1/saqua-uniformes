@@ -190,7 +190,6 @@ const stationeryCategories = {
 
 // Itens de Cozinha
 const kitchenItemsList = [
-  [
   "FACA DE MESA INOX UND.",
   "GARFO DE MESA INOX UND.",
   "ACENDEDOR DE FOGÃO.",
@@ -228,7 +227,7 @@ const kitchenItemsList = [
   "PEGADOR DE MACARRAO INOX UND.",
   "PEGADOR DE SALADA INOX UND.",
   "PRATO DE VIDRO UND.",
-  "TABUA P/ CORTE XG."
+  "TABUA P/ CORTE XG.",
 ]
 
 // Itens de Creche
