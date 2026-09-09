@@ -435,7 +435,7 @@ export default function UniformRequestForm() {
               )}
             </TabsTrigger>
             <TabsTrigger value="kits" className="flex flex-col gap-1 py-3">
-              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-lj1CI99BZx7Ot109BqqLBoXKeCL4uL.png" alt="" className="h-6 w-6 object-contain" />
+              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-TKwfiQgKkgI5qtM08rq1d6pHpBdIvX.png" alt="Kit de aluno" className="h-6 w-6 object-contain" />
               <span className="text-xs">Kits Aluno</span>
               {Object.values(kitQuantities).some(q => q > 0) && (
                 <Badge variant="secondary" className="text-xs">{Object.values(kitQuantities).filter(q => q > 0).length}</Badge>
