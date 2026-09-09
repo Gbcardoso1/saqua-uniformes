@@ -672,7 +672,7 @@ export default function AdminPage() {
 
   return (
     <main
-      className="relative min-h-screen bg-[var(--admin-background)] bg-grid-subtle animate-float-in"
+      className="relative min-h-screen bg-muted/30 bg-grid-subtle animate-float-in"
       style={
         {
           "--admin-background": "oklch(0.43 0.09 192)",
@@ -713,7 +713,7 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("almoxarifado")}
-            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "almoxarifado" ? "border-border bg-card/90" : "border-border"
+            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "almoxarifado" ? "border-selection bg-selection/20" : "border-border"
               }`}
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
@@ -727,7 +727,7 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("uniformes")}
-            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "uniformes" ? "border-border bg-card/90" : "border-border"
+            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "uniformes" ? "border-selection bg-selection/20" : "border-border"
               }`}
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
@@ -741,7 +741,7 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("feedbacks")}
-            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "feedbacks" ? "border-border bg-card/90" : "border-border"
+            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "feedbacks" ? "border-selection bg-selection/20" : "border-border"
               }`}
           >
             <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
@@ -765,7 +765,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => handleTabChange("almoxarifado")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "almoxarifado"
-                ? "bg-muted text-foreground"
+                ? "bg-selection/20 text-selection"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
           >
@@ -776,7 +776,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => handleTabChange("uniformes")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "uniformes"
-                ? "bg-muted text-foreground"
+                ? "bg-selection/20 text-selection"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
           >
@@ -787,7 +787,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => handleTabChange("feedbacks")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "feedbacks"
-                ? "bg-muted text-foreground"
+                ? "bg-selection/20 text-selection"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
           >
