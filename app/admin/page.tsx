@@ -672,7 +672,7 @@ export default function AdminPage() {
 
   return (
     <main
-      className="relative min-h-screen bg-muted/30"
+      className="relative min-h-screen bg-muted/30 bg-grid-subtle animate-float-in"
       style={
         {
           "--primary": "oklch(0.56 0.085 192)",
@@ -682,10 +682,10 @@ export default function AdminPage() {
       }
     >
       
-      <header className="sticky top-0 z-30 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80">
+      <header className="sticky top-0 z-30 border-b border-border/70 bg-card/85 shadow-sm backdrop-blur-xl transition-shadow duration-300 supports-[backdrop-filter]:bg-card/75">
         <div className="flex w-full flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+            <div className="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20 transition-transform duration-300 hover:scale-105">
               <LayoutDashboard className="h-5 w-5" />
             </div>
             <div>
@@ -712,7 +712,7 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("almoxarifado")}
-            className={`flex items-center gap-4 rounded-xl border bg-card p-4 text-left transition-all hover:shadow-md ${activeTab === "almoxarifado" ? "border-primary ring-1 ring-primary/30" : "border-border"
+            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "almoxarifado" ? "border-selection bg-selection/12 ring-1 ring-selection/30 shadow-md shadow-selection/10" : "border-border"
               }`}
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -726,7 +726,7 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("uniformes")}
-            className={`flex items-center gap-4 rounded-xl border bg-card p-4 text-left transition-all hover:shadow-md ${activeTab === "uniformes" ? "border-primary ring-1 ring-primary/30" : "border-border"
+            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "uniformes" ? "border-selection bg-selection/12 ring-1 ring-selection/30 shadow-md shadow-selection/10" : "border-border"
               }`}
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -740,7 +740,7 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("feedbacks")}
-            className={`flex items-center gap-4 rounded-xl border bg-card p-4 text-left transition-all hover:shadow-md ${activeTab === "feedbacks" ? "border-primary ring-1 ring-primary/30" : "border-border"
+            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "feedbacks" ? "border-selection bg-selection/12 ring-1 ring-selection/30 shadow-md shadow-selection/10" : "border-border"
               }`}
           >
             <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -764,7 +764,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => handleTabChange("almoxarifado")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "almoxarifado"
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-selection text-selection-foreground shadow-md shadow-selection/20"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
           >
@@ -775,7 +775,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => handleTabChange("uniformes")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "uniformes"
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-selection text-selection-foreground shadow-md shadow-selection/20"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
           >
@@ -786,7 +786,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => handleTabChange("feedbacks")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "feedbacks"
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-selection text-selection-foreground shadow-md shadow-selection/20"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
           >

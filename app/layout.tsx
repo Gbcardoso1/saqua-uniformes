@@ -8,7 +8,8 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: 'Solicitação de Uniformes | Sistema Educacional',
-  description: 'Formulário de solicitação de uniformes e calçados para instituições de ensino',
+  description: 'Portal moderno para solicitação e gestão de uniformes, calçados e materiais escolares.',
+  themeColor: '#0d6971',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -35,8 +36,8 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="pt-BR">
-      <body className={`font-sans antialiased`}>
+    <html lang="pt-BR" className="bg-background">
+      <body className={`${_geist.variable} ${_geistMono.variable} font-sans antialiased`}>
         {children}
         <Analytics />
       </body>
