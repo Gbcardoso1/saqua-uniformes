@@ -712,7 +712,7 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("almoxarifado")}
-            className={`flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${activeTab === "almoxarifado" ? "border-primary ring-1 ring-primary/30" : "border-border"
+            className={`flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${activeTab === "almoxarifado" ? "border-selection bg-selection/12 ring-1 ring-selection/30 shadow-md shadow-selection/10" : "border-border"
               }`}
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -726,7 +726,7 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("uniformes")}
-            className={`flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${activeTab === "uniformes" ? "border-primary ring-1 ring-primary/30" : "border-border"
+            className={`flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${activeTab === "uniformes" ? "border-selection bg-selection/12 ring-1 ring-selection/30 shadow-md shadow-selection/10" : "border-border"
               }`}
           >
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -740,7 +740,7 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("feedbacks")}
-            className={`flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${activeTab === "feedbacks" ? "border-primary ring-1 ring-primary/30" : "border-border"
+            className={`flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg ${activeTab === "feedbacks" ? "border-selection bg-selection/12 ring-1 ring-selection/30 shadow-md shadow-selection/10" : "border-border"
               }`}
           >
             <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -764,7 +764,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => handleTabChange("almoxarifado")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "almoxarifado"
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-selection text-selection-foreground shadow-md shadow-selection/20"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
           >
@@ -775,7 +775,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => handleTabChange("uniformes")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "uniformes"
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-selection text-selection-foreground shadow-md shadow-selection/20"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
           >
@@ -786,7 +786,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => handleTabChange("feedbacks")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "feedbacks"
-                ? "bg-primary text-primary-foreground shadow-sm"
+                ? "bg-selection text-selection-foreground shadow-md shadow-selection/20"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
           >
