@@ -68,7 +68,7 @@ export default function Home() {
           <div className="animate-rise-in mb-10 text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-white/80 shadow-sm backdrop-blur-sm">
               <span className="size-1.5 rounded-full bg-[#f7c75b]" />
-              Portal de solicitações
+              PREFEITURA DE SAQUAREMA
             </div>
             <h1 className="mx-auto mb-3 max-w-3xl text-3xl font-bold tracking-tight text-white text-balance md:text-5xl">
               {activeTab === "uniformes"
