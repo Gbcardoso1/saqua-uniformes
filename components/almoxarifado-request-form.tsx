@@ -599,21 +599,21 @@ export default function AlmoxarifadoRequestForm() {
       <Tabs defaultValue="papelaria" className="w-full">
         <TabsList className="grid w-full grid-cols-3 h-auto">
           <TabsTrigger value="papelaria" className="flex flex-col gap-1 py-3">
-            <Package className="h-4 w-4" />
+            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-9gh34ukYu8h2xNP6tE5baHdS2u0pbg.png" alt="" className="h-6 w-6 object-contain" />
             <span className="text-xs">Papelaria</span>
             {selectedStationeryCount > 0 && (
               <Badge variant="secondary" className="text-xs">{selectedStationeryCount}</Badge>
             )}
           </TabsTrigger>
           <TabsTrigger value="cozinha" className="flex flex-col gap-1 py-3">
-            <UtensilsCrossed className="h-4 w-4" />
+            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-uiaGEexsxyKr6Sy3cB7pOTyx6AlWup.png" alt="" className="h-6 w-6 object-contain" />
             <span className="text-xs">Cozinha</span>
             {selectedKitchenCount > 0 && (
               <Badge variant="secondary" className="text-xs">{selectedKitchenCount}</Badge>
             )}
           </TabsTrigger>
           <TabsTrigger value="creche" className="flex flex-col gap-1 py-3">
-            <Baby className="h-4 w-4" />
+            <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-LuZNgbwT96TI9QcsNAHGa46zG8eYLG.png" alt="" className="h-6 w-6 object-contain" />
             <span className="text-xs">Creche</span>
             {selectedCrecheCount > 0 && (
               <Badge variant="secondary" className="text-xs">{selectedCrecheCount}</Badge>
