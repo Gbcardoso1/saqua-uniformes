@@ -672,9 +672,10 @@ export default function AdminPage() {
 
   return (
     <main
-      className="relative min-h-screen bg-muted/30 bg-grid-subtle animate-float-in"
+      className="relative min-h-screen bg-[var(--admin-background)] bg-grid-subtle animate-float-in"
       style={
         {
+          "--admin-background": "oklch(0.43 0.09 192)",
           "--primary": "oklch(0.56 0.085 192)",
           "--primary-foreground": "oklch(0.99 0 0)",
           "--ring": "oklch(0.56 0.085 192)",
