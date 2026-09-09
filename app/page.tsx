@@ -88,7 +88,7 @@ export default function Home() {
                 variant={activeTab === "uniformes" ? "default" : "outline"}
                 className={`gap-2 ${
                   activeTab === "uniformes"
-                    ? "bg-selection text-selection-foreground shadow-lg shadow-selection/20 hover:bg-selection/90"
+                    ? "bg-transparent border-transparent text-selection hover:bg-white/10"
                     : "bg-transparent border-white/30 text-white hover:bg-white/10"
                 }`}
               >
@@ -100,7 +100,7 @@ export default function Home() {
                 variant={activeTab === "almoxarifado" ? "default" : "outline"}
                 className={`gap-2 ${
                   activeTab === "almoxarifado"
-                    ? "bg-selection text-selection-foreground shadow-lg shadow-selection/20 hover:bg-selection/90"
+                    ? "bg-transparent border-transparent text-selection hover:bg-white/10"
                     : "bg-transparent border-white/30 text-white hover:bg-white/10"
                 }`}
               >
