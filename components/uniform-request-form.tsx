@@ -421,35 +421,35 @@ export default function UniformRequestForm() {
         <Tabs defaultValue="uniformes" className="w-full">
           <TabsList className="grid w-full grid-cols-5 h-auto">
             <TabsTrigger value="uniformes" className="flex flex-col gap-1 py-3">
-              <Shirt className="h-4 w-4" />
+              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-LCrG1dDmTibpK27GGrdY3Zv8PeaHMb.png" alt="" className="h-6 w-6 object-contain" />
               <span className="text-xs">Uniformes</span>
               {Object.values(uniformQuantities).some(q => q > 0) && (
                 <Badge variant="secondary" className="text-xs">{Object.values(uniformQuantities).filter(q => q > 0).length}</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="calcados" className="flex flex-col gap-1 py-3">
-              <Footprints className="h-4 w-4" />
+              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-JvwMlTnax1wFWGn4uRyruIba7194Xu.png" alt="" className="h-6 w-6 object-contain" />
               <span className="text-xs">Calçados</span>
               {(Object.values(shoeQuantities).some(q => q > 0) || Object.values(crocsQuantities).some(q => q > 0)) && (
                 <Badge variant="secondary" className="text-xs">{Object.values(shoeQuantities).filter(q => q > 0).length + Object.values(crocsQuantities).filter(q => q > 0).length}</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="kits" className="flex flex-col gap-1 py-3">
-              <Package className="h-4 w-4" />
+              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-roHe3Az1FqbvHHtd1RuE0I8nvGDnkd.png" alt="" className="h-6 w-6 object-contain" />
               <span className="text-xs">Kits Aluno</span>
               {Object.values(kitQuantities).some(q => q > 0) && (
                 <Badge variant="secondary" className="text-xs">{Object.values(kitQuantities).filter(q => q > 0).length}</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="professor" className="flex flex-col gap-1 py-3">
-              <Users className="h-4 w-4" />
+              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-BdRfq9ZOtRH3trzmVVpUMAUX705R0m.png" alt="" className="h-6 w-6 object-contain" />
               <span className="text-xs">Professor</span>
               {(kitPoloQuantity > 0 || Object.values(poloQuantities).some(q => q > 0)) && (
                 <Badge variant="secondary" className="text-xs">!</Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="mochilas" className="flex flex-col gap-1 py-3">
-              <Backpack className="h-4 w-4" />
+              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-joEsFeLmA3FrkAc1LBdjJO313Gfl5u.png" alt="" className="h-6 w-6 object-contain" />
               <span className="text-xs">Mochilas</span>
               {Object.values(backpackQuantities).some(q => q > 0) && (
                 <Badge variant="secondary" className="text-xs">{Object.values(backpackQuantities).filter(q => q > 0).length}</Badge>
