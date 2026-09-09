@@ -536,7 +536,7 @@ export default function UniformRequestForm() {
                                   return (
                                     <div
                                       key={key}
-                                      className={`flex items-center justify-between rounded-md border p-2 ${qty > 0 ? 'border-primary bg-primary/5' : ''}`}
+                                      className={`flex items-center justify-between rounded-md border p-2 ${qty > 0 ? 'border-selection bg-selection/12 ring-1 ring-selection/20' : ''}`}
                                     >
                                       <span className="text-sm font-medium">{size}</span>
                                       <Input
@@ -611,7 +611,7 @@ export default function UniformRequestForm() {
                       return (
                         <div
                           key={size}
-                          className={`flex flex-col items-center rounded-md border p-3 ${qty > 0 ? 'border-primary bg-primary/5' : ''}`}
+                          className={`flex flex-col items-center rounded-md border p-3 ${qty > 0 ? 'border-selection bg-selection/12 ring-1 ring-selection/20' : ''}`}
                         >
                           <span className="text-sm font-medium mb-2">Tam. {size}</span>
                           <Input
@@ -636,7 +636,7 @@ export default function UniformRequestForm() {
                       return (
                         <div
                           key={size}
-                          className={`flex flex-col items-center rounded-md border p-3 ${qty > 0 ? 'border-primary bg-primary/5' : ''}`}
+                          className={`flex flex-col items-center rounded-md border p-3 ${qty > 0 ? 'border-selection bg-selection/12 ring-1 ring-selection/20' : ''}`}
                         >
                           <span className="text-sm font-medium mb-2">Tam. {size}</span>
                           <Input
@@ -675,7 +675,7 @@ export default function UniformRequestForm() {
                     return (
                       <div
                         key={kit}
-                        className={`flex items-center justify-between rounded-lg border p-4 ${qty > 0 ? 'border-primary bg-primary/5' : ''}`}
+                        className={`flex items-center justify-between rounded-lg border p-4 ${qty > 0 ? 'border-selection bg-selection/12 ring-1 ring-selection/20' : ''}`}
                       >
                         <span className="font-medium">{kit}</span>
                         <Input
@@ -707,7 +707,7 @@ export default function UniformRequestForm() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className={`flex items-center justify-between rounded-lg border p-4 ${kitPoloQuantity > 0 ? 'border-primary bg-primary/5' : ''}`}>
+                <div className={`flex items-center justify-between rounded-lg border p-4 ${kitPoloQuantity > 0 ? 'border-selection bg-selection/12 ring-1 ring-selection/20' : ''}`}>
                   <span className="font-medium">Kit de Professor (Completo)</span>
                   <Input
                     type="number"
@@ -727,7 +727,7 @@ export default function UniformRequestForm() {
                       return (
                         <div
                           key={size}
-                          className={`flex items-center justify-between rounded-lg border p-3 ${qty > 0 ? 'border-primary bg-primary/5' : ''}`}
+                          className={`flex items-center justify-between rounded-lg border p-3 ${qty > 0 ? 'border-selection bg-selection/12 ring-1 ring-selection/20' : ''}`}
                         >
                           <span className="font-medium">{size}</span>
                           <Input
@@ -766,7 +766,7 @@ export default function UniformRequestForm() {
                     return (
                       <div
                         key={type}
-                        className={`flex items-center justify-between rounded-lg border p-4 ${qty > 0 ? 'border-primary bg-primary/5' : ''}`}
+                        className={`flex items-center justify-between rounded-lg border p-4 ${qty > 0 ? 'border-selection bg-selection/12 ring-1 ring-selection/20' : ''}`}
                       >
                         <span className="font-medium">{type}</span>
                         <Input
