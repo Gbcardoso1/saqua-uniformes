@@ -40,7 +40,7 @@ export default function Home() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 bg-[#1a8b8b]/95 backdrop-blur supports-[backdrop-filter]:bg-[#1a8b8b]/90 border-b border-white/20">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/15 bg-[#116f73]/85 shadow-lg shadow-[#073f45]/10 backdrop-blur-xl supports-[backdrop-filter]:bg-[#116f73]/80">
         <div className="container flex h-16 items-center justify-between px-4 gap-4">
           <Image
             src="/prefeitura.png"
@@ -62,16 +62,20 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="relative min-h-screen bg-[#1a8b8b] pt-24 pb-8 px-4">
+      <main className="relative min-h-screen overflow-hidden bg-[#0d6971] px-4 pb-12 pt-28">
         <BeachDecorations />
         <div className="relative z-10 mx-auto max-w-4xl">
-          <div className="mb-8 text-center">
-            <h1 className="text-3xl font-bold text-white mb-2 text-balance">
+          <div className="animate-rise-in mb-10 text-center">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-white/80 shadow-sm backdrop-blur-sm">
+              <span className="size-1.5 rounded-full bg-[#f7c75b]" />
+              Portal de solicitações
+            </div>
+            <h1 className="mx-auto mb-3 max-w-3xl text-3xl font-bold tracking-tight text-white text-balance md:text-5xl">
               {activeTab === "uniformes"
                 ? "Formulário de Solicitação de Uniformes e Calçados"
                 : "Formulário de Solicitação de Almoxarifado"}
             </h1>
-            <p className="text-white/90 text-pretty mb-6">
+            <p className="mx-auto mb-7 max-w-2xl text-base leading-7 text-white/80 text-pretty md:text-lg">
               {activeTab === "uniformes"
                 ? "Preencha os dados abaixo para solicitar uniformes e calçados para sua instituição"
                 : "Preencha os dados abaixo para solicitar itens de papelaria e cozinha para sua instituição"}

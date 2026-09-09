@@ -90,6 +90,23 @@
   }
 }
 
+/* ===== Camada visual moderna ===== */
+:root {
+  --shadow-soft: 0 18px 45px -28px oklch(0.2 0.08 205 / 0.45);
+}
+
+.bg-grid-subtle {
+  background-image: linear-gradient(to right, oklch(0.6 0.02 250 / 0.07) 1px, transparent 1px), linear-gradient(to bottom, oklch(0.6 0.02 250 / 0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-rise-in { animation: rise-in 650ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
 /* ===== Animações tema praia de Saquarema ===== */
 
 /* Ondas deslizando horizontalmente */
@@ -193,6 +210,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .animate-rise-in,
   .animate-wave-slide,
   .animate-cloud-drift,
   .animate-sun-pulse,
