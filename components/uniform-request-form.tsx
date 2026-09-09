@@ -421,7 +421,7 @@ export default function UniformRequestForm() {
         <Tabs defaultValue="uniformes" className="w-full">
           <TabsList className="grid w-full grid-cols-5 h-auto">
             <TabsTrigger value="uniformes" className="flex flex-col gap-1 py-3">
-              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-Y60tOE8ma2KrHLjCaIpLpEyBKtnszi.png" alt="" className="h-6 w-6 object-contain" />
+              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-H9jVG2mK1DRpu9YuAWsFkypJCgYzRb.png" alt="Uniforme" className="h-6 w-6 object-contain" />
               <span className="text-xs">Uniformes</span>
               {Object.values(uniformQuantities).some(q => q > 0) && (
                 <Badge variant="secondary" className="text-xs">{Object.values(uniformQuantities).filter(q => q > 0).length}</Badge>
