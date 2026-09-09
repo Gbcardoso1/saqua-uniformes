@@ -62,7 +62,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="relative min-h-screen overflow-hidden bg-[#0d6971] px-4 pb-12 pt-28">
+      <main className="relative min-h-screen overflow-hidden bg-[#0d6971] px-4 pb-12 pt-28 selection:bg-[#f7c75b]/30">
         <BeachDecorations />
         <div className="relative z-10 mx-auto max-w-4xl">
           <div className="animate-rise-in mb-10 text-center">
@@ -82,7 +82,7 @@ export default function Home() {
             </p>
 
             {/* Tab Navigation */}
-            <div className="flex justify-center gap-2 mb-8">
+            <div className="animate-float-in flex flex-wrap justify-center gap-2 mb-8" style={{ animationDelay: "120ms" }}>
               <Button
                 onClick={() => setActiveTab("uniformes")}
                 variant={activeTab === "uniformes" ? "default" : "outline"}
@@ -110,7 +110,9 @@ export default function Home() {
             </div>
           </div>
           
-          {activeTab === "uniformes" ? <UniformRequestForm /> : <AlmoxarifadoRequestForm />}
+          <div className="animate-float-in" style={{ animationDelay: "220ms" }}>
+            {activeTab === "uniformes" ? <UniformRequestForm /> : <AlmoxarifadoRequestForm />}
+          </div>
         </div>
 
         {/* Botão de Feedback */}

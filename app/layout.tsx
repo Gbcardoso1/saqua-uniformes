@@ -8,7 +8,8 @@ const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: 'Solicitação de Uniformes | Sistema Educacional',
-  description: 'Formulário de solicitação de uniformes e calçados para instituições de ensino',
+  description: 'Portal moderno para solicitação e gestão de uniformes, calçados e materiais escolares.',
+  themeColor: '#0d6971',
   generator: 'v0.app',
   icons: {
     icon: [
