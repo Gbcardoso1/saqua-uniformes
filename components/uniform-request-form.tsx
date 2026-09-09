@@ -421,7 +421,7 @@ export default function UniformRequestForm() {
         <Tabs defaultValue="uniformes" className="w-full">
           <TabsList className="grid w-full grid-cols-5 h-auto">
             <TabsTrigger value="uniformes" className="flex flex-col gap-1 py-3">
-              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-LCrG1dDmTibpK27GGrdY3Zv8PeaHMb.png" alt="" className="h-6 w-6 object-contain" />
+              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-LCrG1dDmTibpK27DGrdY3Zv8PeaHMb.png" alt="" className="h-6 w-6 object-contain" />
               <span className="text-xs">Uniformes</span>
               {Object.values(uniformQuantities).some(q => q > 0) && (
                 <Badge variant="secondary" className="text-xs">{Object.values(uniformQuantities).filter(q => q > 0).length}</Badge>
@@ -435,7 +435,7 @@ export default function UniformRequestForm() {
               )}
             </TabsTrigger>
             <TabsTrigger value="kits" className="flex flex-col gap-1 py-3">
-              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-roHe3Az1FqbvHHtd1RuE0I8nvGDnkd.png" alt="" className="h-6 w-6 object-contain" />
+              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-roHe3Az1FqbvHHtd1RuE0I8nvGDnkd.png" alt="" className="h-7 w-7 object-contain" />
               <span className="text-xs">Kits Aluno</span>
               {Object.values(kitQuantities).some(q => q > 0) && (
                 <Badge variant="secondary" className="text-xs">{Object.values(kitQuantities).filter(q => q > 0).length}</Badge>
