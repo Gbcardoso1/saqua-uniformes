@@ -420,35 +420,35 @@ export default function UniformRequestForm() {
         {/* Tabs de Categorias */}
         <Tabs defaultValue="uniformes" className="w-full">
           <TabsList className="grid w-full grid-cols-5 h-auto">
-            <TabsTrigger value="uniformes" className="flex flex-col gap-1 py-3 data-[state=active]:bg-transparent data-[state=active]:text-selection data-[state=active]:shadow-none">
+            <TabsTrigger value="uniformes" className="flex flex-col gap-1 py-3">
               <Shirt className="h-4 w-4" />
               <span className="text-xs">Uniformes</span>
               {Object.values(uniformQuantities).some(q => q > 0) && (
                 <Badge variant="secondary" className="text-xs">{Object.values(uniformQuantities).filter(q => q > 0).length}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="calcados" className="flex flex-col gap-1 py-3 data-[state=active]:bg-transparent data-[state=active]:text-selection data-[state=active]:shadow-none">
+            <TabsTrigger value="calcados" className="flex flex-col gap-1 py-3">
               <Footprints className="h-4 w-4" />
               <span className="text-xs">Calçados</span>
               {(Object.values(shoeQuantities).some(q => q > 0) || Object.values(crocsQuantities).some(q => q > 0)) && (
                 <Badge variant="secondary" className="text-xs">{Object.values(shoeQuantities).filter(q => q > 0).length + Object.values(crocsQuantities).filter(q => q > 0).length}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="kits" className="flex flex-col gap-1 py-3 data-[state=active]:bg-transparent data-[state=active]:text-selection data-[state=active]:shadow-none">
+            <TabsTrigger value="kits" className="flex flex-col gap-1 py-3">
               <Package className="h-4 w-4" />
               <span className="text-xs">Kits Aluno</span>
               {Object.values(kitQuantities).some(q => q > 0) && (
                 <Badge variant="secondary" className="text-xs">{Object.values(kitQuantities).filter(q => q > 0).length}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="professor" className="flex flex-col gap-1 py-3 data-[state=active]:bg-transparent data-[state=active]:text-selection data-[state=active]:shadow-none">
+            <TabsTrigger value="professor" className="flex flex-col gap-1 py-3">
               <Users className="h-4 w-4" />
               <span className="text-xs">Professor</span>
               {(kitPoloQuantity > 0 || Object.values(poloQuantities).some(q => q > 0)) && (
                 <Badge variant="secondary" className="text-xs">!</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="mochilas" className="flex flex-col gap-1 py-3 data-[state=active]:bg-transparent data-[state=active]:text-selection data-[state=active]:shadow-none">
+            <TabsTrigger value="mochilas" className="flex flex-col gap-1 py-3">
               <Backpack className="h-4 w-4" />
               <span className="text-xs">Mochilas</span>
               {Object.values(backpackQuantities).some(q => q > 0) && (
