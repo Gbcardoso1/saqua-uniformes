@@ -107,6 +107,7 @@ export default function Home() {
                 <Package className="h-4 w-4" />
                 Almoxarifado
               </Button>
+              <FeedbackButton />
             </div>
           </div>
           
@@ -115,8 +116,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Botão de Feedback */}
-        <FeedbackButton />
       </main>
 
       <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
