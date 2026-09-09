@@ -23,7 +23,7 @@
   --border: oklch(0.88 0.01 250);
   --input: oklch(0.88 0.01 250);
   --ring: oklch(0.35 0.08 250);
-  --selection: oklch(0.72 0.16 88);
+  --selection: oklch(0.65 0.15 165);
   --selection-foreground: oklch(0.25 0.07 205);
   --radius: 0.75rem;
   --shadow-soft: 0 18px 45px -28px oklch(0.2 0.08 205 / 0.45);
@@ -49,7 +49,7 @@
   --border: oklch(0.269 0 0);
   --input: oklch(0.269 0 0);
   --ring: oklch(0.439 0 0);
-  --selection: oklch(0.72 0.16 88);
+  --selection: oklch(0.65 0.15 165);
   --selection-foreground: oklch(0.22 0.06 205);
 }
 
