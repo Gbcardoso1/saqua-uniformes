@@ -675,6 +675,7 @@ export default function AdminPage() {
       className="relative min-h-screen bg-muted/30 bg-grid-subtle animate-float-in"
       style={
         {
+          "--admin-background": "oklch(0.43 0.09 192)",
           "--primary": "oklch(0.56 0.085 192)",
           "--primary-foreground": "oklch(0.99 0 0)",
           "--ring": "oklch(0.56 0.085 192)",
@@ -685,7 +686,7 @@ export default function AdminPage() {
       <header className="sticky top-0 z-30 border-b border-border/70 bg-card/85 shadow-sm backdrop-blur-xl transition-shadow duration-300 supports-[backdrop-filter]:bg-card/75">
         <div className="flex w-full flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between md:px-8">
           <div className="flex items-center gap-3">
-            <div className="flex size-11 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20 transition-transform duration-300 hover:scale-105">
+            <div className="flex size-11 items-center justify-center rounded-2xl bg-muted text-foreground shadow-sm transition-transform duration-300 hover:scale-105">
               <LayoutDashboard className="h-5 w-5" />
             </div>
             <div>
@@ -712,10 +713,10 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("almoxarifado")}
-            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "almoxarifado" ? "border-selection bg-selection/12 ring-1 ring-selection/30 shadow-md shadow-selection/10" : "border-border"
+            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "almoxarifado" ? "border-selection bg-selection/20" : "border-border"
               }`}
           >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
               <Package className="h-6 w-6" />
             </div>
             <div className="min-w-0">
@@ -726,10 +727,10 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("uniformes")}
-            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "uniformes" ? "border-selection bg-selection/12 ring-1 ring-selection/30 shadow-md shadow-selection/10" : "border-border"
+            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "uniformes" ? "border-selection bg-selection/20" : "border-border"
               }`}
           >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
               <Shirt className="h-6 w-6" />
             </div>
             <div className="min-w-0">
@@ -740,10 +741,10 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("feedbacks")}
-            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "feedbacks" ? "border-selection bg-selection/12 ring-1 ring-selection/30 shadow-md shadow-selection/10" : "border-border"
+            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "feedbacks" ? "border-selection bg-selection/20" : "border-border"
               }`}
           >
-            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
               <MessageSquare className="h-6 w-6" />
               {pendingFeedbacksCount > 0 && (
                 <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground">
@@ -764,7 +765,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => handleTabChange("almoxarifado")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "almoxarifado"
-                ? "bg-selection text-selection-foreground shadow-md shadow-selection/20"
+                ? "bg-selection/20 text-selection"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
           >
@@ -775,7 +776,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => handleTabChange("uniformes")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "uniformes"
-                ? "bg-selection text-selection-foreground shadow-md shadow-selection/20"
+                ? "bg-selection/20 text-selection"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
           >
@@ -786,7 +787,7 @@ export default function AdminPage() {
             type="button"
             onClick={() => handleTabChange("feedbacks")}
             className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "feedbacks"
-                ? "bg-selection text-selection-foreground shadow-md shadow-selection/20"
+                ? "bg-selection/20 text-selection"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
           >
@@ -794,7 +795,7 @@ export default function AdminPage() {
             <span>Feedbacks</span>
             {pendingFeedbacksCount > 0 && (
               <span className={`ml-0.5 inline-flex items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-semibold ${activeTab === "feedbacks"
-                  ? "bg-primary-foreground/20 text-primary-foreground"
+                  ? "bg-muted-foreground/20 text-muted-foreground"
                   : "bg-destructive text-destructive-foreground"
                 }`}>
                 {pendingFeedbacksCount}

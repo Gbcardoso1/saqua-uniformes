@@ -73,11 +73,12 @@ export function FeedbackButton() {
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button
-          size="icon"
-          className="fixed right-4 bottom-24 z-40 h-14 w-14 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-lg shadow-emerald-500/30 transition-all duration-300 hover:scale-105"
+          size="sm"
+          className="h-10 gap-2 rounded-md border border-white/30 bg-transparent px-4 text-white shadow-none hover:bg-white/10"
           title="Enviar feedback ou sugestao"
         >
-          <MessageSquarePlus className="h-6 w-6" />
+          <MessageSquarePlus className="h-4 w-4" />
+          Feedback
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-full sm:max-w-md p-0 border-l-0">
