@@ -308,8 +308,10 @@ export default function AdminPage() {
     router.push("/")
   }
 
-  const almoxarifadoCount = submissions.filter((s) => s.submissionType === "almoxarifado").length
-  const uniformesCount = submissions.filter((s) => (s.submissionType || "uniformes") === "uniformes").length
+  const almoxarifadoSubmissions = submissions.filter((s) => s.submissionType === "almoxarifado")
+  const uniformesSubmissions = submissions.filter((s) => (s.submissionType || "uniformes") === "uniformes")
+  const getSubmissionStatusCount = (items: Submission[], status: string) =>
+    items.filter((submission) => (submission.status || "pendente") === status).length
   const pendingFeedbacksCount = feedbacks.filter((f) => (f.status || "pendente") === "pendente").length
 
   const handleTabChange = (tab: "almoxarifado" | "uniformes" | "feedbacks") => {
@@ -716,39 +718,29 @@ export default function AdminPage() {
 
       <div className="relative z-10 w-full px-4 py-6 md:px-8 md:py-8">
         {/* Indicadores em tempo real por aba */}
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <div className="flex items-center gap-4 rounded-2xl border border-border bg-card/90 p-4 shadow-sm">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-              <Package className="h-6 w-6" />
+        <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          {[
+            { title: "Almoxarifado", icon: Package, items: almoxarifadoSubmissions, labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
+            { title: "Uniformes e Kits", icon: Shirt, items: uniformesSubmissions, labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
+            { title: "Feedbacks", icon: MessageSquare, items: feedbacks, labels: ["Resolvidos", "Lidos", "Pendentes"], statuses: ["resolvido", "lido", "pendente"] },
+          ].map(({ title, icon: Icon, items, labels, statuses }) => (
+            <div key={title} className="rounded-2xl border border-border bg-card/90 p-5 shadow-sm">
+              <div className="mb-4 flex items-center gap-3 border-b border-border pb-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+                  <Icon className="h-5 w-5" />
+                </div>
+                <h3 className="font-semibold text-foreground">{title}</h3>
+              </div>
+              <div className="space-y-2">
+                {labels.map((label, index) => (
+                  <div key={label} className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">{label}</span>
+                    <span className="font-bold text-foreground">{title === "Feedbacks" ? items.filter((feedback) => (feedback.status || "pendente") === statuses[index]).length : getSubmissionStatusCount(items as Submission[], statuses[index])}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="text-2xl font-bold leading-none text-foreground">{almoxarifadoCount}</p>
-              <p className="mt-1 truncate text-sm text-muted-foreground">Almoxarifado</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 rounded-2xl border border-border bg-card/90 p-4 shadow-sm">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-              <Shirt className="h-6 w-6" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-2xl font-bold leading-none text-foreground">{uniformesCount}</p>
-              <p className="mt-1 truncate text-sm text-muted-foreground">Uniformes e Kits</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 rounded-2xl border border-border bg-card/90 p-4 shadow-sm">
-            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-              <MessageSquare className="h-6 w-6" />
-              {pendingFeedbacksCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground">
-                  {pendingFeedbacksCount}
-                </span>
-              )}
-            </div>
-            <div className="min-w-0">
-              <p className="text-2xl font-bold leading-none text-foreground">{feedbacks.length}</p>
-              <p className="mt-1 truncate text-sm text-muted-foreground">Feedbacks</p>
-            </div>
-          </div>
+          ))}
         </div>
 
         {/* Tabs */}
