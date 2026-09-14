@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt, MessageSquare, LayoutDashboard } from "lucide-react"
+import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt, MessageSquare, LayoutDashboard, FileSpreadsheet, FileText } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { InstitutionPicker } from "@/components/institution-picker"
@@ -81,7 +81,10 @@ export default function AdminPage() {
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [nameFilter, setNameFilter] = useState<string>("all")
-  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "feedbacks">("almoxarifado")
+  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "feedbacks" | "relatorio">("almoxarifado")
+  const [reportInstitution, setReportInstitution] = useState("all")
+  const [reportMonth, setReportMonth] = useState("all")
+  const [reportYear, setReportYear] = useState("all")
   const [institutions, setInstitutions] = useState<string[]>([])
   const [names, setNames] = useState<string[]>([])
   const [months, setMonths] = useState<{ value: string; label: string }[]>([])
@@ -314,7 +317,34 @@ export default function AdminPage() {
     items.filter((submission) => (submission.status || "pendente") === status).length
   const pendingFeedbacksCount = feedbacks.filter((f) => (f.status || "pendente") === "pendente").length
 
-  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "feedbacks") => {
+  const reportSubmissions = submissions.filter((submission) => {
+    const date = new Date(submission.timestamp)
+    const matchesInstitution = reportInstitution === "all" || submission.institution === reportInstitution
+    const matchesMonth = reportMonth === "all" || String(date.getMonth() + 1).padStart(2, "0") === reportMonth
+    const matchesYear = reportYear === "all" || String(date.getFullYear()) === reportYear
+    return matchesInstitution && matchesMonth && matchesYear
+  })
+
+  const exportReportCsv = () => {
+    const headers = ["Data", "Solicitante", "Matrícula", "Instituição", "Tipo", "Status", "Itens"]
+    const rows = reportSubmissions.map((submission) => [
+      new Date(submission.timestamp).toLocaleString("pt-BR"), submission.name, submission.matricula,
+      submission.institution, submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits",
+      submission.status || "pendente", [...(submission.uniforms || []), ...(submission.shoes || []), ...(submission.studentKits || []), ...(submission.teacherPolos || []), ...(submission.backpacks || [])].reduce((sum, item) => sum + Number(item.quantity || item.kitQuantity || 0), 0).toString(),
+    ])
+    const csv = [headers, ...rows].map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(",")).join("\\n")
+    const blob = new Blob(["\\ufeff" + csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `relatorio-pedidos-${new Date().toISOString().slice(0, 10)}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const printReport = () => window.print()
+
+  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "feedbacks" | "relatorio") => {
     setActiveTab(tab)
     setInstitutionFilter("all")
     setNameFilter("all")
@@ -789,10 +819,47 @@ export default function AdminPage() {
                 {pendingFeedbacksCount}
               </span>
             )}
-          </button>
-        </div>
+  </button>
+  <button
+    type="button"
+    onClick={() => handleTabChange("relatorio")}
+    className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "relatorio"
+      ? "bg-selection/20 text-selection"
+      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+      }`}
+  >
+    <FileText className="h-4 w-4" />
+    <span>Relatório</span>
+  </button>
+  </div>
 
-        {activeTab === "feedbacks" ? (
+  {activeTab === "relatorio" ? (
+    <Card className="print:shadow-none">
+      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <CardTitle>Relatório de pedidos</CardTitle>
+          <p className="mt-1 text-sm text-muted-foreground">Filtre e exporte todos os pedidos realizados pelas escolas.</p>
+        </div>
+        <div className="flex flex-wrap gap-2 print:hidden">
+          <Button variant="outline" onClick={exportReportCsv}><FileSpreadsheet className="mr-2 h-4 w-4" />Excel (CSV)</Button>
+          <Button onClick={printReport}><FileText className="mr-2 h-4 w-4" />PDF</Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="mb-6 grid gap-4 rounded-xl border border-border bg-muted/30 p-4 md:grid-cols-3 print:hidden">
+          <div className="space-y-2"><Label>Escola</Label><Select value={reportInstitution} onValueChange={setReportInstitution}><SelectTrigger><SelectValue placeholder="Todas as escolas" /></SelectTrigger><SelectContent><SelectItem value="all">Todas as escolas</SelectItem>{institutions.map((institution) => <SelectItem key={institution} value={institution}>{institution}</SelectItem>)}</SelectContent></Select></div>
+          <div className="space-y-2"><Label>Mês</Label><Select value={reportMonth} onValueChange={setReportMonth}><SelectTrigger><SelectValue placeholder="Todos os meses" /></SelectTrigger><SelectContent><SelectItem value="all">Todos os meses</SelectItem>{Array.from({ length: 12 }, (_, index) => <SelectItem key={index + 1} value={String(index + 1).padStart(2, "0")}>{new Date(2024, index).toLocaleString("pt-BR", { month: "long" })}</SelectItem>)}</SelectContent></Select></div>
+          <div className="space-y-2"><Label>Ano</Label><Select value={reportYear} onValueChange={setReportYear}><SelectTrigger><SelectValue placeholder="Todos os anos" /></SelectTrigger><SelectContent><SelectItem value="all">Todos os anos</SelectItem>{[...new Set(submissions.map((submission) => new Date(submission.timestamp).getFullYear()))].sort((a, b) => b - a).map((year) => <SelectItem key={year} value={String(year)}>{year}</SelectItem>)}</SelectContent></Select></div>
+        </div>
+        <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+          {[{ label: "Pedidos", value: reportSubmissions.length }, { label: "Almoxarifado", value: reportSubmissions.filter((s) => s.submissionType === "almoxarifado").length }, { label: "Uniformes e Kits", value: reportSubmissions.filter((s) => (s.submissionType || "uniformes") === "uniformes").length }, { label: "Escolas", value: new Set(reportSubmissions.map((s) => s.institution)).size }].map((metric) => <div key={metric.label} className="rounded-lg border border-border bg-white p-3"><p className="text-xl font-bold">{metric.value}</p><p className="text-xs text-muted-foreground">{metric.label}</p></div>)}
+        </div>
+        <div className="overflow-x-auto rounded-xl border border-border">
+          <Table><TableHeader><TableRow><TableHead>Data</TableHead><TableHead>Solicitante</TableHead><TableHead>Escola</TableHead><TableHead>Tipo</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Itens</TableHead></TableRow></TableHeader><TableBody>{reportSubmissions.length === 0 ? <TableRow><TableCell colSpan={6} className="h-24 text-center text-muted-foreground">Nenhum pedido encontrado para os filtros selecionados.</TableCell></TableRow> : reportSubmissions.map((submission) => <TableRow key={submission.id}><TableCell>{new Date(submission.timestamp).toLocaleDateString("pt-BR")}</TableCell><TableCell>{submission.name}</TableCell><TableCell>{submission.institution}</TableCell><TableCell>{submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits"}</TableCell><TableCell>{submission.status || "Pendente"}</TableCell><TableCell className="text-right">{[...(submission.uniforms || []), ...(submission.shoes || []), ...(submission.studentKits || []), ...(submission.teacherPolos || []), ...(submission.backpacks || [])].reduce((sum, item) => sum + Number(item.quantity || item.kitQuantity || 0), 0)}</TableCell></TableRow>)}</TableBody></Table>
+        </div>
+      </CardContent>
+    </Card>
+  ) : activeTab === "feedbacks" ? (
           <Card>
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
