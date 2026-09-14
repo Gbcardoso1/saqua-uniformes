@@ -342,6 +342,45 @@ export default function AdminPage() {
     URL.revokeObjectURL(url)
   }
 
+  const getSubmissionItems = (submission: Submission) => [
+    ...(submission.uniforms || []).map((item) => ({ description: `${item.type} ${item.gender} - ${item.size}`, quantity: item.quantity })),
+    ...(submission.shoes || []).map((item) => ({ description: `Calçado ${item.type || ""} - ${item.size}`, quantity: item.quantity })),
+    ...(submission.studentKits || []).map((item) => ({ description: `Kit aluno - ${item.size}`, quantity: item.quantity })),
+    ...(submission.teacherPolos || []).map((item) => ({ description: `Polo professor - ${item.size}`, quantity: item.quantity || item.kitQuantity })),
+    ...(submission.backpacks || []).map((item) => ({ description: `Mochila - ${item.size}`, quantity: item.quantity })),
+    ...(submission.stationeryItems || []).map((item) => ({ description: item.item, quantity: item.quantity })),
+    ...(submission.kitchenItems || []).map((item) => ({ description: item.item, quantity: item.quantity })),
+    ...(submission.crecheItems || []).map((item) => ({ description: item.item, quantity: item.quantity })),
+  ]
+
+  const exportSubmissionCsv = (submission: Submission) => {
+    const rows = getSubmissionItems(submission)
+    const data = [
+      ["Pedido", submission.id], ["Data", new Date(submission.timestamp).toLocaleString("pt-BR")],
+      ["Solicitante", submission.name], ["Matrícula", submission.matricula], ["Instituição", submission.institution],
+      ["Tipo", submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits"], ["Status", submission.status || "Pendente"],
+      [], ["Item", "Quantidade"], ...rows.map((item) => [item.description, item.quantity]),
+    ]
+    const csv = data.map((row) => row.map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`).join(",")).join("\\n")
+    const blob = new Blob(["\\ufeff" + csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `pedido-${submission.id}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const printSubmission = (submission: Submission) => {
+    const items = getSubmissionItems(submission)
+    const printWindow = window.open("", "_blank", "width=900,height=700")
+    if (!printWindow) return
+    printWindow.document.write(`<html><head><title>Pedido ${submission.id}</title><style>body{font-family:Arial,sans-serif;padding:32px;color:#17202a}h1{font-size:22px}p{margin:6px 0}.meta{border-bottom:1px solid #ddd;padding-bottom:16px;margin-bottom:18px}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{text-align:left;border-bottom:1px solid #ddd;padding:9px}th{background:#f3f4f6}</style></head><body><h1>Pedido de uniformes e materiais</h1><div class="meta"><p><b>Pedido:</b> ${submission.id}</p><p><b>Data:</b> ${new Date(submission.timestamp).toLocaleString("pt-BR")}</p><p><b>Solicitante:</b> ${submission.name}</p><p><b>Matrícula:</b> ${submission.matricula}</p><p><b>Instituição:</b> ${submission.institution}</p><p><b>Status:</b> ${submission.status || "Pendente"}</p></div><table><thead><tr><th>Item</th><th>Quantidade</th></tr></thead><tbody>${items.map((item) => `<tr><td>${item.description}</td><td>${item.quantity}</td></tr>`).join("")}</tbody></table></body></html>`)
+    printWindow.document.close()
+    printWindow.focus()
+    printWindow.print()
+  }
+
   const printReport = () => window.print()
 
   const handleTabChange = (tab: "almoxarifado" | "uniformes" | "feedbacks" | "relatorio") => {
@@ -855,7 +894,7 @@ export default function AdminPage() {
           {[{ label: "Pedidos", value: reportSubmissions.length }, { label: "Almoxarifado", value: reportSubmissions.filter((s) => s.submissionType === "almoxarifado").length }, { label: "Uniformes e Kits", value: reportSubmissions.filter((s) => (s.submissionType || "uniformes") === "uniformes").length }, { label: "Escolas", value: new Set(reportSubmissions.map((s) => s.institution)).size }].map((metric) => <div key={metric.label} className="rounded-lg border border-border bg-white p-3"><p className="text-xl font-bold">{metric.value}</p><p className="text-xs text-muted-foreground">{metric.label}</p></div>)}
         </div>
         <div className="overflow-x-auto rounded-xl border border-border">
-          <Table><TableHeader><TableRow><TableHead>Data</TableHead><TableHead>Solicitante</TableHead><TableHead>Escola</TableHead><TableHead>Tipo</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Itens</TableHead></TableRow></TableHeader><TableBody>{reportSubmissions.length === 0 ? <TableRow><TableCell colSpan={6} className="h-24 text-center text-muted-foreground">Nenhum pedido encontrado para os filtros selecionados.</TableCell></TableRow> : reportSubmissions.map((submission) => <TableRow key={submission.id}><TableCell>{new Date(submission.timestamp).toLocaleDateString("pt-BR")}</TableCell><TableCell>{submission.name}</TableCell><TableCell>{submission.institution}</TableCell><TableCell>{submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits"}</TableCell><TableCell>{submission.status || "Pendente"}</TableCell><TableCell className="text-right">{[...(submission.uniforms || []), ...(submission.shoes || []), ...(submission.studentKits || []), ...(submission.teacherPolos || []), ...(submission.backpacks || [])].reduce((sum, item) => sum + Number(item.quantity || item.kitQuantity || 0), 0)}</TableCell></TableRow>)}</TableBody></Table>
+          <Table><TableHeader><TableRow><TableHead>Data</TableHead><TableHead>Solicitante</TableHead><TableHead>Escola</TableHead><TableHead>Tipo</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Itens</TableHead><TableHead className="text-right print:hidden">Exportar</TableHead></TableRow></TableHeader><TableBody>{reportSubmissions.length === 0 ? <TableRow><TableCell colSpan={7} className="h-24 text-center text-muted-foreground">Nenhum pedido encontrado para os filtros selecionados.</TableCell></TableRow> : reportSubmissions.map((submission) => <TableRow key={submission.id}><TableCell>{new Date(submission.timestamp).toLocaleDateString("pt-BR")}</TableCell><TableCell>{submission.name}</TableCell><TableCell>{submission.institution}</TableCell><TableCell>{submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits"}</TableCell><TableCell>{submission.status || "Pendente"}</TableCell><TableCell className="text-right">{getSubmissionItems(submission).reduce((sum, item) => sum + Number(item.quantity || 0), 0)}</TableCell><TableCell className="text-right print:hidden"><div className="flex justify-end gap-1"><Button variant="ghost" size="icon" title="Baixar pedido em Excel/CSV" aria-label={`Baixar pedido ${submission.id} em CSV`} onClick={() => exportSubmissionCsv(submission)}><FileSpreadsheet className="h-4 w-4" /></Button><Button variant="ghost" size="icon" title="Imprimir pedido ou salvar como PDF" aria-label={`Imprimir pedido ${submission.id}`} onClick={() => printSubmission(submission)}><FileText className="h-4 w-4" /></Button></div></TableCell></TableRow>)}</TableBody></Table>
         </div>
       </CardContent>
     </Card>
