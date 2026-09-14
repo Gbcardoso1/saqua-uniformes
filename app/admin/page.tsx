@@ -720,24 +720,28 @@ export default function AdminPage() {
         {/* Indicadores em tempo real por aba */}
         <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
           {[
-            { title: "Almoxarifado", icon: Package, items: almoxarifadoSubmissions, labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
-            { title: "Uniformes e Kits", icon: Shirt, items: uniformesSubmissions, labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
-            { title: "Feedbacks", icon: MessageSquare, items: feedbacks, labels: ["Resolvidos", "Lidos", "Pendentes"], statuses: ["resolvido", "lido", "pendente"] },
-          ].map(({ title, icon: Icon, items, labels, statuses }) => (
-            <div key={title} className="rounded-2xl border border-border bg-card/90 p-5 shadow-sm">
-              <div className="mb-4 flex items-center gap-3 border-b border-border pb-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+            { title: "Almoxarifado", icon: Package, items: almoxarifadoSubmissions, accent: "border-l-sky-500 bg-sky-500/5", iconStyle: "bg-sky-500/15 text-sky-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
+            { title: "Uniformes e Kits", icon: Shirt, items: uniformesSubmissions, accent: "border-l-amber-500 bg-amber-500/5", iconStyle: "bg-amber-500/15 text-amber-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
+            { title: "Feedbacks", icon: MessageSquare, items: feedbacks, accent: "border-l-violet-500 bg-violet-500/5", iconStyle: "bg-violet-500/15 text-violet-600", labels: ["Resolvidos", "Lidos", "Pendentes"], statuses: ["resolvido", "lido", "pendente"] },
+          ].map(({ title, icon: Icon, items, accent, iconStyle, labels, statuses }) => (
+            <div key={title} className={`rounded-2xl border border-border border-l-4 bg-card/90 p-5 shadow-sm ${accent}`}>
+              <div className="mb-4 flex items-center gap-3 border-b border-border/70 pb-3">
+                <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${iconStyle}`}>
                   <Icon className="h-5 w-5" />
                 </div>
                 <h3 className="font-semibold text-foreground">{title}</h3>
               </div>
               <div className="space-y-2">
-                {labels.map((label, index) => (
-                  <div key={label} className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">{label}</span>
-                    <span className="font-bold text-foreground">{title === "Feedbacks" ? items.filter((feedback) => (feedback.status || "pendente") === statuses[index]).length : getSubmissionStatusCount(items as Submission[], statuses[index])}</span>
-                  </div>
-                ))}
+                {labels.map((label, index) => {
+                  const count = title === "Feedbacks" ? items.filter((feedback) => (feedback.status || "pendente") === statuses[index]).length : getSubmissionStatusCount(items as Submission[], statuses[index])
+                  const statusStyle = index === 0 ? "bg-emerald-500/10 text-emerald-700" : index === 1 ? "bg-blue-500/10 text-blue-700" : "bg-rose-500/10 text-rose-700"
+                  return (
+                    <div key={label} className="flex items-center justify-between rounded-lg px-2.5 py-2 text-sm transition-colors hover:bg-background/60">
+                      <span className="flex items-center gap-2 text-muted-foreground"><span className={`h-2 w-2 rounded-full ${index === 0 ? "bg-emerald-500" : index === 1 ? "bg-blue-500" : "bg-rose-500"}`} />{label}</span>
+                      <span className={`rounded-full px-2.5 py-0.5 font-bold ${statusStyle}`}>{count}</span>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           ))}
