@@ -718,16 +718,16 @@ export default function AdminPage() {
 
       <div className="relative z-10 w-full px-4 py-6 md:px-8 md:py-8">
         {/* Indicadores em tempo real por aba */}
-        <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <div className="mb-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
           {[
             { title: "Almoxarifado", icon: Package, items: almoxarifadoSubmissions, accent: "border-l-sky-500", iconStyle: "bg-sky-500/15 text-sky-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
             { title: "Uniformes e Kits", icon: Shirt, items: uniformesSubmissions, accent: "border-l-amber-500", iconStyle: "bg-amber-500/15 text-amber-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
             { title: "Feedbacks", icon: MessageSquare, items: feedbacks, accent: "border-l-violet-500", iconStyle: "bg-violet-500/15 text-violet-600", labels: ["Resolvidos", "Lidos", "Pendentes"], statuses: ["resolvido", "lido", "pendente"] },
           ].map(({ title, icon: Icon, items, accent, iconStyle, labels, statuses }) => (
-            <div key={title} className={`rounded-2xl border border-border border-l-4 bg-white p-4 shadow-sm ${accent}`}>
-              <div className="mb-3 flex items-center gap-2.5 border-b border-border/70 pb-2.5">
-                <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${iconStyle}`}>
-                  <Icon className="h-5 w-5" />
+            <div key={title} className={`rounded-xl border border-border border-l-4 bg-white p-3 shadow-sm ${accent}`}>
+              <div className="mb-2 flex items-center gap-2 border-b border-border/70 pb-2">
+                <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${iconStyle}`}>
+                  <Icon className="h-4 w-4" />
                 </div>
                 <h3 className="font-semibold text-foreground">{title}</h3>
               </div>
@@ -736,9 +736,9 @@ export default function AdminPage() {
                   const count = title === "Feedbacks" ? items.filter((feedback) => (feedback.status || "pendente") === statuses[index]).length : getSubmissionStatusCount(items as Submission[], statuses[index])
                   const statusStyle = index === 0 ? "bg-emerald-500/10 text-emerald-700" : index === 1 ? "bg-blue-500/10 text-blue-700" : "bg-rose-500/10 text-rose-700"
                   return (
-                    <div key={label} className="flex items-center justify-between rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-slate-50">
+                    <div key={label} className="flex items-center justify-between rounded-md px-1.5 py-1 text-xs transition-colors hover:bg-slate-50">
                       <span className="flex items-center gap-2 text-muted-foreground"><span className={`h-2 w-2 rounded-full ${index === 0 ? "bg-emerald-500" : index === 1 ? "bg-blue-500" : "bg-rose-500"}`} />{label}</span>
-                      <span className={`rounded-full px-2.5 py-0.5 font-bold ${statusStyle}`}>{count}</span>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${statusStyle}`}>{count}</span>
                     </div>
                   )
                 })}
