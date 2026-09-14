@@ -106,6 +106,13 @@ export default function AdminPage() {
       setIsAuthenticated(true)
       fetchSubmissions()
       fetchFeedbacks()
+
+      const refreshDashboard = window.setInterval(() => {
+        fetchSubmissions()
+        fetchFeedbacks()
+      }, 30000)
+
+      return () => window.clearInterval(refreshDashboard)
     } else {
       router.push("/")
     }
@@ -301,8 +308,9 @@ export default function AdminPage() {
     router.push("/")
   }
 
-  const almoxarifadoCount = submissions.filter((s) => s.submissionType === "almoxarifado").length
-  const uniformesCount = submissions.filter((s) => (s.submissionType || "uniformes") === "uniformes").length
+  const finalizedSubmissionsCount = submissions.filter((s) => s.status === "finalizado" || s.status === "finalizada").length
+  const processingSubmissionsCount = submissions.filter((s) => s.status === "processando").length
+  const pendingSubmissionsCount = submissions.filter((s) => !s.status || s.status === "pendente").length
   const pendingFeedbacksCount = feedbacks.filter((f) => (f.status || "pendente") === "pendente").length
 
   const handleTabChange = (tab: "almoxarifado" | "uniformes" | "feedbacks") => {
@@ -708,55 +716,35 @@ export default function AdminPage() {
       </header>
 
       <div className="relative z-10 w-full px-4 py-6 md:px-8 md:py-8">
-        {/* Resumo */}
-        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <button
-            type="button"
-            onClick={() => handleTabChange("almoxarifado")}
-            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "almoxarifado" ? "border-selection bg-selection/20" : "border-border"
-              }`}
-          >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-              <Package className="h-6 w-6" />
+        {/* Indicadores em tempo real */}
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="flex items-center gap-4 rounded-2xl border border-border bg-card/90 p-4 shadow-sm">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600">
+              <CheckCircle2 className="h-6 w-6" />
             </div>
             <div className="min-w-0">
-              <p className="text-2xl font-bold leading-none text-foreground">{almoxarifadoCount}</p>
-              <p className="mt-1 truncate text-sm text-muted-foreground">Almoxarifado</p>
+              <p className="text-2xl font-bold leading-none text-foreground">{finalizedSubmissionsCount}</p>
+              <p className="mt-1 truncate text-sm text-muted-foreground">Pedidos finalizados</p>
             </div>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleTabChange("uniformes")}
-            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "uniformes" ? "border-selection bg-selection/20" : "border-border"
-              }`}
-          >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-              <Shirt className="h-6 w-6" />
+          </div>
+          <div className="flex items-center gap-4 rounded-2xl border border-border bg-card/90 p-4 shadow-sm">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600">
+              <Loader2 className="h-6 w-6" />
             </div>
             <div className="min-w-0">
-              <p className="text-2xl font-bold leading-none text-foreground">{uniformesCount}</p>
-              <p className="mt-1 truncate text-sm text-muted-foreground">Uniformes e Kits</p>
+              <p className="text-2xl font-bold leading-none text-foreground">{processingSubmissionsCount}</p>
+              <p className="mt-1 truncate text-sm text-muted-foreground">Pedidos processando</p>
             </div>
-          </button>
-          <button
-            type="button"
-            onClick={() => handleTabChange("feedbacks")}
-            className={`interactive-lift flex items-center gap-4 rounded-2xl border bg-card/90 p-4 text-left shadow-sm ${activeTab === "feedbacks" ? "border-selection bg-selection/20" : "border-border"
-              }`}
-          >
-            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground">
-              <MessageSquare className="h-6 w-6" />
-              {pendingFeedbacksCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold text-destructive-foreground">
-                  {pendingFeedbacksCount}
-                </span>
-              )}
+          </div>
+          <div className="flex items-center gap-4 rounded-2xl border border-border bg-card/90 p-4 shadow-sm">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600">
+              <Clock className="h-6 w-6" />
             </div>
             <div className="min-w-0">
-              <p className="text-2xl font-bold leading-none text-foreground">{feedbacks.length}</p>
-              <p className="mt-1 truncate text-sm text-muted-foreground">Feedbacks</p>
+              <p className="text-2xl font-bold leading-none text-foreground">{pendingSubmissionsCount}</p>
+              <p className="mt-1 truncate text-sm text-muted-foreground">Pedidos pendentes</p>
             </div>
-          </button>
+          </div>
         </div>
 
         {/* Tabs */}
