@@ -326,11 +326,11 @@ export default function AdminPage() {
   })
 
   const exportReportCsv = () => {
-    const headers = ["Data", "Solicitante", "Matrícula", "Instituição", "Tipo", "Status", "Itens"]
+    const headers = ["Data", "Solicitante", "Matrícula", "Instituição", "Tipo", "Status", "Itens solicitados", "Total"]
     const rows = reportSubmissions.map((submission) => [
       new Date(submission.timestamp).toLocaleString("pt-BR"), submission.name, submission.matricula,
       submission.institution, submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits",
-      submission.status || "pendente", [...(submission.uniforms || []), ...(submission.shoes || []), ...(submission.studentKits || []), ...(submission.teacherPolos || []), ...(submission.backpacks || [])].reduce((sum, item) => sum + Number(item.quantity || item.kitQuantity || 0), 0).toString(),
+      submission.status || "pendente", getSubmissionItems(submission).map((item) => `${item.description} (${item.quantity || 0})`).join("; "), getSubmissionItems(submission).reduce((sum, item) => sum + Number(item.quantity || 0), 0).toString(),
     ])
     const csv = [headers, ...rows].map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(",")).join("\\n")
     const blob = new Blob(["\\ufeff" + csv], { type: "text/csv;charset=utf-8;" })
@@ -412,8 +412,8 @@ export default function AdminPage() {
     y += 8
 
     const columns = [
-      { label: "Data", width: 27 }, { label: "Solicitante", width: 54 }, { label: "Escola", width: 67 },
-      { label: "Tipo", width: 37 }, { label: "Status", width: 29 }, { label: "Itens", width: 16 },
+      { label: "Data", width: 25 }, { label: "Solicitante", width: 48 }, { label: "Escola", width: 58 },
+      { label: "Tipo", width: 35 }, { label: "Status", width: 25 }, { label: "Itens solicitados", width: 72 }, { label: "Total", width: 14 },
     ]
     const drawHeader = () => {
       doc.setFillColor(239, 246, 246)
@@ -441,18 +441,20 @@ export default function AdminPage() {
       const itemCount = getSubmissionItems(submission).reduce((sum, item) => sum + Number(item.quantity || 0), 0)
       const values = [
         new Date(submission.timestamp).toLocaleDateString("pt-BR"), submission.name || "-", submission.institution || "-",
-        submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits", submission.status || "Pendente", String(itemCount),
+        submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits", submission.status || "Pendente",
+        getSubmissionItems(submission).map((item) => `${item.description} (${item.quantity || 0})`).join("; ") || "Nenhum item informado", String(itemCount),
       ]
+      const wrappedValues = columns.map((column, index) => doc.splitTextToSize(values[index], column.width - 5))
+      const rowHeight = Math.max(8, Math.min(24, Math.max(...wrappedValues.map((lines) => lines.length)) * 3.5 + 4))
       let x = margin + 3
       doc.setTextColor(45, 50, 55)
       columns.forEach((column, index) => {
-        const text = doc.splitTextToSize(values[index], column.width - 5)[0]
-        doc.text(text, x, y + 5)
+        doc.text(wrappedValues[index].slice(0, 5), x, y + 4, { lineHeightFactor: 1.1 })
         x += column.width
       })
       doc.setDrawColor(225, 230, 230)
-      doc.line(margin, y + 8, pageWidth - margin, y + 8)
-      y += 8
+      doc.line(margin, y + rowHeight, pageWidth - margin, y + rowHeight)
+      y += rowHeight
     })
     drawFooter()
     doc.save(`relatorio-pedidos-${new Date().toISOString().slice(0, 10)}.pdf`)
@@ -952,7 +954,7 @@ export default function AdminPage() {
           {[{ label: "Pedidos", value: reportSubmissions.length }, { label: "Almoxarifado", value: reportSubmissions.filter((s) => s.submissionType === "almoxarifado").length }, { label: "Uniformes e Kits", value: reportSubmissions.filter((s) => (s.submissionType || "uniformes") === "uniformes").length }, { label: "Escolas", value: new Set(reportSubmissions.map((s) => s.institution)).size }].map((metric) => <div key={metric.label} className="rounded-lg border border-border bg-white p-3"><p className="text-xl font-bold">{metric.value}</p><p className="text-xs text-muted-foreground">{metric.label}</p></div>)}
         </div>
         <div className="overflow-x-auto rounded-xl border border-border">
-          <Table><TableHeader><TableRow><TableHead>Data</TableHead><TableHead>Solicitante</TableHead><TableHead>Escola</TableHead><TableHead>Tipo</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Itens</TableHead><TableHead className="text-right print:hidden">Exportar</TableHead></TableRow></TableHeader><TableBody>{reportSubmissions.length === 0 ? <TableRow><TableCell colSpan={7} className="h-24 text-center text-muted-foreground">Nenhum pedido encontrado para os filtros selecionados.</TableCell></TableRow> : reportSubmissions.map((submission) => <TableRow key={submission.id}><TableCell>{new Date(submission.timestamp).toLocaleDateString("pt-BR")}</TableCell><TableCell>{submission.name}</TableCell><TableCell>{submission.institution}</TableCell><TableCell>{submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits"}</TableCell><TableCell>{submission.status || "Pendente"}</TableCell><TableCell className="text-right">{getSubmissionItems(submission).reduce((sum, item) => sum + Number(item.quantity || 0), 0)}</TableCell><TableCell className="text-right print:hidden"><div className="flex justify-end gap-1"><Button variant="ghost" size="icon" title="Baixar pedido em Excel/CSV" aria-label={`Baixar pedido ${submission.id} em CSV`} onClick={() => exportSubmissionCsv(submission)}><FileSpreadsheet className="h-4 w-4" /></Button><Button variant="ghost" size="icon" title="Imprimir pedido ou salvar como PDF" aria-label={`Imprimir pedido ${submission.id}`} onClick={() => printSubmission(submission)}><FileText className="h-4 w-4" /></Button></div></TableCell></TableRow>)}</TableBody></Table>
+          <Table><TableHeader><TableRow><TableHead>Data</TableHead><TableHead>Solicitante</TableHead><TableHead>Escola</TableHead><TableHead>Tipo</TableHead><TableHead>Status</TableHead><TableHead>Itens solicitados</TableHead><TableHead className="text-right">Total</TableHead><TableHead className="text-right print:hidden">Exportar</TableHead></TableRow></TableHeader><TableBody>{reportSubmissions.length === 0 ? <TableRow><TableCell colSpan={8} className="h-24 text-center text-muted-foreground">Nenhum pedido encontrado para os filtros selecionados.</TableCell></TableRow> : reportSubmissions.map((submission) => <TableRow key={submission.id}><TableCell>{new Date(submission.timestamp).toLocaleDateString("pt-BR")}</TableCell><TableCell>{submission.name}</TableCell><TableCell>{submission.institution}</TableCell><TableCell>{submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits"}</TableCell><TableCell>{submission.status || "Pendente"}</TableCell><TableCell className="max-w-[280px] text-xs leading-5">{getSubmissionItems(submission).map((item) => `${item.description} (${item.quantity || 0})`).join("; ") || "Nenhum item informado"}</TableCell><TableCell className="text-right">{getSubmissionItems(submission).reduce((sum, item) => sum + Number(item.quantity || 0), 0)}</TableCell><TableCell className="text-right print:hidden"><div className="flex justify-end gap-1"><Button variant="ghost" size="icon" title="Baixar pedido em Excel/CSV" aria-label={`Baixar pedido ${submission.id} em CSV`} onClick={() => exportSubmissionCsv(submission)}><FileSpreadsheet className="h-4 w-4" /></Button><Button variant="ghost" size="icon" title="Imprimir pedido ou salvar como PDF" aria-label={`Imprimir pedido ${submission.id}`} onClick={() => printSubmission(submission)}><FileText className="h-4 w-4" /></Button></div></TableCell></TableRow>)}</TableBody></Table>
         </div>
       </CardContent>
     </Card>
