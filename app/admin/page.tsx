@@ -987,6 +987,7 @@ export default function AdminPage() {
               <header className="flex flex-col gap-3 border-b border-border bg-slate-50/80 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
                 <div className="grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2 lg:grid-cols-4">
                   <span><strong>Data:</strong> {new Date(submission.timestamp).toLocaleDateString("pt-BR")}</span>
+                  <span><strong>Mês:</strong> {new Date(submission.timestamp).toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}</span>
                   <span><strong>Solicitante:</strong> {submission.name}</span>
                   <span><strong>Escola:</strong> {submission.institution}</span>
                   <span><strong>Categoria:</strong> {submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits"}</span>
