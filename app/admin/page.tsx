@@ -418,10 +418,16 @@ export default function AdminPage() {
       { label: "Data", width: 25 }, { label: "Solicitante", width: 48 }, { label: "Instituição", width: 58 },
       { label: "Categoria", width: 35 }, { label: "Item solicitado", width: 88 }, { label: "Qtd.", width: 15 },
     ]
-    const reportRows = reportSubmissions.flatMap((submission) => getSubmissionCategories(submission).flatMap((category) => category.items.map((item) => ({
-      date: new Date(submission.timestamp).toLocaleDateString("pt-BR"), name: submission.name || "-", institution: submission.institution || "-",
-      category: category.name, item: item.description, quantity: String(item.quantity || 0),
-    }))))
+    const reportRows = reportSubmissions
+      .flatMap((submission) => getSubmissionCategories(submission).flatMap((category) => category.items.map((item) => {
+        const date = new Date(submission.timestamp)
+        return {
+          date: date.toLocaleDateString("pt-BR"), monthKey: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`,
+          monthLabel: date.toLocaleDateString("pt-BR", { month: "long", year: "numeric" }), name: submission.name || "-", institution: submission.institution || "-",
+          category: category.name, item: item.description, quantity: String(item.quantity || 0),
+        }
+      })))
+      .sort((a, b) => a.monthKey.localeCompare(b.monthKey))
     const drawHeader = () => {
       doc.setFillColor(239, 246, 246)
       doc.setDrawColor(210, 220, 220)
@@ -440,10 +446,27 @@ export default function AdminPage() {
       doc.text(`Página ${doc.getNumberOfPages()}`, pageWidth - margin, pageHeight - 8, { align: "right" })
     }
 
+    const drawMonthHeader = (label: string) => {
+      if (y > pageHeight - 24) { drawFooter(); doc.addPage(); y = 16; drawHeader() }
+      doc.setFillColor(226, 232, 240)
+      doc.setDrawColor(203, 213, 225)
+      doc.roundedRect(margin, y, pageWidth - margin * 2, 8, 1.5, 1.5, "FD")
+      doc.setTextColor(30, 41, 59)
+      doc.setFont("helvetica", "bold")
+      doc.setFontSize(9)
+      doc.text(label.charAt(0).toUpperCase() + label.slice(1), margin + 3, y + 5.2)
+      y += 10
+    }
+
     drawHeader()
     doc.setFont("helvetica", "normal")
     doc.setFontSize(7.5)
+    let currentMonth = ""
     reportRows.forEach((row) => {
+      if (row.monthKey !== currentMonth) {
+        currentMonth = row.monthKey
+        drawMonthHeader(row.monthLabel)
+      }
       const values = [row.date, row.name, row.institution, row.category, row.item, row.quantity]
       const wrappedValues = columns.map((column, index) => doc.splitTextToSize(values[index], column.width - 5))
       if (y > pageHeight - Math.max(18, Math.min(30, Math.max(...wrappedValues.map((lines) => lines.length)) * 3.5 + 8))) { drawFooter(); doc.addPage(); y = 16; drawHeader() }
