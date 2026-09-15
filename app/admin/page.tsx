@@ -381,6 +381,83 @@ export default function AdminPage() {
     printWindow.print()
   }
 
+  const downloadReportPDF = async () => {
+    const { jsPDF } = await import("jspdf")
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" })
+    const pageWidth = doc.internal.pageSize.getWidth()
+    const pageHeight = doc.internal.pageSize.getHeight()
+    const margin = 14
+    let y = 18
+
+    doc.setFillColor(15, 118, 110)
+    doc.rect(0, 0, pageWidth, 12, "F")
+    doc.setTextColor(255, 255, 255)
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(15)
+    doc.text("Relatório de pedidos", margin, 8)
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(8)
+    doc.text(`Gerado em ${new Date().toLocaleString("pt-BR")}`, pageWidth - margin, 8, { align: "right" })
+
+    y = 23
+    doc.setTextColor(35, 45, 55)
+    doc.setFontSize(9)
+    const filters = [
+      `Escola: ${reportInstitution === "all" ? "Todas" : reportInstitution}`,
+      `Mês: ${reportMonth === "all" ? "Todos" : reportMonth}`,
+      `Ano: ${reportYear === "all" ? "Todos" : reportYear}`,
+      `Total: ${reportSubmissions.length} pedido(s)`,
+    ]
+    doc.text(filters.join("   |   "), margin, y)
+    y += 8
+
+    const columns = [
+      { label: "Data", width: 27 }, { label: "Solicitante", width: 54 }, { label: "Escola", width: 67 },
+      { label: "Tipo", width: 37 }, { label: "Status", width: 29 }, { label: "Itens", width: 16 },
+    ]
+    const drawHeader = () => {
+      doc.setFillColor(239, 246, 246)
+      doc.setDrawColor(210, 220, 220)
+      doc.rect(margin, y, pageWidth - margin * 2, 8, "FD")
+      doc.setTextColor(30, 55, 55)
+      doc.setFont("helvetica", "bold")
+      doc.setFontSize(8)
+      let x = margin + 3
+      columns.forEach((column) => { doc.text(column.label, x, y + 5); x += column.width })
+      y += 8
+    }
+    const drawFooter = () => {
+      doc.setFont("helvetica", "normal")
+      doc.setFontSize(7)
+      doc.setTextColor(110, 120, 125)
+      doc.text(`Página ${doc.getNumberOfPages()}`, pageWidth - margin, pageHeight - 8, { align: "right" })
+    }
+
+    drawHeader()
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(7.5)
+    reportSubmissions.forEach((submission) => {
+      if (y > pageHeight - 18) { drawFooter(); doc.addPage(); y = 16; drawHeader() }
+      const itemCount = getSubmissionItems(submission).reduce((sum, item) => sum + Number(item.quantity || 0), 0)
+      const values = [
+        new Date(submission.timestamp).toLocaleDateString("pt-BR"), submission.name || "-", submission.institution || "-",
+        submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits", submission.status || "Pendente", String(itemCount),
+      ]
+      let x = margin + 3
+      doc.setTextColor(45, 50, 55)
+      columns.forEach((column, index) => {
+        const text = doc.splitTextToSize(values[index], column.width - 5)[0]
+        doc.text(text, x, y + 5)
+        x += column.width
+      })
+      doc.setDrawColor(225, 230, 230)
+      doc.line(margin, y + 8, pageWidth - margin, y + 8)
+      y += 8
+    })
+    drawFooter()
+    doc.save(`relatorio-pedidos-${new Date().toISOString().slice(0, 10)}.pdf`)
+  }
+
   const printReport = () => window.print()
 
   const handleTabChange = (tab: "almoxarifado" | "uniformes" | "feedbacks" | "relatorio") => {
@@ -862,7 +939,7 @@ export default function AdminPage() {
         </div>
         <div className="flex flex-wrap gap-2 print:hidden">
           <Button variant="outline" onClick={exportReportCsv}><FileSpreadsheet className="mr-2 h-4 w-4" />Excel (CSV)</Button>
-          <Button onClick={printReport}><FileText className="mr-2 h-4 w-4" />PDF</Button>
+          <Button onClick={downloadReportPDF}><Download className="mr-2 h-4 w-4" />Baixar PDF</Button>
         </div>
       </CardHeader>
       <CardContent>
