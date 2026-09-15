@@ -791,7 +791,6 @@ export default function AdminPage() {
           {[
             { title: "Almoxarifado", icon: Package, items: almoxarifadoSubmissions, accent: "border-l-sky-500", iconStyle: "bg-sky-500/15 text-sky-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
             { title: "Uniformes e Kits", icon: Shirt, items: uniformesSubmissions, accent: "border-l-amber-500", iconStyle: "bg-amber-500/15 text-amber-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
-            { title: "Feedbacks", icon: MessageSquare, items: feedbacks, accent: "border-l-violet-500", iconStyle: "bg-violet-500/15 text-violet-600", labels: ["Resolvidos", "Lidos", "Pendentes"], statuses: ["resolvido", "lido", "pendente"] },
           ].map(({ title, icon: Icon, items, accent, iconStyle, labels, statuses }) => (
             <div key={title} className={`group rounded-xl border border-border border-l-4 bg-white p-3 shadow-[0_4px_14px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.1)] ${accent}`}>
               <div className="mb-2.5 flex items-center gap-2.5 border-b border-slate-200 pb-2.5">
@@ -840,25 +839,7 @@ export default function AdminPage() {
             <Shirt className="h-4 w-4" />
             <span>Uniformes e Kits</span>
           </button>
-          <button
-            type="button"
-            onClick={() => handleTabChange("feedbacks")}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "feedbacks"
-                ? "bg-selection/20 text-selection"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-          >
-            <MessageSquare className="h-4 w-4" />
-            <span>Feedbacks</span>
-            {pendingFeedbacksCount > 0 && (
-              <span className={`ml-0.5 inline-flex items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-semibold ${activeTab === "feedbacks"
-                  ? "bg-muted-foreground/20 text-muted-foreground"
-                  : "bg-destructive text-destructive-foreground"
-                }`}>
-                {pendingFeedbacksCount}
-              </span>
-            )}
-  </button>
+
   <button
     type="button"
     onClick={() => handleTabChange("relatorio")}
