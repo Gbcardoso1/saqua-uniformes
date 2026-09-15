@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Lock, Package } from "lucide-react"
+import { Lock, Package, Shirt } from "lucide-react"
 import Image from "next/image"
 import { BeachDecorations } from "@/components/beach-decorations"
 
@@ -91,7 +91,7 @@ export default function Home() {
                     : "bg-transparent border-white/30 text-white hover:bg-white/10"
                 }`}
               >
-                <img src="/professor-uniforme.png" alt="" className="h-5 w-5 object-contain" />
+                <Shirt className="h-4 w-4" />
                 Uniformes e Calçados
               </Button>
               <Button
