@@ -804,9 +804,9 @@ export default function AdminPage() {
                   const count = title === "Feedbacks" ? items.filter((feedback) => (feedback.status || "pendente") === statuses[index]).length : getSubmissionStatusCount(items as Submission[], statuses[index])
                   const statusStyle = index === 0 ? "bg-emerald-500/10 text-emerald-700" : index === 1 ? "bg-blue-500/10 text-blue-700" : "bg-rose-500/10 text-rose-700"
                   return (
-                    <div key={label} className="flex items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-colors hover:bg-slate-50">
+                    <div key={label} className="flex items-center justify-between rounded-lg px-2 py-1 text-sm leading-tight transition-colors hover:bg-slate-50">
                       <span className="flex items-center gap-2 text-muted-foreground"><span className={`h-2 w-2 rounded-full ${index === 0 ? "bg-emerald-500" : index === 1 ? "bg-blue-500" : "bg-rose-500"}`} />{label}</span>
-                      <span className={`min-w-8 rounded-full px-2 py-0.5 text-center text-xs font-bold tabular-nums ${statusStyle}`}>{count}</span>
+                      <span className={`min-w-8 rounded-full px-2 py-0.5 text-center text-sm font-bold leading-tight tabular-nums ${statusStyle}`}>{count}</span>
                     </div>
                   )
                 })}
