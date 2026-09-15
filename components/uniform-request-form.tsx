@@ -442,7 +442,7 @@ export default function UniformRequestForm() {
               )}
             </TabsTrigger>
             <TabsTrigger value="professor" className="flex flex-col gap-1 py-3">
-              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-BdRfq9ZOtRH3trzmVVpUMAUX705R0m.png" alt="" className="h-6 w-6 object-contain" />
+              <img src="/professor-uniforme.png" alt="Professor com uniforme" className="h-7 w-7 object-contain" />
               <span className="text-xs">Professor</span>
               {(kitPoloQuantity > 0 || Object.values(poloQuantities).some(q => q > 0)) && (
                 <Badge variant="secondary" className="text-xs">!</Badge>
