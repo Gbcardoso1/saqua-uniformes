@@ -337,7 +337,8 @@ export default function AdminPage() {
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
     link.href = url
-    link.download = `relatorio-pedidos-${new Date().toISOString().slice(0, 10)}.csv`
+    const institutionName = reportInstitution === "all" ? "todas-instituicoes" : reportInstitution.toLowerCase().replace(/[^a-z0-9]+/gi, "-")
+    link.download = `relatorio-${institutionName}-${new Date().toISOString().slice(0, 10)}.csv`
     link.click()
     URL.revokeObjectURL(url)
   }
@@ -414,9 +415,13 @@ export default function AdminPage() {
     y += 8
 
     const columns = [
-      { label: "Data", width: 25 }, { label: "Solicitante", width: 48 }, { label: "Escola", width: 58 },
-      { label: "Tipo", width: 35 }, { label: "Status", width: 25 }, { label: "Itens solicitados", width: 72 }, { label: "Total", width: 14 },
+      { label: "Data", width: 25 }, { label: "Solicitante", width: 48 }, { label: "Instituição", width: 58 },
+      { label: "Categoria", width: 35 }, { label: "Item solicitado", width: 88 }, { label: "Qtd.", width: 15 },
     ]
+    const reportRows = reportSubmissions.flatMap((submission) => getSubmissionCategories(submission).flatMap((category) => category.items.map((item) => ({
+      date: new Date(submission.timestamp).toLocaleDateString("pt-BR"), name: submission.name || "-", institution: submission.institution || "-",
+      category: category.name, item: item.description, quantity: String(item.quantity || 0),
+    }))))
     const drawHeader = () => {
       doc.setFillColor(239, 246, 246)
       doc.setDrawColor(210, 220, 220)
@@ -438,15 +443,10 @@ export default function AdminPage() {
     drawHeader()
     doc.setFont("helvetica", "normal")
     doc.setFontSize(7.5)
-    reportSubmissions.forEach((submission) => {
-      if (y > pageHeight - 18) { drawFooter(); doc.addPage(); y = 16; drawHeader() }
-      const itemCount = getSubmissionItems(submission).reduce((sum, item) => sum + Number(item.quantity || 0), 0)
-      const values = [
-        new Date(submission.timestamp).toLocaleDateString("pt-BR"), submission.name || "-", submission.institution || "-",
-        submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits", submission.status || "Pendente",
-        getSubmissionItems(submission).map((item) => `${item.description} (${item.quantity || 0})`).join("; ") || "Nenhum item informado", String(itemCount),
-      ]
+    reportRows.forEach((row) => {
+      const values = [row.date, row.name, row.institution, row.category, row.item, row.quantity]
       const wrappedValues = columns.map((column, index) => doc.splitTextToSize(values[index], column.width - 5))
+      if (y > pageHeight - Math.max(18, Math.min(30, Math.max(...wrappedValues.map((lines) => lines.length)) * 3.5 + 8))) { drawFooter(); doc.addPage(); y = 16; drawHeader() }
       const rowHeight = Math.max(8, Math.min(24, Math.max(...wrappedValues.map((lines) => lines.length)) * 3.5 + 4))
       let x = margin + 3
       doc.setTextColor(45, 50, 55)
@@ -459,7 +459,8 @@ export default function AdminPage() {
       y += rowHeight
     })
     drawFooter()
-    doc.save(`relatorio-pedidos-${new Date().toISOString().slice(0, 10)}.pdf`)
+    const institutionName = reportInstitution === "all" ? "todas-instituicoes" : reportInstitution.toLowerCase().replace(/[^a-z0-9]+/gi, "-")
+    doc.save(`relatorio-${institutionName}-${new Date().toISOString().slice(0, 10)}.pdf`)
   }
 
   const printReport = () => window.print()
