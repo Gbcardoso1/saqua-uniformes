@@ -12,7 +12,6 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Lock, Shirt, Package } from "lucide-react"
 import Image from "next/image"
-import { FeedbackButton } from "@/components/feedback-button"
 import { BeachDecorations } from "@/components/beach-decorations"
 
 export default function Home() {
@@ -107,7 +106,6 @@ export default function Home() {
                 <Package className="h-4 w-4" />
                 Almoxarifado
               </Button>
-              <FeedbackButton />
             </div>
           </div>
           

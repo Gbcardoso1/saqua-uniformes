@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt, MessageSquare, LayoutDashboard } from "lucide-react"
+import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt, MessageSquare, LayoutDashboard, FileSpreadsheet, FileText } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { InstitutionPicker } from "@/components/institution-picker"
@@ -81,7 +81,10 @@ export default function AdminPage() {
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [nameFilter, setNameFilter] = useState<string>("all")
-  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "feedbacks">("almoxarifado")
+  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "feedbacks" | "relatorio">("almoxarifado")
+  const [reportInstitution, setReportInstitution] = useState("all")
+  const [reportMonth, setReportMonth] = useState("all")
+  const [reportYear, setReportYear] = useState("all")
   const [institutions, setInstitutions] = useState<string[]>([])
   const [names, setNames] = useState<string[]>([])
   const [months, setMonths] = useState<{ value: string; label: string }[]>([])
@@ -314,7 +317,197 @@ export default function AdminPage() {
     items.filter((submission) => (submission.status || "pendente") === status).length
   const pendingFeedbacksCount = feedbacks.filter((f) => (f.status || "pendente") === "pendente").length
 
-  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "feedbacks") => {
+  const reportSubmissions = submissions.filter((submission) => {
+    const date = new Date(submission.timestamp)
+    const matchesInstitution = reportInstitution === "all" || submission.institution === reportInstitution
+    const matchesMonth = reportMonth === "all" || String(date.getMonth() + 1).padStart(2, "0") === reportMonth
+    const matchesYear = reportYear === "all" || String(date.getFullYear()) === reportYear
+    return matchesInstitution && matchesMonth && matchesYear
+  })
+
+  const exportReportCsv = () => {
+    const headers = ["Data", "Solicitante", "Matrícula", "Instituição", "Tipo", "Status", "Categoria", "Item", "Quantidade"]
+    const rows = reportSubmissions.flatMap((submission) => getSubmissionCategories(submission).flatMap((category) => category.items.map((item) => [
+      new Date(submission.timestamp).toLocaleString("pt-BR"), submission.name, submission.matricula,
+      submission.institution, submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits",
+      submission.status || "pendente", category.name, item.description, String(item.quantity || 0),
+    ])))
+    const csv = [headers, ...rows].map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(",")).join("\\n")
+    const blob = new Blob(["\\ufeff" + csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    const institutionName = reportInstitution === "all" ? "todas-instituicoes" : reportInstitution.toLowerCase().replace(/[^a-z0-9]+/gi, "-")
+    link.download = `relatorio-${institutionName}-${new Date().toISOString().slice(0, 10)}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const getSubmissionCategories = (submission: Submission) => [
+    { name: "Uniformes", items: (submission.uniforms || []).map((item) => ({ description: `${item.type} ${item.gender} - tamanho ${item.size}`, quantity: item.quantity })) },
+    { name: "Calçados", items: (submission.shoes || []).map((item) => ({ description: `Calçado ${item.type || ""} - tamanho ${item.size}`, quantity: item.quantity })) },
+    { name: "Kits aluno", items: (submission.studentKits || []).map((item) => ({ description: `Kit aluno - tamanho ${item.size}`, quantity: item.quantity })) },
+    { name: "Professor", items: (submission.teacherPolos || []).map((item) => ({ description: `Polo professor - tamanho ${item.size}`, quantity: item.quantity || item.kitQuantity })) },
+    { name: "Mochilas", items: (submission.backpacks || []).map((item) => ({ description: `Mochila - tamanho ${item.size}`, quantity: item.quantity })) },
+    { name: "Papelaria", items: (submission.stationeryItems || []).map((item) => ({ description: item.item, quantity: item.quantity })) },
+    { name: "Cozinha", items: (submission.kitchenItems || []).map((item) => ({ description: item.item, quantity: item.quantity })) },
+    { name: "Creche", items: (submission.crecheItems || []).map((item) => ({ description: item.item, quantity: item.quantity })) },
+  ].filter((category) => category.items.length > 0)
+
+  const getSubmissionItems = (submission: Submission) => getSubmissionCategories(submission).flatMap((category) => category.items)
+
+  const monthlyReportGroups = Object.values(reportSubmissions.reduce<Record<string, { key: string; label: string; submissions: Submission[]; categories: Record<string, { description: string; quantity: number }[]> }>>((groups, submission) => {
+    const date = new Date(submission.timestamp)
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`
+    const label = date.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
+    const group = groups[key] || { key, label, submissions: [], categories: {} }
+    group.submissions.push(submission)
+    getSubmissionCategories(submission).forEach((category) => {
+      const items = group.categories[category.name] || []
+      category.items.forEach((item) => {
+        const existing = items.find((entry) => entry.description === item.description)
+        if (existing) existing.quantity += Number(item.quantity || 0)
+        else items.push({ description: item.description, quantity: Number(item.quantity || 0) })
+      })
+      group.categories[category.name] = items
+    })
+    groups[key] = group
+    return groups
+  }, {})).sort((a, b) => a.key.localeCompare(b.key))
+
+  const exportSubmissionCsv = (submission: Submission) => {
+    const rows = getSubmissionItems(submission)
+    const data = [
+      ["Pedido", submission.id], ["Data", new Date(submission.timestamp).toLocaleString("pt-BR")],
+      ["Solicitante", submission.name], ["Matrícula", submission.matricula], ["Instituição", submission.institution],
+      ["Tipo", submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits"], ["Status", submission.status || "Pendente"],
+      [], ["Item", "Quantidade"], ...rows.map((item) => [item.description, item.quantity]),
+    ]
+    const csv = data.map((row) => row.map((value) => `"${String(value ?? "").replaceAll('"', '""')}"`).join(",")).join("\\n")
+    const blob = new Blob(["\\ufeff" + csv], { type: "text/csv;charset=utf-8;" })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `pedido-${submission.id}.csv`
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  const printSubmission = (submission: Submission) => {
+    const items = getSubmissionItems(submission)
+    const printWindow = window.open("", "_blank", "width=900,height=700")
+    if (!printWindow) return
+    printWindow.document.write(`<html><head><title>Pedido ${submission.id}</title><style>body{font-family:Arial,sans-serif;padding:32px;color:#17202a}h1{font-size:22px}p{margin:6px 0}.meta{border-bottom:1px solid #ddd;padding-bottom:16px;margin-bottom:18px}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{text-align:left;border-bottom:1px solid #ddd;padding:9px}th{background:#f3f4f6}</style></head><body><h1>Pedido de uniformes e materiais</h1><div class="meta"><p><b>Pedido:</b> ${submission.id}</p><p><b>Data:</b> ${new Date(submission.timestamp).toLocaleString("pt-BR")}</p><p><b>Solicitante:</b> ${submission.name}</p><p><b>Matrícula:</b> ${submission.matricula}</p><p><b>Instituição:</b> ${submission.institution}</p><p><b>Status:</b> ${submission.status || "Pendente"}</p></div><table><thead><tr><th>Item</th><th>Quantidade</th></tr></thead><tbody>${items.map((item) => `<tr><td>${item.description}</td><td>${item.quantity}</td></tr>`).join("")}</tbody></table></body></html>`)
+    printWindow.document.close()
+    printWindow.focus()
+    printWindow.print()
+  }
+
+  const downloadReportPDF = async () => {
+    const { jsPDF } = await import("jspdf")
+    const doc = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" })
+    const pageWidth = doc.internal.pageSize.getWidth()
+    const pageHeight = doc.internal.pageSize.getHeight()
+    const margin = 14
+    let y = 18
+
+    doc.setFillColor(15, 118, 110)
+    doc.rect(0, 0, pageWidth, 12, "F")
+    doc.setTextColor(255, 255, 255)
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(15)
+    doc.text("Relatório de pedidos", margin, 8)
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(8)
+    doc.text(`Gerado em ${new Date().toLocaleString("pt-BR")}`, pageWidth - margin, 8, { align: "right" })
+
+    y = 23
+    doc.setTextColor(35, 45, 55)
+    doc.setFontSize(9)
+    const filters = [
+      `Escola: ${reportInstitution === "all" ? "Todas" : reportInstitution}`,
+      `Mês: ${reportMonth === "all" ? "Todos" : reportMonth}`,
+      `Ano: ${reportYear === "all" ? "Todos" : reportYear}`,
+      `Total: ${reportSubmissions.length} pedido(s)`,
+    ]
+    doc.text(filters.join("   |   "), margin, y)
+    y += 8
+
+    const columns = [
+      { label: "Data", width: 25 }, { label: "Solicitante", width: 48 }, { label: "Instituição", width: 58 },
+      { label: "Categoria", width: 35 }, { label: "Item solicitado", width: 88 }, { label: "Qtd.", width: 15 },
+    ]
+    const reportRows = reportSubmissions
+      .flatMap((submission) => getSubmissionCategories(submission).flatMap((category) => category.items.map((item) => {
+        const date = new Date(submission.timestamp)
+        return {
+          date: date.toLocaleDateString("pt-BR"), monthKey: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`,
+          monthLabel: date.toLocaleDateString("pt-BR", { month: "long", year: "numeric" }), name: submission.name || "-", institution: submission.institution || "-",
+          category: category.name, item: item.description, quantity: String(item.quantity || 0),
+        }
+      })))
+      .sort((a, b) => a.monthKey.localeCompare(b.monthKey))
+    const drawHeader = () => {
+      doc.setFillColor(239, 246, 246)
+      doc.setDrawColor(210, 220, 220)
+      doc.rect(margin, y, pageWidth - margin * 2, 8, "FD")
+      doc.setTextColor(30, 55, 55)
+      doc.setFont("helvetica", "bold")
+      doc.setFontSize(8)
+      let x = margin + 3
+      columns.forEach((column) => { doc.text(column.label, x, y + 5); x += column.width })
+      y += 8
+    }
+    const drawFooter = () => {
+      doc.setFont("helvetica", "normal")
+      doc.setFontSize(7)
+      doc.setTextColor(110, 120, 125)
+      doc.text(`Página ${doc.getNumberOfPages()}`, pageWidth - margin, pageHeight - 8, { align: "right" })
+    }
+
+    const drawMonthHeader = (label: string) => {
+      if (y > pageHeight - 24) { drawFooter(); doc.addPage(); y = 16; drawHeader() }
+      doc.setFillColor(226, 232, 240)
+      doc.setDrawColor(203, 213, 225)
+      doc.roundedRect(margin, y, pageWidth - margin * 2, 8, 1.5, 1.5, "FD")
+      doc.setTextColor(30, 41, 59)
+      doc.setFont("helvetica", "bold")
+      doc.setFontSize(9)
+      doc.text(label.charAt(0).toUpperCase() + label.slice(1), margin + 3, y + 5.2)
+      y += 10
+    }
+
+    drawHeader()
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(7.5)
+    let currentMonth = ""
+    reportRows.forEach((row) => {
+      if (row.monthKey !== currentMonth) {
+        currentMonth = row.monthKey
+        drawMonthHeader(row.monthLabel)
+      }
+      const values = [row.date, row.name, row.institution, row.category, row.item, row.quantity]
+      const wrappedValues = columns.map((column, index) => doc.splitTextToSize(values[index], column.width - 5))
+      if (y > pageHeight - Math.max(18, Math.min(30, Math.max(...wrappedValues.map((lines) => lines.length)) * 3.5 + 8))) { drawFooter(); doc.addPage(); y = 16; drawHeader() }
+      const rowHeight = Math.max(8, Math.min(24, Math.max(...wrappedValues.map((lines) => lines.length)) * 3.5 + 4))
+      let x = margin + 3
+      doc.setTextColor(45, 50, 55)
+      columns.forEach((column, index) => {
+        doc.text(wrappedValues[index].slice(0, 5), x, y + 4, { lineHeightFactor: 1.1 })
+        x += column.width
+      })
+      doc.setDrawColor(225, 230, 230)
+      doc.line(margin, y + rowHeight, pageWidth - margin, y + rowHeight)
+      y += rowHeight
+    })
+    drawFooter()
+    const institutionName = reportInstitution === "all" ? "todas-instituicoes" : reportInstitution.toLowerCase().replace(/[^a-z0-9]+/gi, "-")
+    doc.save(`relatorio-${institutionName}-${new Date().toISOString().slice(0, 10)}.pdf`)
+  }
+
+  const printReport = () => window.print()
+
+  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "feedbacks" | "relatorio") => {
     setActiveTab(tab)
     setInstitutionFilter("all")
     setNameFilter("all")
@@ -718,15 +911,14 @@ export default function AdminPage() {
 
       <div className="relative z-10 w-full px-4 py-6 md:px-8 md:py-8">
         {/* Indicadores em tempo real por aba */}
-        <div className="mb-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
+        <div className="mb-5 grid grid-cols-1 gap-3 lg:grid-cols-2">
           {[
             { title: "Almoxarifado", icon: Package, items: almoxarifadoSubmissions, accent: "border-l-sky-500", iconStyle: "bg-sky-500/15 text-sky-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
             { title: "Uniformes e Kits", icon: Shirt, items: uniformesSubmissions, accent: "border-l-amber-500", iconStyle: "bg-amber-500/15 text-amber-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
-            { title: "Feedbacks", icon: MessageSquare, items: feedbacks, accent: "border-l-violet-500", iconStyle: "bg-violet-500/15 text-violet-600", labels: ["Resolvidos", "Lidos", "Pendentes"], statuses: ["resolvido", "lido", "pendente"] },
           ].map(({ title, icon: Icon, items, accent, iconStyle, labels, statuses }) => (
-            <div key={title} className={`rounded-xl border border-border border-l-4 bg-white p-3 shadow-sm ${accent}`}>
-              <div className="mb-2 flex items-center gap-2 border-b border-border/70 pb-2">
-                <div className={`flex h-8 w-8 items-center justify-center rounded-lg ${iconStyle}`}>
+            <div key={title} className={`group rounded-xl border border-border border-l-4 bg-white p-3 shadow-[0_4px_14px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.1)] ${accent}`}>
+              <div className="mb-2.5 flex items-center gap-2.5 border-b border-slate-200 pb-2.5">
+                <div className={`flex h-9 w-9 items-center justify-center rounded-xl ring-1 ring-black/5 ${iconStyle}`}>
                   <Icon className="h-4 w-4" />
                 </div>
                 <h3 className="font-semibold text-foreground">{title}</h3>
@@ -736,9 +928,9 @@ export default function AdminPage() {
                   const count = title === "Feedbacks" ? items.filter((feedback) => (feedback.status || "pendente") === statuses[index]).length : getSubmissionStatusCount(items as Submission[], statuses[index])
                   const statusStyle = index === 0 ? "bg-emerald-500/10 text-emerald-700" : index === 1 ? "bg-blue-500/10 text-blue-700" : "bg-rose-500/10 text-rose-700"
                   return (
-                    <div key={label} className="flex items-center justify-between rounded-md px-1.5 py-1 text-xs transition-colors hover:bg-slate-50">
+                    <div key={label} className="flex items-center justify-between rounded-lg px-2 py-1 text-sm leading-tight transition-colors hover:bg-slate-50">
                       <span className="flex items-center gap-2 text-muted-foreground"><span className={`h-2 w-2 rounded-full ${index === 0 ? "bg-emerald-500" : index === 1 ? "bg-blue-500" : "bg-rose-500"}`} />{label}</span>
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${statusStyle}`}>{count}</span>
+                      <span className={`min-w-8 rounded-full px-2 py-0.5 text-center text-sm font-bold leading-tight tabular-nums ${statusStyle}`}>{count}</span>
                     </div>
                   )
                 })}
@@ -771,28 +963,65 @@ export default function AdminPage() {
             <Shirt className="h-4 w-4" />
             <span>Uniformes e Kits</span>
           </button>
-          <button
-            type="button"
-            onClick={() => handleTabChange("feedbacks")}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "feedbacks"
-                ? "bg-selection/20 text-selection"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-          >
-            <MessageSquare className="h-4 w-4" />
-            <span>Feedbacks</span>
-            {pendingFeedbacksCount > 0 && (
-              <span className={`ml-0.5 inline-flex items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-semibold ${activeTab === "feedbacks"
-                  ? "bg-muted-foreground/20 text-muted-foreground"
-                  : "bg-destructive text-destructive-foreground"
-                }`}>
-                {pendingFeedbacksCount}
-              </span>
-            )}
-          </button>
-        </div>
 
-        {activeTab === "feedbacks" ? (
+  <button
+    type="button"
+    onClick={() => handleTabChange("relatorio")}
+    className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "relatorio"
+      ? "bg-selection/20 text-selection"
+      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+      }`}
+  >
+    <FileText className="h-4 w-4" />
+    <span>Relatório</span>
+  </button>
+  </div>
+
+  {activeTab === "relatorio" ? (
+    <Card className="print:shadow-none">
+      <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <CardTitle>Relatório de pedidos</CardTitle>
+          <p className="mt-1 text-sm text-muted-foreground">Filtre e exporte todos os pedidos realizados pelas escolas.</p>
+        </div>
+        <div className="flex flex-wrap gap-2 print:hidden">
+          <Button variant="outline" onClick={exportReportCsv}><FileSpreadsheet className="mr-2 h-4 w-4" />Excel (CSV)</Button>
+          <Button onClick={downloadReportPDF}><Download className="mr-2 h-4 w-4" />Baixar PDF</Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="mb-6 grid gap-4 rounded-xl border border-border bg-muted/30 p-4 md:grid-cols-3 print:hidden">
+          <div className="space-y-2"><Label>Escola</Label><Select value={reportInstitution} onValueChange={setReportInstitution}><SelectTrigger><SelectValue placeholder="Todas as escolas" /></SelectTrigger><SelectContent><SelectItem value="all">Todas as escolas</SelectItem>{institutions.map((institution) => <SelectItem key={institution} value={institution}>{institution}</SelectItem>)}</SelectContent></Select></div>
+          <div className="space-y-2"><Label>Mês</Label><Select value={reportMonth} onValueChange={setReportMonth}><SelectTrigger><SelectValue placeholder="Todos os meses" /></SelectTrigger><SelectContent><SelectItem value="all">Todos os meses</SelectItem>{Array.from({ length: 12 }, (_, index) => <SelectItem key={index + 1} value={String(index + 1).padStart(2, "0")}>{new Date(2024, index).toLocaleString("pt-BR", { month: "long" })}</SelectItem>)}</SelectContent></Select></div>
+          <div className="space-y-2"><Label>Ano</Label><Select value={reportYear} onValueChange={setReportYear}><SelectTrigger><SelectValue placeholder="Todos os anos" /></SelectTrigger><SelectContent><SelectItem value="all">Todos os anos</SelectItem>{[...new Set(submissions.map((submission) => new Date(submission.timestamp).getFullYear()))].sort((a, b) => b - a).map((year) => <SelectItem key={year} value={String(year)}>{year}</SelectItem>)}</SelectContent></Select></div>
+        </div>
+        <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+          {[{ label: "Pedidos", value: reportSubmissions.length }, { label: "Almoxarifado", value: reportSubmissions.filter((s) => s.submissionType === "almoxarifado").length }, { label: "Uniformes e Kits", value: reportSubmissions.filter((s) => (s.submissionType || "uniformes") === "uniformes").length }, { label: "Escolas", value: new Set(reportSubmissions.map((s) => s.institution)).size }].map((metric) => <div key={metric.label} className="rounded-lg border border-border bg-white p-3"><p className="text-xl font-bold">{metric.value}</p><p className="text-xs text-muted-foreground">{metric.label}</p></div>)}
+        </div>
+        <div className="space-y-6">
+          {monthlyReportGroups.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-border px-6 py-12 text-center text-muted-foreground">Nenhum pedido encontrado para os filtros selecionados.</div>
+          ) : monthlyReportGroups.map((month) => (
+            <section key={month.key} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <header className="flex items-center justify-between border-b border-slate-200 bg-slate-900 px-5 py-4 text-white">
+                <div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">Pedidos agrupados por mês</p><h3 className="mt-1 text-xl font-bold capitalize">{month.label}</h3></div>
+                <span className="rounded-full bg-white/15 px-3 py-1 text-sm font-semibold">{month.submissions.length} {month.submissions.length === 1 ? "pedido" : "pedidos"}</span>
+              </header>
+              <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-4">
+                {Object.entries(month.categories).map(([categoryName, items]) => (
+                  <section key={categoryName} className="min-w-0 rounded-xl border border-slate-200 bg-slate-50/70 p-3">
+                    <div className="mb-3 flex items-center justify-between border-b border-slate-200 pb-2"><h4 className="text-xs font-bold uppercase tracking-wide text-slate-600">{categoryName}</h4><span className="text-xs text-slate-400">{items.length} itens</span></div>
+                    <ul className="space-y-2 text-sm text-slate-700">{items.map((item) => <li key={item.description} className="flex items-start justify-between gap-3"><span className="min-w-0 break-words leading-5">{item.description}</span><strong className="shrink-0 rounded-md bg-white px-2 py-0.5 text-xs text-slate-900 shadow-sm">{item.quantity}</strong></li>)}</ul>
+                  </section>
+                ))}
+              </div>
+              <footer className="border-t border-slate-200 px-5 py-3 text-right text-sm text-slate-500">Total do mês: <strong className="text-slate-900">{month.submissions.reduce((sum, submission) => sum + getSubmissionItems(submission).reduce((total, item) => total + Number(item.quantity || 0), 0), 0)}</strong> itens</footer>
+            </section>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  ) : activeTab === "feedbacks" ? (
           <Card>
             <CardHeader>
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
