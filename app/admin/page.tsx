@@ -356,6 +356,25 @@ export default function AdminPage() {
 
   const getSubmissionItems = (submission: Submission) => getSubmissionCategories(submission).flatMap((category) => category.items)
 
+  const monthlyReportGroups = Object.values(reportSubmissions.reduce<Record<string, { key: string; label: string; submissions: Submission[]; categories: Record<string, { description: string; quantity: number }[]> }>>((groups, submission) => {
+    const date = new Date(submission.timestamp)
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`
+    const label = date.toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
+    const group = groups[key] || { key, label, submissions: [], categories: {} }
+    group.submissions.push(submission)
+    getSubmissionCategories(submission).forEach((category) => {
+      const items = group.categories[category.name] || []
+      category.items.forEach((item) => {
+        const existing = items.find((entry) => entry.description === item.description)
+        if (existing) existing.quantity += Number(item.quantity || 0)
+        else items.push({ description: item.description, quantity: Number(item.quantity || 0) })
+      })
+      group.categories[category.name] = items
+    })
+    groups[key] = group
+    return groups
+  }, {})).sort((a, b) => a.key.localeCompare(b.key))
+
   const exportSubmissionCsv = (submission: Submission) => {
     const rows = getSubmissionItems(submission)
     const data = [
@@ -979,37 +998,25 @@ export default function AdminPage() {
         <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
           {[{ label: "Pedidos", value: reportSubmissions.length }, { label: "Almoxarifado", value: reportSubmissions.filter((s) => s.submissionType === "almoxarifado").length }, { label: "Uniformes e Kits", value: reportSubmissions.filter((s) => (s.submissionType || "uniformes") === "uniformes").length }, { label: "Escolas", value: new Set(reportSubmissions.map((s) => s.institution)).size }].map((metric) => <div key={metric.label} className="rounded-lg border border-border bg-white p-3"><p className="text-xl font-bold">{metric.value}</p><p className="text-xs text-muted-foreground">{metric.label}</p></div>)}
         </div>
-        <div className="space-y-4">
-          {reportSubmissions.length === 0 ? (
+        <div className="space-y-6">
+          {monthlyReportGroups.length === 0 ? (
             <div className="rounded-xl border border-dashed border-border px-6 py-12 text-center text-muted-foreground">Nenhum pedido encontrado para os filtros selecionados.</div>
-          ) : reportSubmissions.map((submission) => (
-            <article key={submission.id} className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
-              <header className="flex flex-col gap-3 border-b border-border bg-slate-50/80 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
-                <div className="grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2 lg:grid-cols-4">
-                  <span><strong>Data:</strong> {new Date(submission.timestamp).toLocaleDateString("pt-BR")}</span>
-                  <span><strong>Mês:</strong> {new Date(submission.timestamp).toLocaleDateString("pt-BR", { month: "long", year: "numeric" })}</span>
-                  <span><strong>Solicitante:</strong> {submission.name}</span>
-                  <span><strong>Escola:</strong> {submission.institution}</span>
-                  <span><strong>Categoria:</strong> {submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits"}</span>
-                </div>
-                <div className="flex items-center gap-2 print:hidden">
-                  <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">{submission.status || "Pendente"}</span>
-                  <Button variant="outline" size="sm" onClick={() => exportSubmissionCsv(submission)}><FileSpreadsheet className="mr-1.5 h-3.5 w-3.5" />Excel</Button>
-                  <Button variant="outline" size="sm" onClick={() => printSubmission(submission)}><FileText className="mr-1.5 h-3.5 w-3.5" />PDF</Button>
-                </div>
+          ) : monthlyReportGroups.map((month) => (
+            <section key={month.key} className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+              <header className="flex items-center justify-between border-b border-slate-200 bg-slate-900 px-5 py-4 text-white">
+                <div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">Pedidos agrupados por mês</p><h3 className="mt-1 text-xl font-bold capitalize">{month.label}</h3></div>
+                <span className="rounded-full bg-white/15 px-3 py-1 text-sm font-semibold">{month.submissions.length} {month.submissions.length === 1 ? "pedido" : "pedidos"}</span>
               </header>
-              <div className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
-                {getSubmissionCategories(submission).map((category) => (
-                  <section key={category.name} className="rounded-lg border border-slate-200 bg-slate-50/50 p-3">
-                    <h4 className="mb-2 border-b border-slate-200 pb-2 text-xs font-bold uppercase tracking-wide text-slate-600">{category.name}</h4>
-                    <ul className="space-y-1.5 text-sm text-slate-700">
-                      {category.items.map((item, index) => <li key={`${category.name}-${index}`} className="flex items-start justify-between gap-3"><span className="min-w-0">{item.description}</span><strong className="shrink-0 rounded bg-white px-1.5 py-0.5 text-xs text-slate-900 shadow-sm">{item.quantity || 0}</strong></li>)}
-                    </ul>
+              <div className="grid gap-4 p-4 md:grid-cols-2 xl:grid-cols-4">
+                {Object.entries(month.categories).map(([categoryName, items]) => (
+                  <section key={categoryName} className="min-w-0 rounded-xl border border-slate-200 bg-slate-50/70 p-3">
+                    <div className="mb-3 flex items-center justify-between border-b border-slate-200 pb-2"><h4 className="text-xs font-bold uppercase tracking-wide text-slate-600">{categoryName}</h4><span className="text-xs text-slate-400">{items.length} itens</span></div>
+                    <ul className="space-y-2 text-sm text-slate-700">{items.map((item) => <li key={item.description} className="flex items-start justify-between gap-3"><span className="min-w-0 break-words leading-5">{item.description}</span><strong className="shrink-0 rounded-md bg-white px-2 py-0.5 text-xs text-slate-900 shadow-sm">{item.quantity}</strong></li>)}</ul>
                   </section>
                 ))}
               </div>
-              <footer className="border-t border-border px-4 py-2 text-right text-xs text-muted-foreground">Total de itens: <strong className="text-foreground">{getSubmissionItems(submission).reduce((sum, item) => sum + Number(item.quantity || 0), 0)}</strong></footer>
-            </article>
+              <footer className="border-t border-slate-200 px-5 py-3 text-right text-sm text-slate-500">Total do mês: <strong className="text-slate-900">{month.submissions.reduce((sum, submission) => sum + getSubmissionItems(submission).reduce((total, item) => total + Number(item.quantity || 0), 0), 0)}</strong> itens</footer>
+            </section>
           ))}
         </div>
       </CardContent>
