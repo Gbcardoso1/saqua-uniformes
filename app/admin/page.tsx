@@ -787,7 +787,7 @@ export default function AdminPage() {
 
       <div className="relative z-10 w-full px-4 py-6 md:px-8 md:py-8">
         {/* Indicadores em tempo real por aba */}
-        <div className="mb-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
+        <div className="mb-5 grid grid-cols-1 gap-3 lg:grid-cols-2">
           {[
             { title: "Almoxarifado", icon: Package, items: almoxarifadoSubmissions, accent: "border-l-sky-500", iconStyle: "bg-sky-500/15 text-sky-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
             { title: "Uniformes e Kits", icon: Shirt, items: uniformesSubmissions, accent: "border-l-amber-500", iconStyle: "bg-amber-500/15 text-amber-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
