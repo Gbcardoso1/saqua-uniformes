@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Lock, Shirt, Package } from "lucide-react"
+import { Lock, Package, Shirt } from "lucide-react"
 import Image from "next/image"
 import { BeachDecorations } from "@/components/beach-decorations"
 

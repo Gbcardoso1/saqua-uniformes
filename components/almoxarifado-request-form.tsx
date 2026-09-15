@@ -812,9 +812,11 @@ export default function AlmoxarifadoRequestForm() {
         </TabsContent>
       </Tabs>
 
-      <Button type="submit" className="w-full" size="lg">
-        Enviar Solicitação
-      </Button>
+      <div className="flex justify-center">
+        <Button type="submit" size="lg" className="min-w-[200px]">
+          Enviar Solicitação
+        </Button>
+      </div>
 
       {/* Confirmation Modal */}
       <Dialog open={showConfirmModal} onOpenChange={setShowConfirmModal}>
