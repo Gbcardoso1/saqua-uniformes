@@ -326,12 +326,12 @@ export default function AdminPage() {
   })
 
   const exportReportCsv = () => {
-    const headers = ["Data", "Solicitante", "Matrícula", "Instituição", "Tipo", "Status", "Itens solicitados", "Total"]
-    const rows = reportSubmissions.map((submission) => [
+    const headers = ["Data", "Solicitante", "Matrícula", "Instituição", "Tipo", "Status", "Categoria", "Item", "Quantidade"]
+    const rows = reportSubmissions.flatMap((submission) => getSubmissionCategories(submission).flatMap((category) => category.items.map((item) => [
       new Date(submission.timestamp).toLocaleString("pt-BR"), submission.name, submission.matricula,
       submission.institution, submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits",
-      submission.status || "pendente", getSubmissionItems(submission).map((item) => `${item.description} (${item.quantity || 0})`).join("; "), getSubmissionItems(submission).reduce((sum, item) => sum + Number(item.quantity || 0), 0).toString(),
-    ])
+      submission.status || "pendente", category.name, item.description, String(item.quantity || 0),
+    ])))
     const csv = [headers, ...rows].map((row) => row.map((value) => `"${String(value).replaceAll('"', '""')}"`).join(",")).join("\\n")
     const blob = new Blob(["\\ufeff" + csv], { type: "text/csv;charset=utf-8;" })
     const url = URL.createObjectURL(blob)
@@ -342,16 +342,18 @@ export default function AdminPage() {
     URL.revokeObjectURL(url)
   }
 
-  const getSubmissionItems = (submission: Submission) => [
-    ...(submission.uniforms || []).map((item) => ({ description: `${item.type} ${item.gender} - ${item.size}`, quantity: item.quantity })),
-    ...(submission.shoes || []).map((item) => ({ description: `Calçado ${item.type || ""} - ${item.size}`, quantity: item.quantity })),
-    ...(submission.studentKits || []).map((item) => ({ description: `Kit aluno - ${item.size}`, quantity: item.quantity })),
-    ...(submission.teacherPolos || []).map((item) => ({ description: `Polo professor - ${item.size}`, quantity: item.quantity || item.kitQuantity })),
-    ...(submission.backpacks || []).map((item) => ({ description: `Mochila - ${item.size}`, quantity: item.quantity })),
-    ...(submission.stationeryItems || []).map((item) => ({ description: item.item, quantity: item.quantity })),
-    ...(submission.kitchenItems || []).map((item) => ({ description: item.item, quantity: item.quantity })),
-    ...(submission.crecheItems || []).map((item) => ({ description: item.item, quantity: item.quantity })),
-  ]
+  const getSubmissionCategories = (submission: Submission) => [
+    { name: "Uniformes", items: (submission.uniforms || []).map((item) => ({ description: `${item.type} ${item.gender} - tamanho ${item.size}`, quantity: item.quantity })) },
+    { name: "Calçados", items: (submission.shoes || []).map((item) => ({ description: `Calçado ${item.type || ""} - tamanho ${item.size}`, quantity: item.quantity })) },
+    { name: "Kits aluno", items: (submission.studentKits || []).map((item) => ({ description: `Kit aluno - tamanho ${item.size}`, quantity: item.quantity })) },
+    { name: "Professor", items: (submission.teacherPolos || []).map((item) => ({ description: `Polo professor - tamanho ${item.size}`, quantity: item.quantity || item.kitQuantity })) },
+    { name: "Mochilas", items: (submission.backpacks || []).map((item) => ({ description: `Mochila - tamanho ${item.size}`, quantity: item.quantity })) },
+    { name: "Papelaria", items: (submission.stationeryItems || []).map((item) => ({ description: item.item, quantity: item.quantity })) },
+    { name: "Cozinha", items: (submission.kitchenItems || []).map((item) => ({ description: item.item, quantity: item.quantity })) },
+    { name: "Creche", items: (submission.crecheItems || []).map((item) => ({ description: item.item, quantity: item.quantity })) },
+  ].filter((category) => category.items.length > 0)
+
+  const getSubmissionItems = (submission: Submission) => getSubmissionCategories(submission).flatMap((category) => category.items)
 
   const exportSubmissionCsv = (submission: Submission) => {
     const rows = getSubmissionItems(submission)
@@ -953,8 +955,37 @@ export default function AdminPage() {
         <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
           {[{ label: "Pedidos", value: reportSubmissions.length }, { label: "Almoxarifado", value: reportSubmissions.filter((s) => s.submissionType === "almoxarifado").length }, { label: "Uniformes e Kits", value: reportSubmissions.filter((s) => (s.submissionType || "uniformes") === "uniformes").length }, { label: "Escolas", value: new Set(reportSubmissions.map((s) => s.institution)).size }].map((metric) => <div key={metric.label} className="rounded-lg border border-border bg-white p-3"><p className="text-xl font-bold">{metric.value}</p><p className="text-xs text-muted-foreground">{metric.label}</p></div>)}
         </div>
-        <div className="overflow-x-auto rounded-xl border border-border">
-          <Table><TableHeader><TableRow><TableHead>Data</TableHead><TableHead>Solicitante</TableHead><TableHead>Escola</TableHead><TableHead>Tipo</TableHead><TableHead>Status</TableHead><TableHead>Itens solicitados</TableHead><TableHead className="text-right">Total</TableHead><TableHead className="text-right print:hidden">Exportar</TableHead></TableRow></TableHeader><TableBody>{reportSubmissions.length === 0 ? <TableRow><TableCell colSpan={8} className="h-24 text-center text-muted-foreground">Nenhum pedido encontrado para os filtros selecionados.</TableCell></TableRow> : reportSubmissions.map((submission) => <TableRow key={submission.id}><TableCell>{new Date(submission.timestamp).toLocaleDateString("pt-BR")}</TableCell><TableCell>{submission.name}</TableCell><TableCell>{submission.institution}</TableCell><TableCell>{submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits"}</TableCell><TableCell>{submission.status || "Pendente"}</TableCell><TableCell className="max-w-[280px] text-xs leading-5">{getSubmissionItems(submission).map((item) => `${item.description} (${item.quantity || 0})`).join("; ") || "Nenhum item informado"}</TableCell><TableCell className="text-right">{getSubmissionItems(submission).reduce((sum, item) => sum + Number(item.quantity || 0), 0)}</TableCell><TableCell className="text-right print:hidden"><div className="flex justify-end gap-1"><Button variant="ghost" size="icon" title="Baixar pedido em Excel/CSV" aria-label={`Baixar pedido ${submission.id} em CSV`} onClick={() => exportSubmissionCsv(submission)}><FileSpreadsheet className="h-4 w-4" /></Button><Button variant="ghost" size="icon" title="Imprimir pedido ou salvar como PDF" aria-label={`Imprimir pedido ${submission.id}`} onClick={() => printSubmission(submission)}><FileText className="h-4 w-4" /></Button></div></TableCell></TableRow>)}</TableBody></Table>
+        <div className="space-y-4">
+          {reportSubmissions.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-border px-6 py-12 text-center text-muted-foreground">Nenhum pedido encontrado para os filtros selecionados.</div>
+          ) : reportSubmissions.map((submission) => (
+            <article key={submission.id} className="overflow-hidden rounded-xl border border-border bg-white shadow-sm">
+              <header className="flex flex-col gap-3 border-b border-border bg-slate-50/80 px-4 py-3 lg:flex-row lg:items-center lg:justify-between">
+                <div className="grid gap-x-6 gap-y-1 text-sm sm:grid-cols-2 lg:grid-cols-4">
+                  <span><strong>Data:</strong> {new Date(submission.timestamp).toLocaleDateString("pt-BR")}</span>
+                  <span><strong>Solicitante:</strong> {submission.name}</span>
+                  <span><strong>Escola:</strong> {submission.institution}</span>
+                  <span><strong>Categoria:</strong> {submission.submissionType === "almoxarifado" ? "Almoxarifado" : "Uniformes e Kits"}</span>
+                </div>
+                <div className="flex items-center gap-2 print:hidden">
+                  <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">{submission.status || "Pendente"}</span>
+                  <Button variant="outline" size="sm" onClick={() => exportSubmissionCsv(submission)}><FileSpreadsheet className="mr-1.5 h-3.5 w-3.5" />Excel</Button>
+                  <Button variant="outline" size="sm" onClick={() => printSubmission(submission)}><FileText className="mr-1.5 h-3.5 w-3.5" />PDF</Button>
+                </div>
+              </header>
+              <div className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
+                {getSubmissionCategories(submission).map((category) => (
+                  <section key={category.name} className="rounded-lg border border-slate-200 bg-slate-50/50 p-3">
+                    <h4 className="mb-2 border-b border-slate-200 pb-2 text-xs font-bold uppercase tracking-wide text-slate-600">{category.name}</h4>
+                    <ul className="space-y-1.5 text-sm text-slate-700">
+                      {category.items.map((item, index) => <li key={`${category.name}-${index}`} className="flex items-start justify-between gap-3"><span className="min-w-0">{item.description}</span><strong className="shrink-0 rounded bg-white px-1.5 py-0.5 text-xs text-slate-900 shadow-sm">{item.quantity || 0}</strong></li>)}
+                    </ul>
+                  </section>
+                ))}
+              </div>
+              <footer className="border-t border-border px-4 py-2 text-right text-xs text-muted-foreground">Total de itens: <strong className="text-foreground">{getSubmissionItems(submission).reduce((sum, item) => sum + Number(item.quantity || 0), 0)}</strong></footer>
+            </article>
+          ))}
         </div>
       </CardContent>
     </Card>
