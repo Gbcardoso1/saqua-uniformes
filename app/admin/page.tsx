@@ -104,7 +104,7 @@ export default function AdminPage() {
   const router = useRouter()
 
   useEffect(() => {
-    fetch("/api/admin/session")
+    fetch("/api/admin/session", { credentials: "include" })
       .then((response) => response.json())
       .then(({ authenticated }) => {
         if (!authenticated) {
