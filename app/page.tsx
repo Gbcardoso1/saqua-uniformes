@@ -21,14 +21,15 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"uniformes" | "almoxarifado">("uniformes")
   const router = useRouter()
 
-  const ADMIN_USERNAME = "patrimônio"
-  const ADMIN_PASSWORD = "#cmpp123"
-
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      // Store authentication in sessionStorage
-      sessionStorage.setItem("adminAuth", "true")
+    const response = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    })
+    if (response.ok) {
+      setShowLoginModal(false)
       router.push("/admin")
     } else {
       alert("Login ou senha incorretos!")

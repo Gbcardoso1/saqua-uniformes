@@ -104,21 +104,22 @@ export default function AdminPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const auth = sessionStorage.getItem("adminAuth")
-    if (auth === "true") {
-      setIsAuthenticated(true)
-      fetchSubmissions()
-      fetchFeedbacks()
-
-      const refreshDashboard = window.setInterval(() => {
+    fetch("/api/admin/session")
+      .then((response) => response.json())
+      .then(({ authenticated }) => {
+        if (!authenticated) {
+          router.push("/")
+          return
+        }
+        setIsAuthenticated(true)
         fetchSubmissions()
         fetchFeedbacks()
-      }, 30000)
-
-      return () => window.clearInterval(refreshDashboard)
-    } else {
-      router.push("/")
-    }
+        const refreshDashboard = window.setInterval(() => {
+          fetchSubmissions()
+          fetchFeedbacks()
+        }, 30000)
+        return () => window.clearInterval(refreshDashboard)
+      })
   }, [router])
 
   useEffect(() => {
