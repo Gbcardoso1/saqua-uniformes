@@ -352,7 +352,13 @@ const kitchenItemsList = [
 
 // Itens de Creche
 const crecheItemsList = [
-  "BANHEIRA PARA BEBE .",
+  "FRALDA  - M",
+  "FRALDA  - P",
+  "FRALDA - G",
+  "FRALDA - XG",
+  "LENÇO UMEDECIDO C/100 UND.",
+  "POMADA P/ ASSADURAS.",
+  "BANHEIRA PARA  BEBE .",
   "CAPA PARA BEBE CONFORTO 96CMX65CM",
   "COLCHONETE CASAL",
   "EDREDOM 1,80M X 2,40M",
@@ -363,12 +369,6 @@ const crecheItemsList = [
   "TOALHA DE BANHO BRANCA UND.",
   "TOALHA DE ROSTO BRANCA UND.",
   "TOALHINHA LAVABO UND.",
-  "FRALDA  - M",
-  "FRALDA  - P",
-  "FRALDA - G",
-  "FRALDA - XG",
-  "LENÇO UMEDECIDO C/100 UND.",
-  "POMADA P/ ASSADURAS.",
 ]
 
 export default function AlmoxarifadoRequestForm() {
