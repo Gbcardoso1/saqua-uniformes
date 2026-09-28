@@ -21,7 +21,7 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 
 // Itens de Papelaria organizados por categoria
-const stationeryCategories = {
+const activeStationeryCategories = {
   "Pincéis e Arte": [
     "PINCEL CHATO LONGO 815-2 - 12 UND",
     "PINCEL CHATO LONGO 815-0 - 12 UND",
@@ -435,7 +435,7 @@ export default function AlmoxarifadoRequestForm() {
 
   const expandAllCategories = () => {
     const allExpanded: Record<string, boolean> = {}
-    Object.keys(stationeryCategories).forEach(cat => {
+    Object.keys(activeStationeryCategories).forEach(cat => {
       allExpanded[cat] = true
     })
     setExpandedCategories(allExpanded)
@@ -447,12 +447,12 @@ export default function AlmoxarifadoRequestForm() {
 
   // Filtrar itens de papelaria por busca
   const filteredStationeryCategories = useMemo(() => {
-    if (!stationerySearch.trim()) return stationeryCategories
+    if (!stationerySearch.trim()) return activeStationeryCategories
 
     const search = stationerySearch.toLowerCase()
     const filtered: Record<string, string[]> = {}
 
-    Object.entries(stationeryCategories).forEach(([category, items]) => {
+    Object.entries(activeStationeryCategories).forEach(([category, items]) => {
       const matchedItems = items.filter(item =>
         item.toLowerCase().includes(search)
       )
