@@ -3,10 +3,10 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt, MessageSquare, LayoutDashboard, FileSpreadsheet, FileText } from "lucide-react"
+import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt, MessageSquare, LayoutDashboard, FileSpreadsheet, FileText, FileCheck2, RotateCcw } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { InstitutionPicker } from "@/components/institution-picker"
@@ -56,6 +56,8 @@ type Submission = {
     quantity: string
   }>
   status?: string
+  termFileName?: string
+  feedback?: string
 }
 
 type Feedback = {
@@ -81,7 +83,7 @@ export default function AdminPage() {
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [nameFilter, setNameFilter] = useState<string>("all")
-  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "feedbacks" | "relatorio">("almoxarifado")
+  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "movimentacoes" | "feedbacks" | "relatorio">("almoxarifado")
   const [reportInstitution, setReportInstitution] = useState("all")
   const [reportMonth, setReportMonth] = useState("all")
   const [reportYear, setReportYear] = useState("all")
@@ -507,7 +509,7 @@ export default function AdminPage() {
 
   const printReport = () => window.print()
 
-  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "feedbacks" | "relatorio") => {
+  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "movimentacoes" | "feedbacks" | "relatorio") => {
     setActiveTab(tab)
     setInstitutionFilter("all")
     setNameFilter("all")
@@ -964,9 +966,20 @@ export default function AdminPage() {
             <span>Uniformes e Kits</span>
           </button>
 
-  <button
-    type="button"
-    onClick={() => handleTabChange("relatorio")}
+          <button
+            type="button"
+            onClick={() => handleTabChange("movimentacoes")}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "movimentacoes"
+              ? "bg-selection/20 text-selection"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+          >
+            <FileCheck2 className="h-4 w-4" />
+            <span>Movimentações</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange("relatorio")}
     className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "relatorio"
       ? "bg-selection/20 text-selection"
       : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -977,7 +990,49 @@ export default function AdminPage() {
   </button>
   </div>
 
-  {activeTab === "relatorio" ? (
+  {activeTab === "movimentacoes" ? (
+    <div className="flex flex-col gap-6">
+      <Card>
+        <CardHeader className="flex flex-col gap-4 border-b sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2"><FileCheck2 className="h-5 w-5 text-selection" /> Revisão de movimentações</CardTitle>
+            <CardDescription>Confira os termos enviados pelas instituições e defina o próximo passo.</CardDescription>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-center sm:flex">
+            {[{ label: "Pendentes", value: filteredSubmissions.filter((s) => (s.status || "pendente") === "pendente") .length }, { label: "Aprovados", value: filteredSubmissions.filter((s) => s.status === "aprovado" || s.status === "finalizado").length }].map((metric) => (
+              <div key={metric.label} className="rounded-lg bg-muted/50 px-4 py-2"><p className="text-xl font-bold">{metric.value}</p><p className="text-xs text-muted-foreground">{metric.label}</p></div>
+            ))}
+          </div>
+        </CardHeader>
+        <CardContent className="pt-6">
+          {filteredSubmissions.length === 0 ? (
+            <div className="rounded-xl border border-dashed px-6 py-14 text-center">
+              <FileText className="mx-auto mb-3 h-10 w-10 text-muted-foreground/50" />
+              <h3 className="font-semibold">Nenhum termo para revisar</h3>
+              <p className="mt-1 text-sm text-muted-foreground">Os envios de movimentação aparecerão aqui quando forem conectados ao banco de dados.</p>
+            </div>
+          ) : (
+            <div className="overflow-x-auto rounded-lg border">
+              <Table>
+                <TableHeader><TableRow><TableHead>Solicitante</TableHead><TableHead>Instituição</TableHead><TableHead>Termo</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Ações</TableHead></TableRow></TableHeader>
+                <TableBody>{filteredSubmissions.map((submission) => <TableRow key={submission.id}>
+                  <TableCell><p className="font-medium">{submission.name}</p><p className="text-xs text-muted-foreground">Matrícula {submission.matricula}</p></TableCell>
+                  <TableCell>{submission.institution}</TableCell>
+                  <TableCell><Button variant="link" className="h-auto p-0" onClick={() => viewDetails(submission)}>{submission.termFileName || "Arquivo anexado"}</Button></TableCell>
+                  <TableCell><Badge variant={submission.status === "aprovado" || submission.status === "finalizado" ? "default" : submission.status === "refazer" ? "destructive" : "secondary"}>{submission.status === "refazer" ? "Refazer termo" : submission.status === "aprovado" ? "OK" : "Em análise"}</Badge></TableCell>
+                  <TableCell className="text-right"><div className="flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => updateStatus(submission, "aprovado")}><CheckCircle2 className="mr-1 h-4 w-4" /> OK</Button><Button size="sm" variant="outline" onClick={() => updateStatus(submission, "refazer")}><RotateCcw className="mr-1 h-4 w-4" /> Refazer</Button></div></TableCell>
+                </TableRow>)}</TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader><CardTitle>Orientação para refazer</CardTitle><CardDescription>A descrição do erro será exibida junto ao envio para a instituição.</CardDescription></CardHeader>
+        <CardContent><div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">Campo de observação do termo — pronto para receber a descrição da pendência quando o banco estiver conectado.</div></CardContent>
+      </Card>
+    </div>
+  ) : activeTab === "relatorio" ? (
     <Card className="print:shadow-none">
       <CardHeader className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
