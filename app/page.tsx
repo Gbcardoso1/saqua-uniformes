@@ -6,11 +6,12 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import UniformRequestForm from "@/components/uniform-request-form"
 import AlmoxarifadoRequestForm from "@/components/almoxarifado-request-form"
+import MovimentacoesForm from "@/components/movimentacoes-form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Lock, Package, Shirt } from "lucide-react"
+import { FileText, Lock, Package, Shirt } from "lucide-react"
 import Image from "next/image"
 import { BeachDecorations } from "@/components/beach-decorations"
 
@@ -18,7 +19,7 @@ export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false)
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
-  const [activeTab, setActiveTab] = useState<"uniformes" | "almoxarifado">("uniformes")
+  const [activeTab, setActiveTab] = useState<"uniformes" | "almoxarifado" | "movimentacoes">("uniformes")
   const router = useRouter()
 
   const ADMIN_USERNAME = "patrimônio"
@@ -72,12 +73,16 @@ export default function Home() {
             <h1 className="mx-auto mb-3 max-w-3xl text-3xl font-bold tracking-tight text-white text-balance md:text-5xl">
               {activeTab === "uniformes"
                 ? "Formulário de Solicitação de Uniformes e Calçados"
-                : "Formulário de Solicitação de Almoxarifado"}
+                : activeTab === "almoxarifado"
+                  ? "Formulário de Solicitação de Almoxarifado"
+                  : "Movimentações e Termos"}
             </h1>
             <p className="mx-auto mb-7 max-w-2xl text-base leading-7 text-white/80 text-pretty md:text-lg">
               {activeTab === "uniformes"
                 ? "Preencha os dados abaixo para solicitar uniformes e calçados para sua instituição"
-                : "Preencha os dados abaixo para solicitar itens de papelaria e cozinha para sua instituição"}
+                : activeTab === "almoxarifado"
+                  ? "Preencha os dados abaixo para solicitar itens de papelaria e cozinha para sua instituição"
+                  : "Envie um termo e acompanhe a análise da sua instituição"}
             </p>
 
             {/* Tab Navigation */}
@@ -106,11 +111,23 @@ export default function Home() {
                 <Package className="h-4 w-4" />
                 Almoxarifado
               </Button>
+              <Button
+                onClick={() => setActiveTab("movimentacoes")}
+                variant={activeTab === "movimentacoes" ? "default" : "outline"}
+                className={`gap-2 ${
+                  activeTab === "movimentacoes"
+                    ? "bg-selection/20 !border-2 !border-selection text-selection hover:bg-selection/30"
+                    : "bg-transparent border-white/30 text-white hover:bg-white/10"
+                }`}
+              >
+                <FileText className="h-4 w-4" />
+                Movimentações
+              </Button>
             </div>
           </div>
           
           <div className="animate-float-in" style={{ animationDelay: "220ms" }}>
-            {activeTab === "uniformes" ? <UniformRequestForm /> : <AlmoxarifadoRequestForm />}
+            {activeTab === "uniformes" ? <UniformRequestForm /> : activeTab === "almoxarifado" ? <AlmoxarifadoRequestForm /> : <MovimentacoesForm />}
           </div>
         </div>
 
