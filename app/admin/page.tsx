@@ -59,6 +59,7 @@ type Submission = {
   }>
   status?: string
   termFileName?: string
+  movementFileName?: string
   feedback?: string
   movementFileData?: string
 }
@@ -1037,7 +1038,7 @@ export default function AdminPage() {
                         <TableCell>
                           <div className="flex flex-col items-start gap-1">
                             <Button variant="link" className="h-auto p-0" onClick={() => viewDetails(submission)}>{submission.termFileName || "Arquivo anexado"}</Button>
-                            {isRejected && submission.movementFileData && <Button asChild variant="link" className="h-auto p-0 text-xs"><a href={submission.movementFileData} download={submission.termFileName || "arquivo-movimentacao"}>Baixar arquivo reprovado</a></Button>}
+                            {isRejected && submission.movementFileData && <Button asChild variant="link" className="h-auto p-0 text-xs"><a href={submission.movementFileData} download={submission.movementFileName || submission.termFileName || "arquivo-movimentacao"}>Baixar arquivo enviado</a></Button>}
                           </div>
                         </TableCell>
                         <TableCell><Badge variant={submission.status === "aprovado" || submission.status === "finalizado" ? "default" : isRejected ? "destructive" : "secondary"}>{isRejected ? "Reprovado - por favor refazer" : submission.status === "aprovado" ? "OK" : "Em análise"}</Badge></TableCell>
