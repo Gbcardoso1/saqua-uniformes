@@ -20,7 +20,7 @@ export function InstitutionPicker({ value, onChange, required, includeAll = fals
 
   return (
     <>
-      <input type="text" name="institution" value={value} onChange={() => undefined} required={required} tabIndex={-1} className="sr-only" aria-hidden="true" />
+      <input type="hidden" name="institution" value={value} required={required} readOnly />
       <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button

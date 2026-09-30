@@ -127,7 +127,7 @@ export default function MovimentacoesForm() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Consultar envio</CardTitle><CardDescription>Informe os três dados exatamente como foram enviados para consultar a situação.</CardDescription></CardHeader>
+        <CardHeader><CardTitle>Consultar envio</CardTitle><CardDescription>Informe nome e matrícula; depois selecione a instituição na lista para consultar a situação.</CardDescription></CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="grid gap-4 md:grid-cols-3">
             <div className="flex flex-col gap-2"><Label htmlFor="query-name">Nome</Label><Input id="query-name" value={queryName} onChange={(e) => setQueryName(e.target.value)} /></div>
