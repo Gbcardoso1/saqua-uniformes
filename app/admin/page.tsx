@@ -58,6 +58,7 @@ type Submission = {
   status?: string
   termFileName?: string
   feedback?: string
+  movementFileData?: string
 }
 
 type Feedback = {
@@ -630,18 +631,20 @@ export default function AdminPage() {
   }
 
   const updateStatus = async (submission: Submission, newStatus: string) => {
+    const feedback = newStatus === "refazer" ? window.prompt("Descreva o que está errado no arquivo:", submission.feedback || "") : ""
+    if (newStatus === "refazer" && feedback === null) return
     setIsUpdating(true)
     try {
       const response = await fetch(`/api/submissions/${submission.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ status: newStatus, feedback }),
       })
 
       if (response.ok) {
         setSubmissions((prev) =>
           prev.map((s) =>
-            s.id === submission.id ? { ...s, status: newStatus } : s
+            s.id === submission.id ? { ...s, status: newStatus, feedback: feedback || undefined } : s
           )
         )
         if (selectedSubmission?.id === submission.id) {

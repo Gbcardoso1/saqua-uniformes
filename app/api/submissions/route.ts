@@ -44,6 +44,8 @@ type Submission = {
     quantity: string
   }>
   status?: string
+  termFileName?: string
+  feedback?: string
 }
 
 export async function GET() {
@@ -74,6 +76,9 @@ export async function GET() {
       kitchenItems: item.kitchen_items || [],
       crecheItems: item.creche_items || [],
       status: item.status || "pendente",
+      termFileName: item.movement_file_name || undefined,
+      feedback: item.movement_feedback || undefined,
+      movementFileData: item.movement_file_data || undefined,
     }))
 
     return NextResponse.json({ submissions })
@@ -103,6 +108,8 @@ export async function POST(request: Request) {
         stationery_items: data.stationeryItems || [],
         kitchen_items: data.kitchenItems || [],
         creche_items: data.crecheItems || [],
+        movement_file_name: data.movementFileName || null,
+        movement_file_data: data.movementFileData || null,
       })
       .select()
       .single()
