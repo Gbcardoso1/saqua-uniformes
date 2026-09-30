@@ -1,14 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { Fragment, useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Eye, Download, ArrowLeft, Trash2, CheckCircle2, Loader2, Clock, FileDown, Package, Shirt, MessageSquare, LayoutDashboard, FileSpreadsheet, FileText, FileCheck2, RotateCcw } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 import { InstitutionPicker } from "@/components/institution-picker"
 
 type Submission = {
@@ -57,7 +59,9 @@ type Submission = {
   }>
   status?: string
   termFileName?: string
+  movementFileName?: string
   feedback?: string
+  movementFileData?: string
 }
 
 type Feedback = {
@@ -92,6 +96,7 @@ export default function AdminPage() {
   const [months, setMonths] = useState<{ value: string; label: string }[]>([])
   const [isDeleting, setIsDeleting] = useState(false)
   const [isUpdating, setIsUpdating] = useState(false)
+  const [feedbackDrafts, setFeedbackDrafts] = useState<Record<string, string>>({})
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
   const [filteredFeedbacks, setFilteredFeedbacks] = useState<Feedback[]>([])
   const [feedbackInstitutionFilter, setFeedbackInstitutionFilter] = useState<string>("all")
@@ -629,21 +634,28 @@ export default function AdminPage() {
     return colors[category] || "bg-gray-100 text-gray-800"
   }
 
-  const updateStatus = async (submission: Submission, newStatus: string) => {
-    setIsUpdating(true)
+  const updateStatus = async (submission: Submission, newStatus: string, providedFeedback = "") => {
+  const feedback = newStatus === "refazer" ? providedFeedback.trim() : ""
+  if (newStatus === "refazer" && !feedback) return
+  setIsUpdating(true)
     try {
       const response = await fetch(`/api/submissions/${submission.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ status: newStatus, feedback }),
       })
 
       if (response.ok) {
         setSubmissions((prev) =>
           prev.map((s) =>
-            s.id === submission.id ? { ...s, status: newStatus } : s
-          )
-        )
+  s.id === submission.id ? { ...s, status: newStatus, feedback: feedback || undefined } : s
+  )
+  )
+  setFeedbackDrafts((prev) => {
+  const next = { ...prev }
+  delete next[submission.id]
+  return next
+  })
         if (selectedSubmission?.id === submission.id) {
           setSelectedSubmission((prev) =>
             prev ? { ...prev, status: newStatus } : null
@@ -1015,13 +1027,37 @@ export default function AdminPage() {
             <div className="overflow-x-auto rounded-lg border">
               <Table>
                 <TableHeader><TableRow><TableHead>Solicitante</TableHead><TableHead>Instituição</TableHead><TableHead>Termo</TableHead><TableHead>Status</TableHead><TableHead className="text-right">Ações</TableHead></TableRow></TableHeader>
-                <TableBody>{filteredSubmissions.map((submission) => <TableRow key={submission.id}>
-                  <TableCell><p className="font-medium">{submission.name}</p><p className="text-xs text-muted-foreground">Matrícula {submission.matricula}</p></TableCell>
-                  <TableCell>{submission.institution}</TableCell>
-                  <TableCell><Button variant="link" className="h-auto p-0" onClick={() => viewDetails(submission)}>{submission.termFileName || "Arquivo anexado"}</Button></TableCell>
-                  <TableCell><Badge variant={submission.status === "aprovado" || submission.status === "finalizado" ? "default" : submission.status === "refazer" ? "destructive" : "secondary"}>{submission.status === "refazer" ? "Refazer termo" : submission.status === "aprovado" ? "OK" : "Em análise"}</Badge></TableCell>
-                  <TableCell className="text-right"><div className="flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => updateStatus(submission, "aprovado")}><CheckCircle2 className="mr-1 h-4 w-4" /> OK</Button><Button size="sm" variant="outline" onClick={() => updateStatus(submission, "refazer")}><RotateCcw className="mr-1 h-4 w-4" /> Refazer</Button></div></TableCell>
-                </TableRow>)}</TableBody>
+                <TableBody>{filteredSubmissions.map((submission) => {
+                  const feedbackDraft = feedbackDrafts[submission.id] ?? submission.feedback ?? ""
+                  const isRejected = submission.status === "refazer"
+                  return (
+                    <Fragment key={submission.id}>
+                      <TableRow>
+                        <TableCell><p className="font-medium">{submission.name}</p><p className="text-xs text-muted-foreground">Matrícula {submission.matricula}</p></TableCell>
+                        <TableCell>{submission.institution}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col items-start gap-1">
+                            <Button variant="link" className="h-auto p-0" onClick={() => viewDetails(submission)}>{submission.termFileName || "Arquivo anexado"}</Button>
+                            {isRejected && submission.movementFileData && <Button asChild variant="link" className="h-auto p-0 text-xs"><a href={submission.movementFileData} download={submission.movementFileName || submission.termFileName || "arquivo-movimentacao"}>Baixar arquivo enviado</a></Button>}
+                          </div>
+                        </TableCell>
+                        <TableCell><Badge variant={submission.status === "aprovado" || submission.status === "finalizado" ? "default" : isRejected ? "destructive" : "secondary"}>{isRejected ? "Reprovado - por favor refazer" : submission.status === "aprovado" ? "OK" : "Em análise"}</Badge></TableCell>
+                        <TableCell className="text-right"><div className="flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => updateStatus(submission, "aprovado")}><CheckCircle2 className="mr-1 h-4 w-4" /> OK</Button><Button size="sm" variant="outline" onClick={() => setFeedbackDrafts((prev) => ({ ...prev, [submission.id]: prev[submission.id] ?? submission.feedback ?? "" }))}><RotateCcw className="mr-1 h-4 w-4" /> Refazer</Button></div></TableCell>
+                      </TableRow>
+                      {feedbackDrafts[submission.id] !== undefined && <TableRow key={`${submission.id}-feedback`}>
+                        <TableCell colSpan={5}>
+                          <div className="flex flex-col gap-2 rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-left">
+                            <Label htmlFor={`feedback-${submission.id}`}>Descreva o que está errado no arquivo</Label>
+                            <div className="flex flex-col gap-2 sm:flex-row">
+                              <Input id={`feedback-${submission.id}`} value={feedbackDraft} onChange={(event) => setFeedbackDrafts((prev) => ({ ...prev, [submission.id]: event.target.value }))} placeholder="Ex.: assinatura ausente ou documento ilegível" />
+                              <Button type="button" variant="destructive" disabled={isUpdating || !feedbackDraft.trim()} onClick={() => updateStatus(submission, "refazer", feedbackDraft)}>Reprovar e enviar</Button>
+                            </div>
+                          </div>
+                        </TableCell>
+                      </TableRow>}
+                    </Fragment>
+                  )
+                })}</TableBody>
               </Table>
             </div>
           )}

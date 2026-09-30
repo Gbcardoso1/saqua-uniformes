@@ -31,6 +31,12 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (body.status !== undefined) {
       updateData.status = body.status
     }
+    if (body.feedback !== undefined) {
+      updateData.movement_feedback = body.feedback || null
+    }
+    if (body.status === "aprovado" || body.status === "refazer") {
+      updateData.movement_reviewed_at = new Date().toISOString()
+    }
 
     const { data, error } = await supabase
       .from("submissions")
@@ -49,6 +55,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
         submission: {
           id: id,
           status: body.status,
+          feedback: body.feedback,
         }
       })
     }
