@@ -17,6 +17,7 @@ type Movimento = {
   fileName: string
   status: "pendente" | "aprovado" | "refazer"
   feedback?: string
+  movementFileData?: string
 }
 
 export default function MovimentacoesForm() {
@@ -135,7 +136,7 @@ export default function MovimentacoesForm() {
             <div className="flex flex-col gap-2"><Label>Instituição</Label><InstitutionPicker value={queryInstitution} onChange={setQueryInstitution} /></div>
           </div>
           <Button type="button" variant="outline" onClick={searchSubmissions} disabled={searching || !queryName || !queryMatricula || !queryInstitution}><Search data-icon="inline-start" /> {searching ? "Consultando..." : "Consultar situação"}</Button>
-          {movimentos.length === 0 ? <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">Informe nome, matrícula e instituição para consultar.</p> : <div className="flex flex-col gap-3">{movimentos.map((item) => <div key={item.id} className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-medium">{item.fileName}</p>{item.status === "refazer" && <p className="mt-2 text-sm text-destructive">Reprovado - por favor refazer: {item.feedback || "Confira o arquivo enviado."}</p>}</div><Badge variant={item.status === "aprovado" ? "default" : item.status === "refazer" ? "destructive" : "secondary"}>{item.status === "pendente" && <Clock3 className="mr-1 size-3" />}{item.status === "refazer" && <AlertCircle className="mr-1 size-3" />}{item.status === "aprovado" ? "Finalizado e confirmado" : item.status === "refazer" ? "Reprovado - por favor refazer" : "Em análise"}</Badge></div>)}</div>}
+          {movimentos.length === 0 ? <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">Informe nome, matrícula e instituição para consultar.</p> : <div className="flex flex-col gap-3">{movimentos.map((item) => <div key={item.id} className="flex flex-col gap-3 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-medium">{item.fileName}</p>{item.status === "refazer" && <div className="mt-2 flex flex-col items-start gap-1"><p className="text-sm text-destructive">Reprovado - por favor refazer: {item.feedback || "Confira o arquivo enviado."}</p>{item.movementFileData && <a href={item.movementFileData} download={item.fileName || "arquivo-movimentacao"} className="text-sm font-medium text-primary underline underline-offset-4">Baixar arquivo enviado para conferir</a>}</div>}</div><Badge variant={item.status === "aprovado" ? "default" : item.status === "refazer" ? "destructive" : "secondary"}>{item.status === "pendente" && <Clock3 className="mr-1 size-3" />}{item.status === "refazer" && <AlertCircle className="mr-1 size-3" />}{item.status === "aprovado" ? "Finalizado e confirmado" : item.status === "refazer" ? "Reprovado - por favor refazer" : "Em análise"}</Badge></div>)}</div>}
         </CardContent>
       </Card>
     </div>
