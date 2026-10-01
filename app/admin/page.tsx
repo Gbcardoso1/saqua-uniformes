@@ -238,10 +238,26 @@ export default function AdminPage() {
     }
   }
 
-  const viewDetails = (submission: Submission) => {
-    setSelectedSubmission(submission)
-    setShowDetailModal(true)
+  const openSubmissionFile = (submission: Submission) => {
+  if (!submission.movementFileData) return
+  window.open(submission.movementFileData, "_blank", "noopener,noreferrer")
   }
+
+  const downloadSubmissionFile = (submission: Submission) => {
+  if (!submission.movementFileData) return
+  const link = document.createElement("a")
+  link.href = submission.movementFileData
+  link.download = submission.movementFileName || submission.termFileName || "arquivo-enviado"
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  }
+
+  const viewDetails = (submission: Submission) => {
+  setSelectedSubmission(submission)
+  setShowDetailModal(true)
+  }
+
 
   const confirmDelete = (submission: Submission) => {
     setSubmissionToDelete(submission)
@@ -1030,8 +1046,8 @@ export default function AdminPage() {
                         <TableCell>{submission.institution}</TableCell>
                         <TableCell>
                           <div className="flex flex-col items-start gap-1">
-                            <Button variant="link" className="h-auto p-0 text-left" onClick={() => viewDetails(submission)}>{submission.termFileName || submission.movementFileName || "Termo anexado"}</Button>
-                            {submission.movementFileData && <Button type="button" variant="link" className="h-auto p-0 text-left text-xs" onClick={() => viewDetails(submission)}><Eye data-icon="inline-start" /> Visualizar termo</Button>}
+                            <Button variant="link" className="h-auto p-0 text-left" onClick={() => openSubmissionFile(submission)}>{submission.termFileName || submission.movementFileName || "Termo anexado"}</Button>
+                            {submission.movementFileData && <Button type="button" variant="link" className="h-auto p-0 text-left text-xs" onClick={() => downloadSubmissionFile(submission)}><Download data-icon="inline-start" /> Baixar arquivo</Button>}
                           </div>
                         </TableCell>
                         <TableCell><div className="flex flex-col items-start gap-1"><Badge variant={submission.status === "aprovado" || submission.status === "finalizado" ? "default" : isRejected ? "destructive" : "secondary"}>{isRejected ? "Reprovado" : submission.status === "aprovado" ? "OK" : "Em análise"}</Badge>{isRejected && <p className="text-xs text-destructive"><span className="font-medium">Motivo da reprovação: </span>{submission.feedback || "Confira o arquivo enviado."}</p>}</div></TableCell>
