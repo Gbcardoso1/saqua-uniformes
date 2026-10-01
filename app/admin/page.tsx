@@ -19,6 +19,7 @@ type Submission = {
   name: string
   matricula: string
   institution: string
+  tmbpPmsNumber?: string
   submissionType?: string
   uniforms: Array<{
     type: string
@@ -87,7 +88,7 @@ export default function AdminPage() {
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [nameFilter, setNameFilter] = useState<string>("all")
-  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "movimentacoes" | "feedbacks" | "relatorio">("almoxarifado")
+  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "movimentacoes" | "visualizacao" | "feedbacks" | "relatorio">("almoxarifado")
   const [reportInstitution, setReportInstitution] = useState("all")
   const [reportMonth, setReportMonth] = useState("all")
   const [reportYear, setReportYear] = useState("all")
@@ -173,7 +174,8 @@ export default function AdminPage() {
     let filtered = submissions
 
     // Filter by active tab
-    filtered = filtered.filter((s) => (s.submissionType || "uniformes") === activeTab)
+    const submissionTab = activeTab === "visualizacao" ? "movimentacoes" : activeTab
+    filtered = filtered.filter((s) => (s.submissionType || "uniformes") === submissionTab)
 
     if (typeFilter !== "all") {
       filtered = filtered.filter((s) => (s.submissionType || "uniformes") === typeFilter)
@@ -236,10 +238,26 @@ export default function AdminPage() {
     }
   }
 
-  const viewDetails = (submission: Submission) => {
-    setSelectedSubmission(submission)
-    setShowDetailModal(true)
+  const openSubmissionFile = (submission: Submission) => {
+  if (!submission.movementFileData) return
+  window.open(submission.movementFileData, "_blank", "noopener,noreferrer")
   }
+
+  const downloadSubmissionFile = (submission: Submission) => {
+  if (!submission.movementFileData) return
+  const link = document.createElement("a")
+  link.href = submission.movementFileData
+  link.download = submission.movementFileName || submission.termFileName || "arquivo-enviado"
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  }
+
+  const viewDetails = (submission: Submission) => {
+  setSelectedSubmission(submission)
+  setShowDetailModal(true)
+  }
+
 
   const confirmDelete = (submission: Submission) => {
     setSubmissionToDelete(submission)
@@ -320,6 +338,7 @@ export default function AdminPage() {
 
   const almoxarifadoSubmissions = submissions.filter((s) => s.submissionType === "almoxarifado")
   const uniformesSubmissions = submissions.filter((s) => (s.submissionType || "uniformes") === "uniformes")
+  const termosSubmissions = submissions.filter((s) => s.submissionType === "movimentacoes")
   const getSubmissionStatusCount = (items: Submission[], status: string) =>
     items.filter((submission) => (submission.status || "pendente") === status).length
   const pendingFeedbacksCount = feedbacks.filter((f) => (f.status || "pendente") === "pendente").length
@@ -514,7 +533,7 @@ export default function AdminPage() {
 
   const printReport = () => window.print()
 
-  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "movimentacoes" | "feedbacks" | "relatorio") => {
+  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "movimentacoes" | "visualizacao" | "feedbacks") => {
     setActiveTab(tab)
     setInstitutionFilter("all")
     setNameFilter("all")
@@ -925,10 +944,11 @@ export default function AdminPage() {
 
       <div className="relative z-10 w-full px-4 py-6 md:px-8 md:py-8">
         {/* Indicadores em tempo real por aba */}
-        <div className="mb-5 grid grid-cols-1 gap-3 lg:grid-cols-2">
+        <div className="mb-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
           {[
             { title: "Almoxarifado", icon: Package, items: almoxarifadoSubmissions, accent: "border-l-sky-500", iconStyle: "bg-sky-500/15 text-sky-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
             { title: "Uniformes e Kits", icon: Shirt, items: uniformesSubmissions, accent: "border-l-amber-500", iconStyle: "bg-amber-500/15 text-amber-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
+            { title: "Termos", icon: FileCheck2, items: termosSubmissions, accent: "border-l-violet-500", iconStyle: "bg-violet-500/15 text-violet-600", labels: ["Pendentes", "OK", "Reprovados"], statuses: ["pendente", "aprovado", "refazer"] },
           ].map(({ title, icon: Icon, items, accent, iconStyle, labels, statuses }) => (
             <div key={title} className={`group rounded-xl border border-border border-l-4 bg-white p-3 shadow-[0_4px_14px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.1)] ${accent}`}>
               <div className="mb-2.5 flex items-center gap-2.5 border-b border-slate-200 pb-2.5">
@@ -939,7 +959,7 @@ export default function AdminPage() {
               </div>
               <div className="space-y-2">
                 {labels.map((label, index) => {
-                  const count = title === "Feedbacks" ? items.filter((feedback) => (feedback.status || "pendente") === statuses[index]).length : getSubmissionStatusCount(items as Submission[], statuses[index])
+                  const count = title === "Feedbacks" ? items.filter((feedback) => (feedback.status || "pendente") === statuses[index]).length : title === "Termos" && statuses[index] === "aprovado" ? (items as Submission[]).filter((submission) => submission.status === "aprovado" || submission.status === "finalizado").length : getSubmissionStatusCount(items as Submission[], statuses[index])
                   const statusStyle = index === 0 ? "bg-emerald-500/10 text-emerald-700" : index === 1 ? "bg-blue-500/10 text-blue-700" : "bg-rose-500/10 text-rose-700"
                   return (
                     <div key={label} className="flex items-center justify-between rounded-lg px-2 py-1 text-sm leading-tight transition-colors hover:bg-slate-50">
@@ -989,25 +1009,14 @@ export default function AdminPage() {
             <FileCheck2 className="h-4 w-4" />
             <span>Movimentações</span>
           </button>
-          <button
-            type="button"
-            onClick={() => handleTabChange("relatorio")}
-    className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "relatorio"
-      ? "bg-selection/20 text-selection"
-      : "text-muted-foreground hover:bg-muted hover:text-foreground"
-      }`}
-  >
-    <FileText className="h-4 w-4" />
-    <span>Relatório</span>
-  </button>
   </div>
 
-  {activeTab === "movimentacoes" ? (
+  {activeTab === "movimentacoes" || activeTab === "visualizacao" ? (
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader className="flex flex-col gap-4 border-b sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2"><FileCheck2 className="h-5 w-5 text-selection" /> Revisão de movimentações</CardTitle>
+            <CardTitle className="flex items-center gap-2"><FileCheck2 className="h-5 w-5 text-selection" /> {activeTab === "visualizacao" ? "Visualização dos termos" : "Revisão de movimentações"}</CardTitle>
             <CardDescription>Confira os termos enviados pelas instituições e defina o próximo passo.</CardDescription>
           </div>
           <div className="grid grid-cols-2 gap-2 text-center sm:flex">
@@ -1033,15 +1042,15 @@ export default function AdminPage() {
                   return (
                     <Fragment key={submission.id}>
                       <TableRow>
-                        <TableCell><p className="font-medium">{submission.name}</p><p className="text-xs text-muted-foreground">Matrícula {submission.matricula}</p></TableCell>
+                        <TableCell><p className="font-medium">{submission.name}</p><p className="text-xs text-muted-foreground">Matrícula {submission.matricula}</p><p className="text-xs text-muted-foreground">TMBP/PMS nº {submission.tmbpPmsNumber || "—"}</p></TableCell>
                         <TableCell>{submission.institution}</TableCell>
                         <TableCell>
                           <div className="flex flex-col items-start gap-1">
-                            <Button variant="link" className="h-auto p-0" onClick={() => viewDetails(submission)}>{submission.termFileName || "Arquivo anexado"}</Button>
-                            {isRejected && submission.movementFileData && <Button asChild variant="link" className="h-auto p-0 text-xs"><a href={submission.movementFileData} download={submission.movementFileName || submission.termFileName || "arquivo-movimentacao"}>Baixar arquivo enviado</a></Button>}
+                            <Button variant="link" className="h-auto p-0 text-left" onClick={() => openSubmissionFile(submission)}>{submission.termFileName || submission.movementFileName || "Termo anexado"}</Button>
+                            {submission.movementFileData && <Button type="button" variant="link" className="h-auto p-0 text-left text-xs" onClick={() => downloadSubmissionFile(submission)}><Download data-icon="inline-start" /> Baixar arquivo</Button>}
                           </div>
                         </TableCell>
-                        <TableCell><Badge variant={submission.status === "aprovado" || submission.status === "finalizado" ? "default" : isRejected ? "destructive" : "secondary"}>{isRejected ? "Reprovado - por favor refazer" : submission.status === "aprovado" ? "OK" : "Em análise"}</Badge></TableCell>
+                        <TableCell><div className="flex flex-col items-start gap-1"><Badge variant={submission.status === "aprovado" || submission.status === "finalizado" ? "default" : isRejected ? "destructive" : "secondary"}>{isRejected ? "Reprovado" : submission.status === "aprovado" ? "OK" : "Em análise"}</Badge>{isRejected && <p className="text-xs text-destructive"><span className="font-medium">Motivo da reprovação: </span>{submission.feedback || "Confira o arquivo enviado."}</p>}</div></TableCell>
                         <TableCell className="text-right"><div className="flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => updateStatus(submission, "aprovado")}><CheckCircle2 className="mr-1 h-4 w-4" /> OK</Button><Button size="sm" variant="outline" onClick={() => setFeedbackDrafts((prev) => ({ ...prev, [submission.id]: prev[submission.id] ?? submission.feedback ?? "" }))}><RotateCcw className="mr-1 h-4 w-4" /> Refazer</Button></div></TableCell>
                       </TableRow>
                       {feedbackDrafts[submission.id] !== undefined && <TableRow key={`${submission.id}-feedback`}>
@@ -1062,10 +1071,6 @@ export default function AdminPage() {
             </div>
           )}
         </CardContent>
-      </Card>
-      <Card>
-        <CardHeader><CardTitle>Orientação para refazer</CardTitle><CardDescription>A descrição do erro será exibida junto ao envio para a instituição.</CardDescription></CardHeader>
-        <CardContent><div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">Campo de observação do termo — pronto para receber a descrição da pendência quando o banco estiver conectado.</div></CardContent>
       </Card>
     </div>
   ) : activeTab === "relatorio" ? (
@@ -1478,8 +1483,28 @@ export default function AdminPage() {
                     <p className="text-xs text-muted-foreground mb-1">Instituição</p>
                     <p className="font-medium">{selectedSubmission.institution}</p>
                   </div>
+                  <div className="rounded-lg bg-muted p-3">
+                    <p className="text-xs text-muted-foreground mb-1">TMBP/PMS nº</p>
+                    <p className="font-medium">{selectedSubmission.tmbpPmsNumber || "—"}</p>
+                  </div>
                 </div>
               </div>
+
+              {selectedSubmission.movementFileData && (
+                <div>
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <h3 className="font-semibold text-lg">Arquivo enviado</h3>
+                    <Button asChild variant="outline" size="sm"><a href={selectedSubmission.movementFileData} target="_blank" rel="noreferrer"><Eye data-icon="inline-start" /> Visualizar</a></Button>
+                  </div>
+                  {selectedSubmission.movementFileData.startsWith("data:application/pdf") ? (
+                    <iframe title="Prévia do arquivo enviado" src={selectedSubmission.movementFileData} className="h-[480px] w-full rounded-lg border" />
+                  ) : selectedSubmission.movementFileData.startsWith("data:image/") ? (
+                    <img src={selectedSubmission.movementFileData} alt="Prévia do arquivo enviado" className="max-h-[480px] w-full rounded-lg border object-contain" />
+                  ) : (
+                    <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground"><FileText className="size-10" /><p>A visualização incorporada não está disponível para este formato.</p><Button asChild variant="outline" size="sm"><a href={selectedSubmission.movementFileData} target="_blank" rel="noreferrer"><Eye data-icon="inline-start" /> Abrir termo em nova aba</a></Button></div>
+                  )}
+                </div>
+              )}
 
               {/* Almoxarifado Items */}
               {selectedSubmission.submissionType === "almoxarifado" && (
@@ -1560,7 +1585,7 @@ export default function AdminPage() {
                     <div className="space-y-2">
                       {selectedSubmission.uniforms.map((uniform, index) => (
                         <div key={index} className="rounded-lg border border-border p-4">
-                          <div className="grid gap-3 sm:grid-cols-4">
+<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                             <div>
                               <p className="text-xs text-muted-foreground mb-1">Segmento</p>
                               <p className="font-medium">{uniform.type}</p>
