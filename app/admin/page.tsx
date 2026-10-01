@@ -325,6 +325,7 @@ export default function AdminPage() {
   const getSubmissionStatusCount = (items: Submission[], status: string) =>
     items.filter((submission) => (submission.status || "pendente") === status).length
   const pendingFeedbacksCount = feedbacks.filter((f) => (f.status || "pendente") === "pendente").length
+  const incomingTermsCount = submissions.filter((submission) => (submission.status || "pendente") === "pendente").length
 
   const reportSubmissions = submissions.filter((submission) => {
     const date = new Date(submission.timestamp)
@@ -959,13 +960,14 @@ export default function AdminPage() {
           <button
             type="button"
             onClick={() => handleTabChange("visualizacao")}
-            className={`flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${activeTab === "visualizacao"
-              ? "bg-amber-100 text-amber-800"
-              : "border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
+            className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${activeTab === "visualizacao"
+              ? "border-amber-200 bg-amber-100 text-amber-800"
+              : "border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
           >
-            <Eye className="h-4 w-4" />
-            <span>Visualização dos termos</span>
+            <Clock className="h-4 w-4" />
+            <span>Termos chegando</span>
+            <span className="inline-flex min-w-6 items-center justify-center rounded-full bg-rose-100 px-2 py-0.5 text-xs font-bold text-rose-700">{incomingTermsCount}</span>
           </button>
         </div>
 
