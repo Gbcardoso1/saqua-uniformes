@@ -7,6 +7,7 @@ type Submission = {
   name: string
   matricula: string
   institution: string
+  tmbpPmsNumber?: string
   submissionType?: string
   uniforms: Array<{
     type: string
@@ -66,6 +67,7 @@ export async function GET() {
       name: item.requester_name,
       matricula: item.registration,
       institution: item.institution,
+      tmbpPmsNumber: item.tmbp_pms_number || "",
       submissionType: item.submission_type || "uniformes",
       uniforms: item.uniforms || [],
       shoes: item.shoes || [],
@@ -99,6 +101,7 @@ export async function POST(request: Request) {
         requester_name: data.name,
         registration: data.matricula,
         institution: data.institution,
+        tmbp_pms_number: data.tmbpPmsNumber || null,
         submission_type: data.submissionType || "uniformes",
         uniforms: data.uniforms || [],
         shoes: data.shoes || [],
@@ -125,6 +128,7 @@ export async function POST(request: Request) {
       name: insertedData.requester_name,
       matricula: insertedData.registration,
       institution: insertedData.institution,
+      tmbpPmsNumber: insertedData.tmbp_pms_number || "",
       submissionType: insertedData.submission_type,
       uniforms: insertedData.uniforms || [],
       shoes: insertedData.shoes || [],

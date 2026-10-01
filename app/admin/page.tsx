@@ -19,6 +19,7 @@ type Submission = {
   name: string
   matricula: string
   institution: string
+  tmbpPmsNumber?: string
   submissionType?: string
   uniforms: Array<{
     type: string
@@ -514,7 +515,7 @@ export default function AdminPage() {
 
   const printReport = () => window.print()
 
-  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "movimentacoes" | "feedbacks" | "relatorio") => {
+  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "movimentacoes" | "feedbacks") => {
     setActiveTab(tab)
     setInstitutionFilter("all")
     setNameFilter("all")
@@ -989,17 +990,7 @@ export default function AdminPage() {
             <FileCheck2 className="h-4 w-4" />
             <span>Movimentações</span>
           </button>
-          <button
-            type="button"
-            onClick={() => handleTabChange("relatorio")}
-    className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "relatorio"
-      ? "bg-selection/20 text-selection"
-      : "text-muted-foreground hover:bg-muted hover:text-foreground"
-      }`}
-  >
-    <FileText className="h-4 w-4" />
-    <span>Relatório</span>
-  </button>
+
   </div>
 
   {activeTab === "movimentacoes" ? (
@@ -1033,12 +1024,12 @@ export default function AdminPage() {
                   return (
                     <Fragment key={submission.id}>
                       <TableRow>
-                        <TableCell><p className="font-medium">{submission.name}</p><p className="text-xs text-muted-foreground">Matrícula {submission.matricula}</p></TableCell>
+                        <TableCell><p className="font-medium">{submission.name}</p><p className="text-xs text-muted-foreground">Matrícula {submission.matricula}</p><p className="text-xs text-muted-foreground">TMBP/PMS nº {submission.tmbpPmsNumber || "—"}</p></TableCell>
                         <TableCell>{submission.institution}</TableCell>
                         <TableCell>
                           <div className="flex flex-col items-start gap-1">
                             <Button variant="link" className="h-auto p-0" onClick={() => viewDetails(submission)}>{submission.termFileName || "Arquivo anexado"}</Button>
-                            {isRejected && submission.movementFileData && <Button asChild variant="link" className="h-auto p-0 text-xs"><a href={submission.movementFileData} download={submission.movementFileName || submission.termFileName || "arquivo-movimentacao"}>Baixar arquivo enviado</a></Button>}
+                            {submission.movementFileData && <Button asChild variant="link" className="h-auto p-0 text-xs"><a href={submission.movementFileData} download={submission.movementFileName || submission.termFileName || "arquivo-movimentacao"}>Baixar arquivo enviado</a></Button>}
                           </div>
                         </TableCell>
                         <TableCell><Badge variant={submission.status === "aprovado" || submission.status === "finalizado" ? "default" : isRejected ? "destructive" : "secondary"}>{isRejected ? "Reprovado - por favor refazer" : submission.status === "aprovado" ? "OK" : "Em análise"}</Badge></TableCell>
@@ -1062,10 +1053,6 @@ export default function AdminPage() {
             </div>
           )}
         </CardContent>
-      </Card>
-      <Card>
-        <CardHeader><CardTitle>Orientação para refazer</CardTitle><CardDescription>A descrição do erro será exibida junto ao envio para a instituição.</CardDescription></CardHeader>
-        <CardContent><div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">Campo de observação do termo — pronto para receber a descrição da pendência quando o banco estiver conectado.</div></CardContent>
       </Card>
     </div>
   ) : activeTab === "relatorio" ? (
@@ -1480,6 +1467,22 @@ export default function AdminPage() {
                   </div>
                 </div>
               </div>
+
+              {selectedSubmission.movementFileData && (
+                <div>
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <h3 className="font-semibold text-lg">Arquivo enviado</h3>
+                    <Button asChild variant="outline" size="sm"><a href={selectedSubmission.movementFileData} download={selectedSubmission.movementFileName || selectedSubmission.termFileName || "arquivo-movimentacao"}><Download data-icon="inline-start" /> Baixar</a></Button>
+                  </div>
+                  {selectedSubmission.movementFileData.startsWith("data:application/pdf") ? (
+                    <iframe title="Prévia do arquivo enviado" src={selectedSubmission.movementFileData} className="h-[480px] w-full rounded-lg border" />
+                  ) : selectedSubmission.movementFileData.startsWith("data:image/") ? (
+                    <img src={selectedSubmission.movementFileData} alt="Prévia do arquivo enviado" className="max-h-[480px] w-full rounded-lg border object-contain" />
+                  ) : (
+                    <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">A prévia não está disponível para este formato. Use o botão Baixar para abrir o arquivo.</div>
+                  )}
+                </div>
+              )}
 
               {/* Almoxarifado Items */}
               {selectedSubmission.submissionType === "almoxarifado" && (
