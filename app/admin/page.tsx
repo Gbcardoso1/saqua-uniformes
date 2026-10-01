@@ -955,6 +955,20 @@ export default function AdminPage() {
           ))}
         </div>
 
+        <div className="mb-4 flex justify-end">
+          <button
+            type="button"
+            onClick={() => handleTabChange("visualizacao")}
+            className={`flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors ${activeTab === "visualizacao"
+              ? "bg-amber-100 text-amber-800"
+              : "border border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+          >
+            <Eye className="h-4 w-4" />
+            <span>Visualização dos termos</span>
+          </button>
+        </div>
+
         {/* Tabs */}
         <div className="mb-6 flex flex-wrap gap-2 rounded-xl border border-border bg-card p-1.5">
           <button
@@ -991,18 +1005,6 @@ export default function AdminPage() {
             <FileCheck2 className="h-4 w-4" />
             <span>Movimentações</span>
           </button>
-          <button
-            type="button"
-            onClick={() => handleTabChange("visualizacao")}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "visualizacao"
-              ? "bg-selection/20 text-selection"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-          >
-            <Eye className="h-4 w-4" />
-            <span>Visualização dos termos</span>
-          </button>
-
   </div>
 
   {activeTab === "movimentacoes" || activeTab === "visualizacao" ? (
@@ -1040,8 +1042,8 @@ export default function AdminPage() {
                         <TableCell>{submission.institution}</TableCell>
                         <TableCell>
                           <div className="flex flex-col items-start gap-1">
-                            <Button variant="link" className="h-auto p-0" onClick={() => viewDetails(submission)}>{submission.termFileName || "Arquivo anexado"}</Button>
-                            {submission.movementFileData && <Button asChild variant="link" className="h-auto p-0 text-xs"><a href={submission.movementFileData} target="_blank" rel="noreferrer">Visualizar arquivo enviado</a></Button>}
+                            <Button variant="link" className="h-auto p-0 text-left" onClick={() => viewDetails(submission)}>{submission.termFileName || submission.movementFileName || "Termo anexado"}</Button>
+                            {submission.movementFileData && <Button type="button" variant="link" className="h-auto p-0 text-left text-xs" onClick={() => viewDetails(submission)}><Eye data-icon="inline-start" /> Visualizar termo</Button>}
                           </div>
                         </TableCell>
                         <TableCell><div className="flex flex-col items-start gap-1"><Badge variant={submission.status === "aprovado" || submission.status === "finalizado" ? "default" : isRejected ? "destructive" : "secondary"}>{isRejected ? "Reprovado" : submission.status === "aprovado" ? "OK" : "Em análise"}</Badge>{isRejected && <p className="text-xs text-destructive"><span className="font-medium">Motivo da reprovação: </span>{submission.feedback || "Confira o arquivo enviado."}</p>}</div></TableCell>
@@ -1495,7 +1497,7 @@ export default function AdminPage() {
                   ) : selectedSubmission.movementFileData.startsWith("data:image/") ? (
                     <img src={selectedSubmission.movementFileData} alt="Prévia do arquivo enviado" className="max-h-[480px] w-full rounded-lg border object-contain" />
                   ) : (
-                    <div className="rounded-lg border border-dashed p-4 text-sm text-muted-foreground">A prévia não está disponível para este formato. Use o botão Baixar para abrir o arquivo.</div>
+                    <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground"><FileText className="size-10" /><p>A visualização incorporada não está disponível para este formato.</p><Button asChild variant="outline" size="sm"><a href={selectedSubmission.movementFileData} target="_blank" rel="noreferrer"><Eye data-icon="inline-start" /> Abrir termo em nova aba</a></Button></div>
                   )}
                 </div>
               )}
