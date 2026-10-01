@@ -322,14 +322,10 @@ export default function AdminPage() {
 
   const almoxarifadoSubmissions = submissions.filter((s) => s.submissionType === "almoxarifado")
   const uniformesSubmissions = submissions.filter((s) => (s.submissionType || "uniformes") === "uniformes")
+  const termosSubmissions = submissions.filter((s) => s.submissionType === "movimentacoes")
   const getSubmissionStatusCount = (items: Submission[], status: string) =>
     items.filter((submission) => (submission.status || "pendente") === status).length
   const pendingFeedbacksCount = feedbacks.filter((f) => (f.status || "pendente") === "pendente").length
-  const statusSummary = [
-    { label: "Pendentes", value: "pendente", count: submissions.filter((s) => (s.status || "pendente") === "pendente").length, className: "text-rose-700 bg-rose-100" },
-    { label: "OK", value: "aprovado", count: submissions.filter((s) => s.status === "aprovado" || s.status === "finalizado").length, className: "text-emerald-700 bg-emerald-100" },
-    { label: "Reprovados", value: "refazer", count: submissions.filter((s) => s.status === "refazer").length, className: "text-red-700 bg-red-100" },
-  ]
 
   const reportSubmissions = submissions.filter((submission) => {
     const date = new Date(submission.timestamp)
@@ -932,10 +928,11 @@ export default function AdminPage() {
 
       <div className="relative z-10 w-full px-4 py-6 md:px-8 md:py-8">
         {/* Indicadores em tempo real por aba */}
-        <div className="mb-5 grid grid-cols-1 gap-3 lg:grid-cols-2">
+        <div className="mb-5 grid grid-cols-1 gap-3 lg:grid-cols-3">
           {[
             { title: "Almoxarifado", icon: Package, items: almoxarifadoSubmissions, accent: "border-l-sky-500", iconStyle: "bg-sky-500/15 text-sky-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
             { title: "Uniformes e Kits", icon: Shirt, items: uniformesSubmissions, accent: "border-l-amber-500", iconStyle: "bg-amber-500/15 text-amber-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
+            { title: "Termos", icon: FileCheck2, items: termosSubmissions, accent: "border-l-violet-500", iconStyle: "bg-violet-500/15 text-violet-600", labels: ["Pendentes", "OK", "Reprovados"], statuses: ["pendente", "aprovado", "refazer"] },
           ].map(({ title, icon: Icon, items, accent, iconStyle, labels, statuses }) => (
             <div key={title} className={`group rounded-xl border border-border border-l-4 bg-white p-3 shadow-[0_4px_14px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.1)] ${accent}`}>
               <div className="mb-2.5 flex items-center gap-2.5 border-b border-slate-200 pb-2.5">
@@ -946,7 +943,7 @@ export default function AdminPage() {
               </div>
               <div className="space-y-2">
                 {labels.map((label, index) => {
-                  const count = title === "Feedbacks" ? items.filter((feedback) => (feedback.status || "pendente") === statuses[index]).length : getSubmissionStatusCount(items as Submission[], statuses[index])
+                  const count = title === "Feedbacks" ? items.filter((feedback) => (feedback.status || "pendente") === statuses[index]).length : title === "Termos" && statuses[index] === "aprovado" ? (items as Submission[]).filter((submission) => submission.status === "aprovado" || submission.status === "finalizado").length : getSubmissionStatusCount(items as Submission[], statuses[index])
                   const statusStyle = index === 0 ? "bg-emerald-500/10 text-emerald-700" : index === 1 ? "bg-blue-500/10 text-blue-700" : "bg-rose-500/10 text-rose-700"
                   return (
                     <div key={label} className="flex items-center justify-between rounded-lg px-2 py-1 text-sm leading-tight transition-colors hover:bg-slate-50">
@@ -957,21 +954,6 @@ export default function AdminPage() {
                 })}
               </div>
             </div>
-          ))}
-        </div>
-
-        <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-2">
-          <span className="px-2 text-sm font-semibold text-foreground">Status dos termos</span>
-          {statusSummary.map((status) => (
-            <button
-              key={status.value}
-              type="button"
-              onClick={() => setStatusFilter(statusFilter === status.value ? "all" : status.value)}
-              className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${statusFilter === status.value ? "border-primary bg-primary/10 text-primary" : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"}`}
-            >
-              <span>{status.label}</span>
-              <span className={`inline-flex min-w-6 items-center justify-center rounded-full px-2 py-0.5 text-xs font-bold ${status.className}`}>{status.count}</span>
-            </button>
           ))}
         </div>
 
