@@ -88,7 +88,7 @@ export default function AdminPage() {
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [nameFilter, setNameFilter] = useState<string>("all")
-  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "movimentacoes" | "feedbacks" | "relatorio">("almoxarifado")
+  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "movimentacoes" | "visualizacao" | "feedbacks" | "relatorio">("almoxarifado")
   const [reportInstitution, setReportInstitution] = useState("all")
   const [reportMonth, setReportMonth] = useState("all")
   const [reportYear, setReportYear] = useState("all")
@@ -174,7 +174,8 @@ export default function AdminPage() {
     let filtered = submissions
 
     // Filter by active tab
-    filtered = filtered.filter((s) => (s.submissionType || "uniformes") === activeTab)
+    const submissionTab = activeTab === "visualizacao" ? "movimentacoes" : activeTab
+    filtered = filtered.filter((s) => (s.submissionType || "uniformes") === submissionTab)
 
     if (typeFilter !== "all") {
       filtered = filtered.filter((s) => (s.submissionType || "uniformes") === typeFilter)
@@ -515,7 +516,7 @@ export default function AdminPage() {
 
   const printReport = () => window.print()
 
-  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "movimentacoes" | "feedbacks") => {
+  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "movimentacoes" | "visualizacao" | "feedbacks") => {
     setActiveTab(tab)
     setInstitutionFilter("all")
     setNameFilter("all")
@@ -990,15 +991,26 @@ export default function AdminPage() {
             <FileCheck2 className="h-4 w-4" />
             <span>Movimentações</span>
           </button>
+          <button
+            type="button"
+            onClick={() => handleTabChange("visualizacao")}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "visualizacao"
+              ? "bg-selection/20 text-selection"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+          >
+            <Eye className="h-4 w-4" />
+            <span>Visualização dos termos</span>
+          </button>
 
   </div>
 
-  {activeTab === "movimentacoes" ? (
+  {activeTab === "movimentacoes" || activeTab === "visualizacao" ? (
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader className="flex flex-col gap-4 border-b sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2"><FileCheck2 className="h-5 w-5 text-selection" /> Revisão de movimentações</CardTitle>
+            <CardTitle className="flex items-center gap-2"><FileCheck2 className="h-5 w-5 text-selection" /> {activeTab === "visualizacao" ? "Visualização dos termos" : "Revisão de movimentações"}</CardTitle>
             <CardDescription>Confira os termos enviados pelas instituições e defina o próximo passo.</CardDescription>
           </div>
           <div className="grid grid-cols-2 gap-2 text-center sm:flex">
@@ -1029,10 +1041,10 @@ export default function AdminPage() {
                         <TableCell>
                           <div className="flex flex-col items-start gap-1">
                             <Button variant="link" className="h-auto p-0" onClick={() => viewDetails(submission)}>{submission.termFileName || "Arquivo anexado"}</Button>
-                            {submission.movementFileData && <Button asChild variant="link" className="h-auto p-0 text-xs"><a href={submission.movementFileData} download={submission.movementFileName || submission.termFileName || "arquivo-movimentacao"}>Baixar arquivo enviado</a></Button>}
+                            {submission.movementFileData && <Button asChild variant="link" className="h-auto p-0 text-xs"><a href={submission.movementFileData} target="_blank" rel="noreferrer">Visualizar arquivo enviado</a></Button>}
                           </div>
                         </TableCell>
-                        <TableCell><Badge variant={submission.status === "aprovado" || submission.status === "finalizado" ? "default" : isRejected ? "destructive" : "secondary"}>{isRejected ? "Reprovado - por favor refazer" : submission.status === "aprovado" ? "OK" : "Em análise"}</Badge></TableCell>
+                        <TableCell><div className="flex flex-col items-start gap-1"><Badge variant={submission.status === "aprovado" || submission.status === "finalizado" ? "default" : isRejected ? "destructive" : "secondary"}>{isRejected ? "Reprovado" : submission.status === "aprovado" ? "OK" : "Em análise"}</Badge>{isRejected && <p className="text-xs text-destructive"><span className="font-medium">Motivo da reprovação: </span>{submission.feedback || "Confira o arquivo enviado."}</p>}</div></TableCell>
                         <TableCell className="text-right"><div className="flex justify-end gap-2"><Button size="sm" variant="outline" onClick={() => updateStatus(submission, "aprovado")}><CheckCircle2 className="mr-1 h-4 w-4" /> OK</Button><Button size="sm" variant="outline" onClick={() => setFeedbackDrafts((prev) => ({ ...prev, [submission.id]: prev[submission.id] ?? submission.feedback ?? "" }))}><RotateCcw className="mr-1 h-4 w-4" /> Refazer</Button></div></TableCell>
                       </TableRow>
                       {feedbackDrafts[submission.id] !== undefined && <TableRow key={`${submission.id}-feedback`}>
@@ -1465,6 +1477,10 @@ export default function AdminPage() {
                     <p className="text-xs text-muted-foreground mb-1">Instituição</p>
                     <p className="font-medium">{selectedSubmission.institution}</p>
                   </div>
+                  <div className="rounded-lg bg-muted p-3">
+                    <p className="text-xs text-muted-foreground mb-1">TMBP/PMS nº</p>
+                    <p className="font-medium">{selectedSubmission.tmbpPmsNumber || "—"}</p>
+                  </div>
                 </div>
               </div>
 
@@ -1472,7 +1488,7 @@ export default function AdminPage() {
                 <div>
                   <div className="mb-3 flex items-center justify-between gap-3">
                     <h3 className="font-semibold text-lg">Arquivo enviado</h3>
-                    <Button asChild variant="outline" size="sm"><a href={selectedSubmission.movementFileData} download={selectedSubmission.movementFileName || selectedSubmission.termFileName || "arquivo-movimentacao"}><Download data-icon="inline-start" /> Baixar</a></Button>
+                    <Button asChild variant="outline" size="sm"><a href={selectedSubmission.movementFileData} target="_blank" rel="noreferrer"><Eye data-icon="inline-start" /> Visualizar</a></Button>
                   </div>
                   {selectedSubmission.movementFileData.startsWith("data:application/pdf") ? (
                     <iframe title="Prévia do arquivo enviado" src={selectedSubmission.movementFileData} className="h-[480px] w-full rounded-lg border" />
@@ -1563,7 +1579,7 @@ export default function AdminPage() {
                     <div className="space-y-2">
                       {selectedSubmission.uniforms.map((uniform, index) => (
                         <div key={index} className="rounded-lg border border-border p-4">
-                          <div className="grid gap-3 sm:grid-cols-4">
+<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
                             <div>
                               <p className="text-xs text-muted-foreground mb-1">Segmento</p>
                               <p className="font-medium">{uniform.type}</p>
