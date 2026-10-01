@@ -325,7 +325,11 @@ export default function AdminPage() {
   const getSubmissionStatusCount = (items: Submission[], status: string) =>
     items.filter((submission) => (submission.status || "pendente") === status).length
   const pendingFeedbacksCount = feedbacks.filter((f) => (f.status || "pendente") === "pendente").length
-  const incomingTermsCount = submissions.filter((submission) => (submission.status || "pendente") === "pendente").length
+  const statusSummary = [
+    { label: "Pendentes", value: "pendente", count: submissions.filter((s) => (s.status || "pendente") === "pendente").length, className: "text-rose-700 bg-rose-100" },
+    { label: "OK", value: "aprovado", count: submissions.filter((s) => s.status === "aprovado" || s.status === "finalizado").length, className: "text-emerald-700 bg-emerald-100" },
+    { label: "Reprovados", value: "refazer", count: submissions.filter((s) => s.status === "refazer").length, className: "text-red-700 bg-red-100" },
+  ]
 
   const reportSubmissions = submissions.filter((submission) => {
     const date = new Date(submission.timestamp)
@@ -956,19 +960,19 @@ export default function AdminPage() {
           ))}
         </div>
 
-        <div className="mb-4 flex justify-end">
-          <button
-            type="button"
-            onClick={() => handleTabChange("visualizacao")}
-            className={`flex items-center justify-center gap-2 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${activeTab === "visualizacao"
-              ? "border-amber-200 bg-amber-100 text-amber-800"
-              : "border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-          >
-            <Clock className="h-4 w-4" />
-            <span>Termos chegando</span>
-            <span className="inline-flex min-w-6 items-center justify-center rounded-full bg-rose-100 px-2 py-0.5 text-xs font-bold text-rose-700">{incomingTermsCount}</span>
-          </button>
+        <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-2">
+          <span className="px-2 text-sm font-semibold text-foreground">Status dos termos</span>
+          {statusSummary.map((status) => (
+            <button
+              key={status.value}
+              type="button"
+              onClick={() => setStatusFilter(statusFilter === status.value ? "all" : status.value)}
+              className={`flex items-center gap-2 rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${statusFilter === status.value ? "border-primary bg-primary/10 text-primary" : "border-transparent text-muted-foreground hover:bg-muted hover:text-foreground"}`}
+            >
+              <span>{status.label}</span>
+              <span className={`inline-flex min-w-6 items-center justify-center rounded-full px-2 py-0.5 text-xs font-bold ${status.className}`}>{status.count}</span>
+            </button>
+          ))}
         </div>
 
         {/* Tabs */}
