@@ -118,7 +118,7 @@ export default function MovimentacoesForm() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2"><Label>Tipo de documento</Label><div className="grid grid-cols-2 gap-2"><Button type="button" variant={documentType === "termo" ? "default" : "outline"} onClick={() => setDocumentType("termo")}>Termo</Button><Button type="button" variant={documentType === "inventario" ? "default" : "outline"} onClick={() => setDocumentType("inventario")}>Inventário</Button></div></div>
+            <div className="flex flex-col gap-2"><Label>Tipo de documento</Label><div className="flex gap-2"><Button type="button" size="sm" variant={documentType === "termo" ? "default" : "outline"} onClick={() => setDocumentType("termo")}>Termo</Button><Button type="button" size="sm" variant={documentType === "inventario" ? "default" : "outline"} onClick={() => setDocumentType("inventario")}>Inventário</Button></div></div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="flex flex-col gap-2"><Label htmlFor="mov-name">Nome</Label><Input id="mov-name" value={name} onChange={(e) => setName(e.target.value)} required /></div>
               <div className="flex flex-col gap-2"><Label htmlFor="mov-matricula">Matrícula</Label><Input id="mov-matricula" value={matricula} onChange={(e) => setMatricula(e.target.value)} required /></div>
