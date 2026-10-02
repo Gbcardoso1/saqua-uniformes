@@ -22,14 +22,18 @@ type Movimento = {
   movementFileData?: string
 }
 
-export default function MovimentacoesForm() {
+type MovimentacoesFormProps = {
+  documentType: "termo" | "inventario"
+  onDocumentTypeChange: (type: "termo" | "inventario") => void
+}
+
+export default function MovimentacoesForm({ documentType, onDocumentTypeChange }: MovimentacoesFormProps) {
   const [movimentos, setMovimentos] = useState<Movimento[]>([])
   const [name, setName] = useState("")
   const [matricula, setMatricula] = useState("")
   const [tmbpPmsNumber, setTmbpPmsNumber] = useState("")
   const [institution, setInstitution] = useState("")
   const [file, setFile] = useState<File | null>(null)
-  const [documentType, setDocumentType] = useState<"termo" | "inventario">("termo")
   const [queryName, setQueryName] = useState("")
   const [queryMatricula, setQueryMatricula] = useState("")
   const [queryInstitution, setQueryInstitution] = useState("")
@@ -77,7 +81,7 @@ export default function MovimentacoesForm() {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!name || !matricula || !tmbpPmsNumber || !institution || !file) return
+    if (!name || !matricula || (documentType === "termo" && !tmbpPmsNumber) || !institution || !file) return
     setLoading(true)
     try {
       const movementFileData = await new Promise<string>((resolve, reject) => {
@@ -118,11 +122,11 @@ export default function MovimentacoesForm() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col gap-2"><Label>Tipo de documento</Label><div className="flex gap-2"><Button type="button" size="sm" variant={documentType === "termo" ? "default" : "outline"} onClick={() => setDocumentType("termo")}>Termo</Button><Button type="button" size="sm" variant={documentType === "inventario" ? "default" : "outline"} onClick={() => setDocumentType("inventario")}>Inventário</Button></div></div>
+            <div className="flex flex-col gap-2"><Label>Tipo de documento</Label><div className="flex gap-2"><Button type="button" size="sm" variant={documentType === "termo" ? "default" : "outline"} onClick={() => onDocumentTypeChange("termo")}>Termo</Button><Button type="button" size="sm" variant={documentType === "inventario" ? "default" : "outline"} onClick={() => onDocumentTypeChange("inventario")}>Inventário</Button></div></div>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="flex flex-col gap-2"><Label htmlFor="mov-name">Nome</Label><Input id="mov-name" value={name} onChange={(e) => setName(e.target.value)} required /></div>
               <div className="flex flex-col gap-2"><Label htmlFor="mov-matricula">Matrícula</Label><Input id="mov-matricula" value={matricula} onChange={(e) => setMatricula(e.target.value)} required /></div>
-              <div className="flex flex-col gap-2"><Label htmlFor="mov-tmbp-pms">TMBP/PMS nº</Label><Input id="mov-tmbp-pms" value={tmbpPmsNumber} onChange={(e) => setTmbpPmsNumber(e.target.value)} placeholder="001/2026" required /></div>
+              {documentType === "termo" && <div className="flex flex-col gap-2"><Label htmlFor="mov-tmbp-pms">TMBP/PMS nº</Label><Input id="mov-tmbp-pms" value={tmbpPmsNumber} onChange={(e) => setTmbpPmsNumber(e.target.value)} placeholder="001/2026" required /></div>}
             </div>
             <div className="flex flex-col gap-2"><Label>Instituição</Label><InstitutionPicker value={institution} onChange={setInstitution} required /></div>
             <div className="flex flex-col gap-2"><Label htmlFor="mov-file">Termo ou arquivo</Label><label htmlFor="mov-file" className="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed p-4 text-sm text-muted-foreground hover:border-primary"><Upload className="size-5 text-primary" /><span className="truncate">{file ? file.name : "Clique para anexar PDF, DOC ou imagem"}</span></label><Input id="mov-file" type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" className="sr-only" onChange={(e) => setFile(e.target.files?.[0] ?? null)} required /></div>

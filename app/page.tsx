@@ -20,6 +20,7 @@ export default function Home() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [activeTab, setActiveTab] = useState<"uniformes" | "almoxarifado" | "movimentacoes">("uniformes")
+  const [documentType, setDocumentType] = useState<"termo" | "inventario">("termo")
   const router = useRouter()
 
   const ADMIN_USERNAME = "patrimônio"
@@ -75,7 +76,7 @@ export default function Home() {
                 ? "Formulário de Solicitação de Uniformes e Calçados"
                 : activeTab === "almoxarifado"
                   ? "Formulário de Solicitação de Almoxarifado"
-                  : "Movimentações e Termos"}
+                  : documentType === "termo" ? "Termo de movimentação" : "Inventário"}
             </h1>
             <p className="mx-auto mb-7 max-w-2xl text-base leading-7 text-white/80 text-pretty md:text-lg">
               {activeTab === "uniformes"
@@ -127,7 +128,7 @@ export default function Home() {
           </div>
           
           <div className="animate-float-in" style={{ animationDelay: "220ms" }}>
-            {activeTab === "uniformes" ? <UniformRequestForm /> : activeTab === "almoxarifado" ? <AlmoxarifadoRequestForm /> : <MovimentacoesForm />}
+            {activeTab === "uniformes" ? <UniformRequestForm /> : activeTab === "almoxarifado" ? <AlmoxarifadoRequestForm /> : <MovimentacoesForm documentType={documentType} onDocumentTypeChange={setDocumentType} />}
           </div>
         </div>
 
