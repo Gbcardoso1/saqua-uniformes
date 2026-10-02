@@ -241,17 +241,17 @@ export default function AdminPage() {
       return
     }
 
-    try {
-      const [header, encoded] = dataUrl.split(",", 2)
-      const mimeType = header.match(/^data:([^;]+)/)?.[1] || "application/octet-stream"
-      const binary = atob(encoded)
-      const bytes = new Uint8Array(binary.length)
-      for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index)
-      const objectUrl = URL.createObjectURL(new Blob([bytes], { type: mimeType }))
-      setPreviewUrl(objectUrl)
-      return () => URL.revokeObjectURL(objectUrl)
-    } catch {
-      setPreviewUrl(null)
+    let objectUrl: string | null = null
+    fetch(dataUrl)
+      .then((response) => response.blob())
+      .then((blob) => {
+        objectUrl = URL.createObjectURL(new Blob([blob], { type: "application/pdf" }))
+        setPreviewUrl(objectUrl)
+      })
+      .catch(() => setPreviewUrl(null))
+
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl)
     }
   }, [selectedSubmission, showFilePreview])
 
@@ -1776,17 +1776,11 @@ export default function AdminPage() {
           </DialogHeader>
           {selectedSubmission?.movementFileData && (
             <div className="min-h-0 flex-1 overflow-hidden rounded-lg border bg-muted/30">
-              {selectedSubmission.movementFileData.startsWith("data:application/pdf") && previewUrl ? (
-                <iframe title="Pré-visualização do arquivo PDF" src={previewUrl} className="size-full min-h-[55vh]" />
-              ) : selectedSubmission.movementFileData.startsWith("data:image/") && previewUrl ? (
-                <div className="flex size-full items-center justify-center overflow-auto p-4">
-                  <img src={previewUrl} alt="Arquivo enviado" className="max-h-full max-w-full object-contain" />
-                </div>
+              {previewUrl ? (
+                <iframe title="Visualizador do arquivo PDF" src={previewUrl} className="size-full min-h-[65vh] border-0" />
               ) : (
-                <div className="flex size-full flex-col items-center justify-center gap-3 p-6 text-center">
-                  <FileText className="size-10 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Este formato não possui visualização no navegador.</p>
-                  <Button type="button" onClick={() => selectedSubmission && downloadSubmissionFile(selectedSubmission)}><Download data-icon="inline-start" /> Baixar arquivo</Button>
+                <div className="flex size-full items-center justify-center p-6 text-center text-sm text-muted-foreground">
+                  Carregando o visualizador PDF...
                 </div>
               )}
             </div>
