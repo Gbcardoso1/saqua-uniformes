@@ -9,6 +9,7 @@ type Submission = {
   institution: string
   tmbpPmsNumber?: string
   submissionType?: string
+  documentType?: "termo" | "inventario"
   uniforms: Array<{
     type: string
     gender: string
@@ -46,6 +47,8 @@ type Submission = {
   }>
   status?: string
   termFileName?: string
+  movementFileName?: string
+  fileName?: string
   feedback?: string
 }
 
@@ -69,6 +72,7 @@ export async function GET() {
       institution: item.institution,
       tmbpPmsNumber: item.tmbp_pms_number || "",
       submissionType: item.submission_type || "uniformes",
+      documentType: item.submission_type === "movimentacoes-inventario" ? "inventario" : item.submission_type?.startsWith("movimentacoes") ? "termo" : undefined,
       uniforms: item.uniforms || [],
       shoes: item.shoes || [],
       studentKits: item.student_kits || [],
@@ -79,6 +83,8 @@ export async function GET() {
       crecheItems: item.creche_items || [],
       status: item.status || "pendente",
       termFileName: item.movement_file_name || undefined,
+      movementFileName: item.movement_file_name || undefined,
+      fileName: item.movement_file_name || "Arquivo anexado",
       feedback: item.movement_feedback || undefined,
       movementFileData: item.movement_file_data || undefined,
     }))
@@ -130,6 +136,7 @@ export async function POST(request: Request) {
       institution: insertedData.institution,
       tmbpPmsNumber: insertedData.tmbp_pms_number || "",
       submissionType: insertedData.submission_type,
+      documentType: insertedData.submission_type === "movimentacoes-inventario" ? "inventario" : insertedData.submission_type?.startsWith("movimentacoes") ? "termo" : undefined,
       uniforms: insertedData.uniforms || [],
       shoes: insertedData.shoes || [],
       studentKits: insertedData.student_kits || [],

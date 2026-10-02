@@ -21,6 +21,7 @@ type Submission = {
   institution: string
   tmbpPmsNumber?: string
   submissionType?: string
+  documentType?: "termo" | "inventario"
   uniforms: Array<{
     type: string
     gender: string
@@ -174,8 +175,8 @@ export default function AdminPage() {
     let filtered = submissions
 
     // Filter by active tab
-    const submissionTab = activeTab === "visualizacao" ? "movimentacoes" : activeTab
-    filtered = filtered.filter((s) => (s.submissionType || "uniformes") === submissionTab)
+const submissionTab = activeTab === "visualizacao" ? "movimentacoes" : activeTab
+  filtered = filtered.filter((s) => submissionTab === "movimentacoes" ? s.submissionType?.startsWith("movimentacoes") : (s.submissionType || "uniformes") === submissionTab)
 
     if (typeFilter !== "all") {
       filtered = filtered.filter((s) => (s.submissionType || "uniformes") === typeFilter)
@@ -212,13 +213,7 @@ export default function AdminPage() {
       const response = await fetch("/api/submissions")
       const data = await response.json()
 
-      if (data.submissions) {
-        setSubmissions(data.submissions)
-        setFilteredSubmissions(data.submissions)
-      } else {
-        setSubmissions([])
-        setFilteredSubmissions([])
-      }
+      setSubmissions(Array.isArray(data.submissions) ? data.submissions : [])
     } catch (error) {
       console.error("Error fetching submissions:", error)
       setSubmissions([])
@@ -236,11 +231,6 @@ export default function AdminPage() {
     } catch (error) {
       console.error("Error fetching feedbacks:", error)
     }
-  }
-
-  const openSubmissionFile = (submission: Submission) => {
-  if (!submission.movementFileData) return
-  window.open(submission.movementFileData, "_blank", "noopener,noreferrer")
   }
 
   const downloadSubmissionFile = (submission: Submission) => {
@@ -338,7 +328,7 @@ export default function AdminPage() {
 
   const almoxarifadoSubmissions = submissions.filter((s) => s.submissionType === "almoxarifado")
   const uniformesSubmissions = submissions.filter((s) => (s.submissionType || "uniformes") === "uniformes")
-  const termosSubmissions = submissions.filter((s) => s.submissionType === "movimentacoes")
+  const termosSubmissions = submissions.filter((s) => s.submissionType?.startsWith("movimentacoes"))
   const getSubmissionStatusCount = (items: Submission[], status: string) =>
     items.filter((submission) => (submission.status || "pendente") === status).length
   const pendingFeedbacksCount = feedbacks.filter((f) => (f.status || "pendente") === "pendente").length
@@ -907,7 +897,7 @@ export default function AdminPage() {
 
   return (
     <main
-      className="relative min-h-screen bg-muted/30 bg-grid-subtle animate-float-in"
+      className="relative min-h-screen bg-muted/30 bg-grid-subtle"
       style={
         {
           "--admin-background": "oklch(0.43 0.09 192)",
@@ -1046,7 +1036,7 @@ export default function AdminPage() {
                         <TableCell>{submission.institution}</TableCell>
                         <TableCell>
                           <div className="flex flex-col items-start gap-1">
-                            <Button variant="link" className="h-auto p-0 text-left" onClick={() => openSubmissionFile(submission)}>{submission.termFileName || submission.movementFileName || "Termo anexado"}</Button>
+                            <p className="font-medium">{submission.documentType === "inventario" ? "Inventário" : "Termo de movimentação"}</p><p className="text-xs text-muted-foreground">{submission.termFileName || submission.movementFileName || "Arquivo anexado"}</p>
                             {submission.movementFileData && <Button type="button" variant="link" className="h-auto p-0 text-left text-xs" onClick={() => downloadSubmissionFile(submission)}><Download data-icon="inline-start" /> Baixar arquivo</Button>}
                           </div>
                         </TableCell>
