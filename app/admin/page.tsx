@@ -81,6 +81,7 @@ export default function AdminPage() {
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
   const [showDetailModal, setShowDetailModal] = useState(false)
   const [showFilePreview, setShowFilePreview] = useState(false)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [submissionToDelete, setSubmissionToDelete] = useState<Submission | null>(null)
   const [institutionFilter, setInstitutionFilter] = useState<string>("all")
@@ -232,6 +233,27 @@ export default function AdminPage() {
       console.error("Error fetching feedbacks:", error)
     }
   }
+
+  useEffect(() => {
+    const dataUrl = showFilePreview ? selectedSubmission?.movementFileData : null
+    if (!dataUrl) {
+      setPreviewUrl(null)
+      return
+    }
+
+    try {
+      const [header, encoded] = dataUrl.split(",", 2)
+      const mimeType = header.match(/^data:([^;]+)/)?.[1] || "application/octet-stream"
+      const binary = atob(encoded)
+      const bytes = new Uint8Array(binary.length)
+      for (let index = 0; index < binary.length; index += 1) bytes[index] = binary.charCodeAt(index)
+      const objectUrl = URL.createObjectURL(new Blob([bytes], { type: mimeType }))
+      setPreviewUrl(objectUrl)
+      return () => URL.revokeObjectURL(objectUrl)
+    } catch {
+      setPreviewUrl(null)
+    }
+  }, [selectedSubmission, showFilePreview])
 
   const openSubmissionFile = (submission: Submission) => {
     if (!submission.movementFileData) return
@@ -1754,11 +1776,11 @@ export default function AdminPage() {
           </DialogHeader>
           {selectedSubmission?.movementFileData && (
             <div className="min-h-0 flex-1 overflow-hidden rounded-lg border bg-muted/30">
-              {selectedSubmission.movementFileData.startsWith("data:application/pdf") ? (
-                <iframe title="Pré-visualização do arquivo PDF" src={selectedSubmission.movementFileData} className="size-full min-h-[55vh]" />
-              ) : selectedSubmission.movementFileData.startsWith("data:image/") ? (
+              {selectedSubmission.movementFileData.startsWith("data:application/pdf") && previewUrl ? (
+                <iframe title="Pré-visualização do arquivo PDF" src={previewUrl} className="size-full min-h-[55vh]" />
+              ) : selectedSubmission.movementFileData.startsWith("data:image/") && previewUrl ? (
                 <div className="flex size-full items-center justify-center overflow-auto p-4">
-                  <img src={selectedSubmission.movementFileData} alt="Arquivo enviado" className="max-h-full max-w-full object-contain" />
+                  <img src={previewUrl} alt="Arquivo enviado" className="max-h-full max-w-full object-contain" />
                 </div>
               ) : (
                 <div className="flex size-full flex-col items-center justify-center gap-3 p-6 text-center">
