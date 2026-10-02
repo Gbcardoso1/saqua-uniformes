@@ -46,6 +46,7 @@ type Submission = {
   }>
   status?: string
   termFileName?: string
+  movementFileName?: string
   feedback?: string
 }
 
@@ -79,6 +80,7 @@ export async function GET() {
       crecheItems: item.creche_items || [],
       status: item.status || "pendente",
       termFileName: item.movement_file_name || undefined,
+      movementFileName: item.movement_file_name || undefined,
       feedback: item.movement_feedback || undefined,
       movementFileData: item.movement_file_data || undefined,
     }))
