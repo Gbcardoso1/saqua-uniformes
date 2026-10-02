@@ -80,8 +80,6 @@ export default function AdminPage() {
   const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([])
   const [selectedSubmission, setSelectedSubmission] = useState<Submission | null>(null)
   const [showDetailModal, setShowDetailModal] = useState(false)
-  const [showFilePreview, setShowFilePreview] = useState(false)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [submissionToDelete, setSubmissionToDelete] = useState<Submission | null>(null)
   const [institutionFilter, setInstitutionFilter] = useState<string>("all")
@@ -234,31 +232,13 @@ export default function AdminPage() {
     }
   }
 
-  useEffect(() => {
-    const dataUrl = showFilePreview ? selectedSubmission?.movementFileData : null
-    if (!dataUrl) {
-      setPreviewUrl(null)
-      return
-    }
-
-    let objectUrl: string | null = null
-    fetch(dataUrl)
-      .then((response) => response.blob())
-      .then((blob) => {
-        objectUrl = URL.createObjectURL(new Blob([blob], { type: "application/pdf" }))
-        setPreviewUrl(objectUrl)
-      })
-      .catch(() => setPreviewUrl(null))
-
-    return () => {
-      if (objectUrl) URL.revokeObjectURL(objectUrl)
-    }
-  }, [selectedSubmission, showFilePreview])
-
   const openSubmissionFile = (submission: Submission) => {
     if (!submission.movementFileData) return
-    setSelectedSubmission(submission)
-    setShowFilePreview(true)
+
+    const pdfWindow = window.open(submission.movementFileData, "_blank", "noopener,noreferrer")
+    if (!pdfWindow) {
+      window.location.href = submission.movementFileData
+    }
   }
 
   const downloadSubmissionFile = (submission: Submission) => {
@@ -1762,26 +1742,6 @@ export default function AdminPage() {
                     </div>
                   )}
                 </>
-              )}
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showFilePreview} onOpenChange={setShowFilePreview}>
-        <DialogContent className="flex h-[min(90vh,850px)] max-w-5xl flex-col">
-          <DialogHeader>
-            <DialogTitle>{selectedSubmission?.movementFileName || selectedSubmission?.termFileName || "Arquivo enviado"}</DialogTitle>
-            <DialogDescription>Visualização do arquivo enviado pela instituição.</DialogDescription>
-          </DialogHeader>
-          {selectedSubmission?.movementFileData && (
-            <div className="min-h-0 flex-1 overflow-hidden rounded-lg border bg-muted/30">
-              {previewUrl ? (
-                <iframe title="Visualizador do arquivo PDF" src={previewUrl} className="size-full min-h-[65vh] border-0" />
-              ) : (
-                <div className="flex size-full items-center justify-center p-6 text-center text-sm text-muted-foreground">
-                  Carregando o visualizador PDF...
-                </div>
               )}
             </div>
           )}
