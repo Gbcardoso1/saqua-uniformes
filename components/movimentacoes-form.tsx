@@ -8,7 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { InstitutionPicker } from "@/components/institution-picker"
-import { createClient } from "@/lib/supabase/client"
 
 type Movimento = {
   id: string
@@ -85,18 +84,16 @@ export default function MovimentacoesForm({ documentType, onDocumentTypeChange }
     if (!name || !matricula || (documentType === "termo" && !tmbpPmsNumber) || !institution || !file) return
     setLoading(true)
     try {
-      const supabase = createClient()
-      const filePath = `submissions/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`
-      const { error: uploadError } = await supabase.storage.from("submission-files").upload(filePath, file, {
-        contentType: file.type || "application/octet-stream",
-        upsert: false,
-      })
-      if (uploadError) throw uploadError
-      const { data: publicFile } = supabase.storage.from("submission-files").getPublicUrl(filePath)
+      const formData = new FormData()
+      formData.set("name", name)
+      formData.set("matricula", matricula)
+      formData.set("institution", institution)
+      formData.set("tmbpPmsNumber", tmbpPmsNumber)
+      formData.set("submissionType", `movimentacoes-${documentType}`)
+      formData.set("file", file)
       const response = await fetch("/api/submissions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, matricula, institution, tmbpPmsNumber, submissionType: `movimentacoes-${documentType}`, movementFileName: file.name, movementFileData: publicFile.publicUrl }),
+        body: formData,
       })
       const result = await response.json()
       if (!response.ok || !result.success) throw new Error("Falha ao enviar")

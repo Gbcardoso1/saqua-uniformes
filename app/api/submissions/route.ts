@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
+import { createClient as createServiceClient } from "@supabase/supabase-js"
 
 type Submission = {
   id: string
@@ -98,17 +99,35 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const data = await request.json()
+    const contentType = request.headers.get("content-type") || ""
+    const data = contentType.includes("multipart/form-data") ? await request.formData() : await request.json()
+    let movementFileData = contentType.includes("multipart/form-data") ? null : data.movementFileData || null
+    let movementFileName = contentType.includes("multipart/form-data") ? null : data.movementFileName || null
+
+    if (contentType.includes("multipart/form-data")) {
+      const file = data.get("file")
+      if (!(file instanceof File) || file.size === 0) {
+        return NextResponse.json({ success: false, error: "Arquivo não recebido" }, { status: 400 })
+      }
+      const serviceSupabase = createServiceClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+      const filePath = `submissions/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`
+      const { error: uploadError } = await serviceSupabase.storage.from("submission-files").upload(filePath, file, { contentType: file.type || "application/octet-stream", upsert: false })
+      if (uploadError) throw uploadError
+      const { data: publicFile } = serviceSupabase.storage.from("submission-files").getPublicUrl(filePath)
+      movementFileData = publicFile.publicUrl
+      movementFileName = file.name
+    }
+
     const supabase = await createClient()
 
     const { data: insertedData, error } = await supabase
       .from("submissions")
       .insert({
-        requester_name: data.name,
-        registration: data.matricula,
-        institution: data.institution,
-        tmbp_pms_number: data.tmbpPmsNumber || null,
-        submission_type: data.submissionType || "uniformes",
+        requester_name: contentType.includes("multipart/form-data") ? data.get("name") : data.name,
+        registration: contentType.includes("multipart/form-data") ? data.get("matricula") : data.matricula,
+        institution: contentType.includes("multipart/form-data") ? data.get("institution") : data.institution,
+        tmbp_pms_number: (contentType.includes("multipart/form-data") ? data.get("tmbpPmsNumber") : data.tmbpPmsNumber) || null,
+        submission_type: (contentType.includes("multipart/form-data") ? data.get("submissionType") : data.submissionType) || "uniformes",
         uniforms: data.uniforms || [],
         shoes: data.shoes || [],
         student_kits: data.studentKits || [],
@@ -117,8 +136,8 @@ export async function POST(request: Request) {
         stationery_items: data.stationeryItems || [],
         kitchen_items: data.kitchenItems || [],
         creche_items: data.crecheItems || [],
-        movement_file_name: data.movementFileName || null,
-        movement_file_data: data.movementFileData || null,
+        movement_file_name: movementFileName,
+        movement_file_data: movementFileData,
       })
       .select()
       .single()
