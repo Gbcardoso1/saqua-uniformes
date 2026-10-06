@@ -95,8 +95,10 @@ export default function MovimentacoesForm({ documentType, onDocumentTypeChange }
         method: "POST",
         body: formData,
       })
-      const result = await response.json()
-      if (!response.ok || !result.success) throw new Error("Falha ao enviar")
+      const result = await response.json().catch(() => ({}))
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || `Falha ao enviar (${response.status})`)
+      }
       setSentReceipt({ id: result.submission.id, date: new Date().toISOString() })
       setQueryName(name)
       setQueryMatricula(matricula)
