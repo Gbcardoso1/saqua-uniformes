@@ -109,7 +109,13 @@ export async function POST(request: Request) {
       if (!(file instanceof File) || file.size === 0) {
         return NextResponse.json({ success: false, error: "Arquivo não recebido" }, { status: 400 })
       }
-      const serviceSupabase = createServiceClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+      const supabaseUrl = process.env.SUPABASE_URL
+      const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
+      if (!supabaseUrl || !serviceRoleKey) {
+        console.error("[v0] Supabase storage credentials are not configured")
+        return NextResponse.json({ success: false, error: "Armazenamento de arquivos indisponível" }, { status: 503 })
+      }
+      const serviceSupabase = createServiceClient(supabaseUrl, serviceRoleKey)
       const filePath = `submissions/${crypto.randomUUID()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`
       const { error: uploadError } = await serviceSupabase.storage.from("submission-files").upload(filePath, file, { contentType: file.type || "application/octet-stream", upsert: false })
       if (uploadError) throw uploadError
