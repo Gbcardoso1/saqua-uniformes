@@ -6,7 +6,9 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
     const { id } = await params
     const supabase = await createClient()
 
-    const { error } = await supabase.from("submissions").delete().eq("id", id)
+    const { error: movementError } = await supabase.from("movement_submissions").delete().eq("id", id)
+    const { error: regularError } = await supabase.from("submissions").delete().eq("id", id)
+    const error = movementError && regularError ? movementError : null
 
     if (error) {
       console.error("Error deleting submission:", error)
@@ -38,11 +40,16 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       updateData.movement_reviewed_at = new Date().toISOString()
     }
 
-    const { data, error } = await supabase
-      .from("submissions")
+    const { data: movementData, error: movementError } = await supabase
+      .from("movement_submissions")
       .update(updateData)
       .eq("id", id)
       .select()
+    const { data: regularData, error: regularError } = movementData?.length
+      ? { data: [], error: null }
+      : await supabase.from("submissions").update(updateData).eq("id", id).select()
+    const data = movementData?.length ? movementData : regularData
+    const error = movementData?.length ? movementError : regularError
 
     if (error) {
       console.error("Error updating submission:", error)
