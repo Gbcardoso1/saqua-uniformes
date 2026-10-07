@@ -57,7 +57,12 @@ export async function GET() {
   try {
     const supabase = await createClient()
 
-    const { data, error } = await supabase.from("submissions").select("*").order("submitted_at", { ascending: false })
+    const [{ data: regularData, error: regularError }, { data: movementData, error: movementError }] = await Promise.all([
+      supabase.from("submissions").select("*").not("submission_type", "like", "movimentacoes-%"),
+      supabase.from("movement_submissions").select("*")
+    ])
+    const data = [...(regularData || []), ...(movementData || [])].sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime())
+    const error = regularError || movementError
 
     if (error) {
       console.error("Error fetching submissions:", error)
@@ -126,14 +131,16 @@ export async function POST(request: Request) {
 
     const supabase = await createClient()
 
+    const submissionType = (contentType.includes("multipart/form-data") ? data.get("submissionType") : data.submissionType) || "uniformes"
+    const targetTable = String(submissionType).startsWith("movimentacoes") ? "movement_submissions" : "submissions"
     const { data: insertedData, error } = await supabase
-      .from("submissions")
+      .from(targetTable)
       .insert({
         requester_name: contentType.includes("multipart/form-data") ? data.get("name") : data.name,
         registration: contentType.includes("multipart/form-data") ? data.get("matricula") : data.matricula,
         institution: contentType.includes("multipart/form-data") ? data.get("institution") : data.institution,
         tmbp_pms_number: (contentType.includes("multipart/form-data") ? data.get("tmbpPmsNumber") : data.tmbpPmsNumber) || null,
-        submission_type: (contentType.includes("multipart/form-data") ? data.get("submissionType") : data.submissionType) || "uniformes",
+        submission_type: submissionType,
         uniforms: data.uniforms || [],
         shoes: data.shoes || [],
         student_kits: data.studentKits || [],
