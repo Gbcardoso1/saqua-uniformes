@@ -89,7 +89,7 @@ export default function AdminPage() {
   const [typeFilter, setTypeFilter] = useState<string>("all")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [nameFilter, setNameFilter] = useState<string>("all")
-  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "movimentacoes" | "visualizacao" | "feedbacks" | "relatorio">("almoxarifado")
+  const [activeTab, setActiveTab] = useState<"almoxarifado" | "uniformes" | "feedbacks" | "relatorio">("almoxarifado")
   const [reportInstitution, setReportInstitution] = useState("all")
   const [reportMonth, setReportMonth] = useState("all")
   const [reportYear, setReportYear] = useState("all")
@@ -175,8 +175,7 @@ export default function AdminPage() {
     let filtered = submissions
 
     // Filter by active tab
-const submissionTab = activeTab === "visualizacao" ? "movimentacoes" : activeTab
-  filtered = filtered.filter((s) => submissionTab === "movimentacoes" ? s.submissionType?.startsWith("movimentacoes") : (s.submissionType || "uniformes") === submissionTab)
+    filtered = filtered.filter((s) => (s.submissionType || "uniformes") === activeTab)
 
     if (typeFilter !== "all") {
       filtered = filtered.filter((s) => (s.submissionType || "uniformes") === typeFilter)
@@ -328,7 +327,6 @@ const submissionTab = activeTab === "visualizacao" ? "movimentacoes" : activeTab
 
   const almoxarifadoSubmissions = submissions.filter((s) => s.submissionType === "almoxarifado")
   const uniformesSubmissions = submissions.filter((s) => (s.submissionType || "uniformes") === "uniformes")
-  const termosSubmissions = submissions.filter((s) => s.submissionType?.startsWith("movimentacoes"))
   const getSubmissionStatusCount = (items: Submission[], status: string) =>
     items.filter((submission) => (submission.status || "pendente") === status).length
   const pendingFeedbacksCount = feedbacks.filter((f) => (f.status || "pendente") === "pendente").length
@@ -523,7 +521,7 @@ const submissionTab = activeTab === "visualizacao" ? "movimentacoes" : activeTab
 
   const printReport = () => window.print()
 
-  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "movimentacoes" | "visualizacao" | "feedbacks") => {
+  const handleTabChange = (tab: "almoxarifado" | "uniformes" | "feedbacks") => {
     setActiveTab(tab)
     setInstitutionFilter("all")
     setNameFilter("all")
@@ -938,8 +936,7 @@ const submissionTab = activeTab === "visualizacao" ? "movimentacoes" : activeTab
           {[
             { title: "Almoxarifado", icon: Package, items: almoxarifadoSubmissions, accent: "border-l-sky-500", iconStyle: "bg-sky-500/15 text-sky-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
             { title: "Uniformes e Kits", icon: Shirt, items: uniformesSubmissions, accent: "border-l-amber-500", iconStyle: "bg-amber-500/15 text-amber-600", labels: ["Finalizados", "Processando", "Pendentes"], statuses: ["finalizado", "processando", "pendente"] },
-            { title: "Termos", icon: FileCheck2, items: termosSubmissions, accent: "border-l-violet-500", iconStyle: "bg-violet-500/15 text-violet-600", labels: ["Pendentes", "Aprovado", "Reprovados"], statuses: ["pendente", "aprovado", "refazer"] },
-          ].map(({ title, icon: Icon, items, accent, iconStyle, labels, statuses }) => (
+                    ].map(({ title, icon: Icon, items, accent, iconStyle, labels, statuses }) => (
             <div key={title} className={`group rounded-xl border border-border border-l-4 bg-white p-3 shadow-[0_4px_14px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_8px_22px_rgba(15,23,42,0.1)] ${accent}`}>
               <div className="mb-2.5 flex items-center gap-2.5 border-b border-slate-200 pb-2.5">
                 <div className={`flex h-9 w-9 items-center justify-center rounded-xl ring-1 ring-black/5 ${iconStyle}`}>
@@ -988,20 +985,9 @@ const submissionTab = activeTab === "visualizacao" ? "movimentacoes" : activeTab
             <span>Uniformes e Kits</span>
           </button>
 
-          <button
-            type="button"
-            onClick={() => handleTabChange("movimentacoes")}
-            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-colors sm:flex-none ${activeTab === "movimentacoes"
-              ? "bg-selection/20 text-selection"
-              : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-          >
-            <FileCheck2 className="h-4 w-4" />
-            <span>Movimentações</span>
-          </button>
   </div>
 
-  {activeTab === "movimentacoes" || activeTab === "visualizacao" ? (
+  {false ? (
     <div className="flex flex-col gap-6">
       <Card>
         <CardHeader className="flex flex-col gap-4 border-b sm:flex-row sm:items-center sm:justify-between">
@@ -1746,7 +1732,7 @@ const submissionTab = activeTab === "visualizacao" ? "movimentacoes" : activeTab
             <DialogTitle>Confirmar Exclusão</DialogTitle>
             <DialogDescription>
               Tem certeza que deseja excluir a solicitação de{" "}
-              <span className="font-semibold">{submissionToDelete?.name}</span>? Esta ação não pode ser desfeita.
+              <span className="font-semibold">{submissionToDelete?.name}</span>? Esta aç��o não pode ser desfeita.
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2 mt-4">
