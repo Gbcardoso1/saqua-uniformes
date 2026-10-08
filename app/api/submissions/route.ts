@@ -57,12 +57,13 @@ export async function GET() {
   try {
     const supabase = await createClient()
 
-    const [{ data: regularData, error: regularError }, { data: movementData, error: movementError }] = await Promise.all([
-      supabase.from("submissions").select("*").not("submission_type", "like", "movimentacoes-%"),
-      supabase.from("movement_submissions").select("*")
-    ])
-    const data = [...(regularData || []), ...(movementData || [])].sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime())
-    const error = regularError || movementError
+    // Todas as solicitações atuais ficam em `submissions`. A antiga tabela
+    // `movement_submissions` não existe mais e sua consulta fazia o painel
+    // descartar também os registros válidos ao receber um erro do Supabase.
+    const { data, error } = await supabase
+      .from("submissions")
+      .select("*")
+      .order("submitted_at", { ascending: false })
 
     if (error) {
       console.error("Error fetching submissions:", error)
