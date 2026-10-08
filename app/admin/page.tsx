@@ -122,7 +122,7 @@ export default function AdminPage() {
       const refreshDashboard = window.setInterval(() => {
         fetchSubmissions()
         fetchFeedbacks()
-      }, 30000)
+      }, 120000)
 
       return () => window.clearInterval(refreshDashboard)
     } else {
@@ -209,8 +209,9 @@ export default function AdminPage() {
 
   const fetchSubmissions = async () => {
     try {
-      const response = await fetch("/api/submissions")
+      const response = await fetch("/api/submissions", { cache: "no-store" })
       const data = await response.json()
+      if (!response.ok) throw new Error(data.error || "Falha ao carregar solicitações")
 
       setSubmissions(Array.isArray(data.submissions) ? data.submissions : [])
     } catch (error) {
