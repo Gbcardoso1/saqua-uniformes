@@ -55,19 +55,23 @@ type Submission = {
 
 export async function GET() {
   try {
-    const supabase = await createClient()
+    const supabaseUrl = process.env.SUPABASE_URL
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
+    if (!supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json({ submissions: [], error: "Configuração do banco indisponível" }, { status: 503 })
+    }
 
-    // Todas as solicitações atuais ficam em `submissions`. A antiga tabela
-    // `movement_submissions` não existe mais e sua consulta fazia o painel
-    // descartar também os registros válidos ao receber um erro do Supabase.
-    const { data, error } = await supabase
+    // O painel administrativo precisa ler todos os registros, sem depender
+    // da sessão/cookies do navegador nem das políticas RLS públicas.
+    const serviceSupabase = createServiceClient(supabaseUrl, serviceRoleKey)
+    const { data, error } = await serviceSupabase
       .from("submissions")
       .select("*")
       .order("submitted_at", { ascending: false })
 
     if (error) {
       console.error("Error fetching submissions:", error)
-      return NextResponse.json({ submissions: [] })
+      return NextResponse.json({ submissions: [], error: "Não foi possível carregar as solicitações" }, { status: 500 })
     }
 
     // Transform database format to match frontend expectations
