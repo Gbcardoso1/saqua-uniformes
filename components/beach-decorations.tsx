@@ -79,8 +79,8 @@ export function BeachDecorations({
       className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
     >
       {/* Lua cheia com brilho no canto superior direito */}
-      <div className="absolute -right-10 -top-10 animate-sun-pulse">
-        <div className="relative h-48 w-48">
+      <div className="absolute -right-14 -top-14 animate-sun-pulse">
+        <div className="relative h-64 w-64">
           <div className="animate-sun-spin absolute inset-0">
             <SunRays />
           </div>
@@ -123,53 +123,46 @@ export function BeachDecorations({
         <Gull className="w-8 text-white/70" />
       </div>
 
-      {/* Animações ilustradas de Halloween */}
+      {/* Ícones de Halloween, menores que as decorações principais */}
       <img
-        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/vampire-Tle3RILIf3Ev7k6pBo8PpXuvF8qSt4.gif"
+        src="/halloween-spiderweb.png"
         alt=""
-        className="animate-bob-float absolute top-56 right-[12%] w-16 opacity-80 md:w-24"
+        className="animate-bob-float absolute top-32 right-[18%] w-16 opacity-70 md:w-20"
         style={{ animationDelay: "-2s" }}
       />
       <img
-        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/spider-3EYgO4dc86EYaxhsUkezatpwnbrNwv.gif"
+        src="/halloween-ghost.png"
         alt=""
-        className="animate-bob-float absolute top-72 left-[9%] w-12 opacity-75 md:w-20"
+        className="animate-bob-float absolute top-64 left-[12%] w-16 opacity-75 md:w-20"
         style={{ animationDelay: "-4s" }}
       />
       <img
-        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/haunted-castle-LkXpUXmVOyf568pRBkdtM66Wc59TWj.gif"
+        src="/halloween-bats.png"
         alt=""
-        className="animate-bob-float absolute bottom-44 right-24 hidden w-24 opacity-80 md:block md:w-32"
+        className="animate-bob-float absolute top-24 left-[32%] w-16 opacity-75 md:w-20"
         style={{ animationDelay: "-1s" }}
       />
-
-      {/* Abóboras flutuando nos cantos */}
       <img
-        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/pumpkin-G8gzvfJ8qo0DczHNbmespYBOYwfNdp.gif"
+        src="/halloween-pumpkin.png"
         alt=""
-        className="animate-bob-float absolute bottom-28 right-8 w-14 opacity-95 md:right-16 md:w-20"
-      />
-      <img
-        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/pumpkin-path-5NJd9R7BIEBPlqQeWoYEEknGa68al.gif"
-        alt=""
-        className="animate-bob-float absolute bottom-20 left-8 w-16 opacity-85 md:left-20 md:w-24"
-        style={{ animationDelay: "-1.5s" }}
+        className="animate-bob-float absolute bottom-32 right-[10%] w-16 opacity-80 md:w-20"
+        style={{ animationDelay: "-3s" }}
       />
 
       {/* Bruma rasteira no rodapé */}
       <div className="absolute bottom-0 left-0 right-0 h-40">
         <WaveLayer
-          className="text-red-950/55"
+          className="text-[#031d36]/70"
           durationSeconds={12}
           heightClass="h-32"
         />
         <WaveLayer
-          className="text-red-900/65"
+          className="text-[#042f55]/80"
           durationSeconds={9}
           heightClass="h-24"
         />
         <WaveLayer
-          className="text-red-800/75"
+          className="text-[#06446e]/85"
           durationSeconds={6}
           heightClass="h-16"
         />
