@@ -150,7 +150,7 @@
   .interactive-lift { animation: none; transition: none; }
 }
 
-/* ===== Animações tema praia de Saquarema ===== */
+/* ===== Animações sazonais de Halloween ===== */
 
 /* Ondas deslizando horizontalmente */
 @keyframes wave-slide {
@@ -223,11 +223,22 @@
 @keyframes bob-float {
   0%,
   100% {
-    transform: translateY(0) rotate(-8deg);
+    transform: translateY(0) rotate(-5deg);
   }
   50% {
-    transform: translateY(-14px) rotate(-4deg);
+    transform: translateY(-12px) rotate(5deg);
   }
+}
+
+@keyframes fog-pulse {
+  0%, 100% { opacity: 0.18; transform: translateX(-2%) scaleY(1); }
+  50% { opacity: 0.34; transform: translateX(2%) scaleY(1.08); }
+}
+
+@keyframes bat-dart {
+  0%, 100% { transform: translate(-8vw, 0) rotate(-4deg); }
+  45% { transform: translate(42vw, 22px) rotate(5deg); }
+  100% { transform: translate(112vw, -8px) rotate(-3deg); }
 }
 
 .animate-wave-slide {
@@ -251,6 +262,12 @@
 .animate-bob-float {
   animation: bob-float 4s ease-in-out infinite;
 }
+.animate-fog-pulse {
+  animation: fog-pulse 8s ease-in-out infinite;
+}
+.animate-bat-dart {
+  animation: bat-dart linear infinite;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .animate-rise-in,
@@ -260,7 +277,9 @@
   .animate-sun-spin,
   .animate-gull-fly,
   .animate-gull-flap,
-  .animate-bob-float {
+  .animate-bob-float,
+  .animate-fog-pulse,
+  .animate-bat-dart {
     animation: none;
   }
 }

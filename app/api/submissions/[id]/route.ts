@@ -1,10 +1,17 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase/server"
+import { createClient as createServiceClient } from "@supabase/supabase-js"
+
+function getServiceClient() {
+  const supabaseUrl = process.env.SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
+  if (!supabaseUrl || !serviceRoleKey) throw new Error("Supabase service credentials are not configured")
+  return createServiceClient(supabaseUrl, serviceRoleKey)
+}
 
 export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
-    const supabase = await createClient()
+    const supabase = getServiceClient()
 
     const { error: movementError } = await supabase.from("movement_submissions").delete().eq("id", id)
     const { error: regularError } = await supabase.from("submissions").delete().eq("id", id)
@@ -26,7 +33,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   try {
     const { id } = await params
     const body = await request.json()
-    const supabase = await createClient()
+    const supabase = getServiceClient()
 
     const updateData: Record<string, unknown> = {}
 
@@ -36,10 +43,6 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     if (body.feedback !== undefined) {
       updateData.movement_feedback = body.feedback || null
     }
-    if (body.status === "aprovado" || body.status === "refazer") {
-      updateData.movement_reviewed_at = new Date().toISOString()
-    }
-
     const { data: movementData, error: movementError } = await supabase
       .from("movement_submissions")
       .update(updateData)

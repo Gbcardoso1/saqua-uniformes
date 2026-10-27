@@ -1,12 +1,11 @@
 "use client"
 
 /**
- * Camada decorativa com tema da praia de Saquarema (capital do surfe).
+ * Camada decorativa sazonal de Halloween.
  * Fica atrás de todo o conteúdo, sem capturar cliques.
  *
- * variant="full"   -> home: sol, nuvens, gaivotas, prancha e ondas.
- * variant="subtle" -> painel admin: apenas ondas discretas no rodapé e
- *                     uma gaivota ocasional, para não atrapalhar a leitura.
+ * variant="full"   -> home: lua, névoa, morcegos, abóboras e bruma.
+ * variant="subtle" -> painel admin: névoa discreta e morcegos ocasionais.
  */
 export function BeachDecorations({
   variant = "full",
@@ -19,21 +18,21 @@ export function BeachDecorations({
         aria-hidden="true"
         className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
       >
-        {/* Nuvens leves atravessando o céu */}
+        {/* Névoa atravessando o céu */}
         <div
           className="animate-cloud-drift absolute top-24 left-0"
           style={{ animationDuration: "55s" }}
         >
-          <Cloud className="w-24 text-primary/15" />
+          <Cloud className="w-24 text-slate-950/80" />
         </div>
         <div
           className="animate-cloud-drift absolute top-44 left-0"
           style={{ animationDuration: "80s", animationDelay: "-30s" }}
         >
-          <Cloud className="w-16 text-primary/10" />
+          <Cloud className="w-16 text-slate-950/65" />
         </div>
 
-        {/* Gaivotas cruzando devagar */}
+        {/* Morcegos cruzando devagar */}
         <div
           className="animate-gull-fly absolute top-28 left-0"
           style={{ animationDuration: "40s" }}
@@ -47,25 +46,25 @@ export function BeachDecorations({
           <Gull className="w-7 text-primary/30" />
         </div>
 
-        {/* Prancha de surfe boiando no canto */}
+        {/* Abóbora flutuando no canto */}
         <div className="absolute bottom-24 right-6 animate-bob-float md:right-12">
-          <Surfboard className="w-10 opacity-70 md:w-12" />
+          <Pumpkin className="w-10 opacity-85 md:w-12" />
         </div>
 
         {/* Ondas no rodapé, em tom da cor primária (bem mais visíveis) */}
         <div className="absolute bottom-0 left-0 right-0 h-32">
           <WaveLayer
-            className="text-primary/20"
+            className="text-red-950/45"
             durationSeconds={16}
             heightClass="h-28"
           />
           <WaveLayer
-            className="text-primary/30"
+            className="text-red-900/55"
             durationSeconds={11}
             heightClass="h-20"
           />
           <WaveLayer
-            className="text-primary/40"
+            className="text-red-800/65"
             durationSeconds={8}
             heightClass="h-12"
           />
@@ -79,38 +78,38 @@ export function BeachDecorations({
       aria-hidden="true"
       className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
     >
-      {/* Sol com raios girando no canto superior direito */}
+      {/* Lua cheia com brilho no canto superior direito */}
       <div className="absolute -right-10 -top-10 animate-sun-pulse">
         <div className="relative h-48 w-48">
           <div className="animate-sun-spin absolute inset-0">
             <SunRays />
           </div>
-          <div className="absolute inset-[30%] rounded-full bg-yellow-200/80 blur-[1px]" />
-          <div className="absolute inset-[34%] rounded-full bg-yellow-100" />
+          <div className="absolute inset-[28%] rounded-full bg-violet-500/30 blur-[12px]" />
+          <div className="absolute inset-[34%] rounded-full bg-slate-100 shadow-[0_0_34px_rgba(226,232,240,0.8)]" />
         </div>
       </div>
 
-      {/* Nuvens flutuando */}
+      {/* Névoa flutuando */}
       <div
         className="animate-cloud-drift absolute top-24 left-0"
         style={{ animationDuration: "42s" }}
       >
-        <Cloud className="w-28 text-white opacity-80" />
+        <Cloud className="w-28 text-slate-950 opacity-90" />
       </div>
       <div
         className="animate-cloud-drift absolute top-44 left-0"
         style={{ animationDuration: "60s", animationDelay: "-15s" }}
       >
-        <Cloud className="w-20 text-white opacity-60" />
+        <Cloud className="w-20 text-slate-950 opacity-75" />
       </div>
       <div
         className="animate-cloud-drift absolute top-14 left-0"
         style={{ animationDuration: "75s", animationDelay: "-40s" }}
       >
-        <Cloud className="w-36 text-white opacity-50" />
+        <Cloud className="w-36 text-slate-950 opacity-65" />
       </div>
 
-      {/* Gaivotas voando */}
+      {/* Morcegos voando */}
       <div
         className="animate-gull-fly absolute top-36 left-0"
         style={{ animationDuration: "28s" }}
@@ -124,25 +123,53 @@ export function BeachDecorations({
         <Gull className="w-8 text-white/70" />
       </div>
 
-      {/* Prancha de surfe boiando */}
-      <div className="absolute bottom-28 right-8 animate-bob-float md:right-16">
-        <Surfboard className="w-12 opacity-90 md:w-16" />
-      </div>
+      {/* Animações ilustradas de Halloween */}
+      <img
+        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/vampire-Tle3RILIf3Ev7k6pBo8PpXuvF8qSt4.gif"
+        alt=""
+        className="animate-bob-float absolute top-56 right-[12%] w-16 opacity-80 md:w-24"
+        style={{ animationDelay: "-2s" }}
+      />
+      <img
+        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/spider-3EYgO4dc86EYaxhsUkezatpwnbrNwv.gif"
+        alt=""
+        className="animate-bob-float absolute top-72 left-[9%] w-12 opacity-75 md:w-20"
+        style={{ animationDelay: "-4s" }}
+      />
+      <img
+        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/haunted-castle-LkXpUXmVOyf568pRBkdtM66Wc59TWj.gif"
+        alt=""
+        className="animate-bob-float absolute bottom-44 right-24 hidden w-24 opacity-80 md:block md:w-32"
+        style={{ animationDelay: "-1s" }}
+      />
 
-      {/* Ondas do mar no rodapé */}
+      {/* Abóboras flutuando nos cantos */}
+      <img
+        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/pumpkin-G8gzvfJ8qo0DczHNbmespYBOYwfNdp.gif"
+        alt=""
+        className="animate-bob-float absolute bottom-28 right-8 w-14 opacity-95 md:right-16 md:w-20"
+      />
+      <img
+        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/pumpkin-path-5NJd9R7BIEBPlqQeWoYEEknGa68al.gif"
+        alt=""
+        className="animate-bob-float absolute bottom-20 left-8 w-16 opacity-85 md:left-20 md:w-24"
+        style={{ animationDelay: "-1.5s" }}
+      />
+
+      {/* Bruma rasteira no rodapé */}
       <div className="absolute bottom-0 left-0 right-0 h-40">
         <WaveLayer
-          className="text-white/10"
+          className="text-red-950/55"
           durationSeconds={12}
           heightClass="h-32"
         />
         <WaveLayer
-          className="text-white/15"
+          className="text-red-900/65"
           durationSeconds={9}
           heightClass="h-24"
         />
         <WaveLayer
-          className="text-white/20"
+          className="text-red-800/75"
           durationSeconds={6}
           heightClass="h-16"
         />
@@ -154,16 +181,7 @@ export function BeachDecorations({
 function SunRays() {
   return (
     <svg viewBox="0 0 100 100" className="h-full w-full">
-      <g fill="none" stroke="rgb(254 240 138 / 0.7)" strokeWidth="3" strokeLinecap="round">
-        {Array.from({ length: 12 }).map((_, i) => {
-          const angle = (i * 30 * Math.PI) / 180
-          const x1 = 50 + Math.cos(angle) * 32
-          const y1 = 50 + Math.sin(angle) * 32
-          const x2 = 50 + Math.cos(angle) * 46
-          const y2 = 50 + Math.sin(angle) * 46
-          return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} />
-        })}
-      </g>
+      <circle cx="50" cy="50" r="38" fill="none" stroke="rgb(251 146 60 / 0.35)" strokeWidth="2" strokeDasharray="3 6" />
     </svg>
   )
 }
@@ -181,24 +199,21 @@ function Cloud({ className }: { className?: string }) {
 
 function Gull({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 60 30" className={`animate-gull-flap ${className ?? ""}`} fill="none">
-      <path
-        d="M4 20 Q18 4 30 18 Q42 4 56 20"
-        stroke="currentColor"
-        strokeWidth="4"
-        strokeLinecap="round"
-      />
+    <svg viewBox="0 0 80 42" className={`animate-gull-flap ${className ?? ""}`} fill="currentColor">
+      <path d="M2 20 Q13 7 25 16 L40 8 L55 16 Q67 7 78 20 L61 18 L55 34 L40 24 L25 34 L19 18 Z" />
+      <circle cx="33" cy="17" r="1.5" fill="rgb(24 24 27)" />
+      <circle cx="47" cy="17" r="1.5" fill="rgb(24 24 27)" />
     </svg>
   )
 }
 
-function Surfboard({ className }: { className?: string }) {
+function Pumpkin({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 40 120" className={className}>
-      <ellipse cx="20" cy="60" rx="16" ry="58" fill="#ffb347" />
-      <ellipse cx="20" cy="60" rx="16" ry="58" fill="none" stroke="#e67e22" strokeWidth="2" />
-      <line x1="20" y1="8" x2="20" y2="112" stroke="#e67e22" strokeWidth="2" />
-      <path d="M20 30 L14 60 L20 90 L26 60 Z" fill="#ff6b6b" opacity="0.85" />
+    <svg viewBox="0 0 80 80" className={className}>
+      <path d="M40 8 C61 8 72 25 68 47 C64 67 52 75 40 75 C28 75 16 67 12 47 C8 25 19 8 40 8Z" fill="#f97316" stroke="#7c2d12" strokeWidth="3" />
+      <path d="M25 22 Q31 17 36 23 L32 30 L23 30Z M44 23 Q49 17 55 22 L57 30 L47 30Z" fill="#18181b" />
+      <path d="M29 49 Q40 58 51 49" fill="none" stroke="#18181b" strokeWidth="3" strokeLinecap="round" />
+      <path d="M34 9 Q40 1 46 9" fill="none" stroke="#65a30d" strokeWidth="5" strokeLinecap="round" />
     </svg>
   )
 }

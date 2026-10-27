@@ -1,12 +1,19 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClient as createServiceClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
+
+function getServiceClient() {
+  const supabaseUrl = process.env.SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
+  if (!supabaseUrl || !serviceRoleKey) throw new Error("Supabase service credentials are not configured")
+  return createServiceClient(supabaseUrl, serviceRoleKey)
+}
 
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const supabase = await createClient()
+    const supabase = getServiceClient()
     const { id } = await params
 
     const { error } = await supabase

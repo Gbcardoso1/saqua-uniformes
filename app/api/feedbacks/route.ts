@@ -1,9 +1,16 @@
-import { createClient } from "@/lib/supabase/server"
+import { createClient as createServiceClient } from "@supabase/supabase-js"
 import { NextResponse } from "next/server"
+
+function getServiceClient() {
+  const supabaseUrl = process.env.SUPABASE_URL
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
+  if (!supabaseUrl || !serviceRoleKey) throw new Error("Supabase service credentials are not configured")
+  return createServiceClient(supabaseUrl, serviceRoleKey)
+}
 
 export async function GET() {
   try {
-    const supabase = await createClient()
+    const supabase = getServiceClient()
     
     const { data, error } = await supabase
       .from("feedbacks")
@@ -24,7 +31,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient()
+    const supabase = getServiceClient()
     const body = await request.json()
     const { institution, category, message } = body
 
@@ -59,7 +66,7 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const supabase = await createClient()
+    const supabase = getServiceClient()
     const body = await request.json()
     const { id, status } = body
 
