@@ -23,13 +23,13 @@ export function BeachDecorations({
           className="animate-cloud-drift absolute top-24 left-0"
           style={{ animationDuration: "55s" }}
         >
-          <Cloud className="w-24 text-primary/15" />
+          <Cloud className="w-24 text-slate-950/80" />
         </div>
         <div
           className="animate-cloud-drift absolute top-44 left-0"
           style={{ animationDuration: "80s", animationDelay: "-30s" }}
         >
-          <Cloud className="w-16 text-primary/10" />
+          <Cloud className="w-16 text-slate-950/65" />
         </div>
 
         {/* Morcegos cruzando devagar */}
@@ -48,7 +48,7 @@ export function BeachDecorations({
 
         {/* Abóbora flutuando no canto */}
         <div className="absolute bottom-24 right-6 animate-bob-float md:right-12">
-          <Surfboard className="w-10 opacity-70 md:w-12" />
+          <Pumpkin className="w-10 opacity-85 md:w-12" />
         </div>
 
         {/* Ondas no rodapé, em tom da cor primária (bem mais visíveis) */}
@@ -84,8 +84,8 @@ export function BeachDecorations({
           <div className="animate-sun-spin absolute inset-0">
             <SunRays />
           </div>
-          <div className="absolute inset-[30%] rounded-full bg-orange-400/30 blur-[8px]" />
-          <div className="absolute inset-[34%] rounded-full bg-amber-100 shadow-[0_0_28px_rgba(251,146,60,0.65)]" />
+          <div className="absolute inset-[28%] rounded-full bg-violet-500/30 blur-[12px]" />
+          <div className="absolute inset-[34%] rounded-full bg-slate-100 shadow-[0_0_34px_rgba(226,232,240,0.8)]" />
         </div>
       </div>
 
@@ -94,19 +94,19 @@ export function BeachDecorations({
         className="animate-cloud-drift absolute top-24 left-0"
         style={{ animationDuration: "42s" }}
       >
-        <Cloud className="w-28 text-white opacity-80" />
+        <Cloud className="w-28 text-slate-950 opacity-90" />
       </div>
       <div
         className="animate-cloud-drift absolute top-44 left-0"
         style={{ animationDuration: "60s", animationDelay: "-15s" }}
       >
-        <Cloud className="w-20 text-white opacity-60" />
+        <Cloud className="w-20 text-slate-950 opacity-75" />
       </div>
       <div
         className="animate-cloud-drift absolute top-14 left-0"
         style={{ animationDuration: "75s", animationDelay: "-40s" }}
       >
-        <Cloud className="w-36 text-white opacity-50" />
+        <Cloud className="w-36 text-slate-950 opacity-65" />
       </div>
 
       {/* Morcegos voando */}
@@ -123,9 +123,12 @@ export function BeachDecorations({
         <Gull className="w-8 text-white/70" />
       </div>
 
-      {/* Abóbora flutuando */}
+      {/* Abóboras flutuando nos cantos */}
       <div className="absolute bottom-28 right-8 animate-bob-float md:right-16">
-        <Surfboard className="w-12 opacity-90 md:w-16" />
+        <Pumpkin className="w-12 opacity-95 md:w-16" />
+      </div>
+      <div className="absolute bottom-20 left-8 animate-bob-float md:left-20" style={{ animationDelay: "-1.5s" }}>
+        <Pumpkin className="w-9 opacity-80 md:w-12" />
       </div>
 
       {/* Bruma rasteira no rodapé */}
@@ -179,7 +182,7 @@ function Gull({ className }: { className?: string }) {
   )
 }
 
-function Surfboard({ className }: { className?: string }) {
+function Pumpkin({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 80 80" className={className}>
       <path d="M40 8 C61 8 72 25 68 47 C64 67 52 75 40 75 C28 75 16 67 12 47 C8 25 19 8 40 8Z" fill="#f97316" stroke="#7c2d12" strokeWidth="3" />
