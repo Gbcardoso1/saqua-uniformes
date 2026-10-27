@@ -79,8 +79,8 @@ export function BeachDecorations({
       className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
     >
       {/* Lua cheia com brilho no canto superior direito */}
-      <div className="absolute -right-10 -top-10 animate-sun-pulse">
-        <div className="relative h-48 w-48">
+      <div className="absolute -right-14 -top-14 animate-sun-pulse">
+        <div className="relative h-64 w-64">
           <div className="animate-sun-spin absolute inset-0">
             <SunRays />
           </div>
@@ -126,17 +126,17 @@ export function BeachDecorations({
       {/* Bruma rasteira no rodapé */}
       <div className="absolute bottom-0 left-0 right-0 h-40">
         <WaveLayer
-          className="text-[#062f4f]/55"
+          className="text-[#031d36]/70"
           durationSeconds={12}
           heightClass="h-32"
         />
         <WaveLayer
-          className="text-[#074b78]/65"
+          className="text-[#042f55]/80"
           durationSeconds={9}
           heightClass="h-24"
         />
         <WaveLayer
-          className="text-[#0a5f91]/75"
+          className="text-[#06446e]/85"
           durationSeconds={6}
           heightClass="h-16"
         />
