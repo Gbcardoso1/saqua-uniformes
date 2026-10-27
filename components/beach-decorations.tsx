@@ -126,17 +126,17 @@ export function BeachDecorations({
       {/* Bruma rasteira no rodapé */}
       <div className="absolute bottom-0 left-0 right-0 h-40">
         <WaveLayer
-          className="text-red-950/55"
+          className="text-[#062f4f]/55"
           durationSeconds={12}
           heightClass="h-32"
         />
         <WaveLayer
-          className="text-red-900/65"
+          className="text-[#074b78]/65"
           durationSeconds={9}
           heightClass="h-24"
         />
         <WaveLayer
-          className="text-red-800/75"
+          className="text-[#0a5f91]/75"
           durationSeconds={6}
           heightClass="h-16"
         />
