@@ -123,6 +123,32 @@ export function BeachDecorations({
         <Gull className="w-8 text-white/70" />
       </div>
 
+      {/* Ícones de Halloween, menores que as decorações principais */}
+      <img
+        src="/halloween-spiderweb.png"
+        alt=""
+        className="animate-bob-float absolute top-32 right-[18%] w-16 opacity-70 md:w-20"
+        style={{ animationDelay: "-2s" }}
+      />
+      <img
+        src="/halloween-ghost.png"
+        alt=""
+        className="animate-bob-float absolute top-64 left-[12%] w-16 opacity-75 md:w-20"
+        style={{ animationDelay: "-4s" }}
+      />
+      <img
+        src="/halloween-bats.png"
+        alt=""
+        className="animate-bob-float absolute top-24 left-[32%] w-16 opacity-75 md:w-20"
+        style={{ animationDelay: "-1s" }}
+      />
+      <img
+        src="/halloween-pumpkin.png"
+        alt=""
+        className="animate-bob-float absolute bottom-32 right-[10%] w-16 opacity-80 md:w-20"
+        style={{ animationDelay: "-3s" }}
+      />
+
       {/* Bruma rasteira no rodapé */}
       <div className="absolute bottom-0 left-0 right-0 h-40">
         <WaveLayer
