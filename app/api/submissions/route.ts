@@ -64,18 +64,26 @@ export async function GET() {
     // O painel administrativo precisa ler todos os registros, sem depender
     // da sessão/cookies do navegador nem das políticas RLS públicas.
     const serviceSupabase = createServiceClient(supabaseUrl, serviceRoleKey)
-    const { data, error } = await serviceSupabase
-      .from("submissions")
-      .select("*")
-      .order("submitted_at", { ascending: false })
+    // Os dois formulários gravam no Supabase e o painel precisa consolidar
+    // as solicitações em uma única lista. Movimentações antigas ficam na
+    // tabela separada; se ela ainda não existir, os pedidos principais continuam
+    // disponíveis no painel.
+    const [regularResult, movementResult] = await Promise.all([
+      serviceSupabase.from("submissions").select("*").order("submitted_at", { ascending: false }),
+      serviceSupabase.from("movement_submissions").select("*").order("submitted_at", { ascending: false }),
+    ])
 
-    if (error) {
-      console.error("Error fetching submissions:", error)
+    if (regularResult.error && movementResult.error) {
+      console.error("Error fetching submissions:", regularResult.error, movementResult.error)
       return NextResponse.json({ submissions: [], error: "Não foi possível carregar as solicitações" }, { status: 500 })
     }
 
-    // Transform database format to match frontend expectations
-    const submissions: Submission[] = data.map((item) => ({
+    const rows = [...(regularResult.data || []), ...(movementResult.data || [])].sort(
+      (a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime(),
+    )
+
+    // Transform database format to match frontend expectations.
+    const submissions: Submission[] = rows.map((item) => ({
       id: item.id,
       timestamp: item.submitted_at,
       name: item.requester_name,
