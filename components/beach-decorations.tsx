@@ -54,17 +54,17 @@ export function BeachDecorations({
         {/* Ondas no rodapé, em tom da cor primária (bem mais visíveis) */}
         <div className="absolute bottom-0 left-0 right-0 h-32">
           <WaveLayer
-            className="text-primary/20"
+            className="text-red-950/45"
             durationSeconds={16}
             heightClass="h-28"
           />
           <WaveLayer
-            className="text-primary/30"
+            className="text-red-900/55"
             durationSeconds={11}
             heightClass="h-20"
           />
           <WaveLayer
-            className="text-primary/40"
+            className="text-red-800/65"
             durationSeconds={8}
             heightClass="h-12"
           />
@@ -134,17 +134,17 @@ export function BeachDecorations({
       {/* Bruma rasteira no rodapé */}
       <div className="absolute bottom-0 left-0 right-0 h-40">
         <WaveLayer
-          className="text-white/10"
+          className="text-red-950/55"
           durationSeconds={12}
           heightClass="h-32"
         />
         <WaveLayer
-          className="text-white/15"
+          className="text-red-900/65"
           durationSeconds={9}
           heightClass="h-24"
         />
         <WaveLayer
-          className="text-white/20"
+          className="text-red-800/75"
           durationSeconds={6}
           heightClass="h-16"
         />
