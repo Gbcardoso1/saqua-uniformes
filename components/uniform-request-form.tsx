@@ -214,6 +214,7 @@ export default function UniformRequestForm() {
           name: formData.name,
           matricula: formData.matricula,
           institution: formData.institution,
+          submissionType: "uniformes",
           uniforms,
           shoes,
           studentKits,

@@ -134,11 +134,17 @@ export async function POST(request: Request) {
       movementFileName = file.name
     }
 
-    const supabase = await createClient()
+    const supabaseUrl = process.env.SUPABASE_URL
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
+    if (!supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json({ success: false, error: "Configuração do banco indisponível" }, { status: 503 })
+    }
 
+    // As solicitações públicas precisam ser gravadas mesmo sem uma sessão autenticada.
+    const serviceSupabase = createServiceClient(supabaseUrl, serviceRoleKey)
     const submissionType = (contentType.includes("multipart/form-data") ? data.get("submissionType") : data.submissionType) || "uniformes"
     const targetTable = String(submissionType).startsWith("movimentacoes") ? "movement_submissions" : "submissions"
-    const { data: insertedData, error } = await supabase
+    const { data: insertedData, error } = await serviceSupabase
       .from(targetTable)
       .insert({
         requester_name: contentType.includes("multipart/form-data") ? data.get("name") : data.name,
