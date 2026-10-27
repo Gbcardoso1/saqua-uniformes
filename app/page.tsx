@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Lock, Package, Shirt } from "lucide-react"
 import Image from "next/image"
+import { BeachDecorations } from "@/components/beach-decorations"
 
 export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false)
@@ -61,6 +62,7 @@ export default function Home() {
       </header>
 
       <main className="relative min-h-screen overflow-hidden bg-[#0d6971] px-4 pb-12 pt-28 selection:bg-[#f7c75b]/30">
+        <BeachDecorations />
         <div className="relative z-10 mx-auto max-w-4xl">
           <div className="animate-rise-in mb-10 text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-white/80 shadow-sm backdrop-blur-sm">
