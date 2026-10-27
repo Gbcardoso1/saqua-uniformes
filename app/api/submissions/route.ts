@@ -140,56 +140,53 @@ export async function POST(request: Request) {
     }
 
     const supabase = await createClient()
+    const isMultipart = contentType.includes("multipart/form-data")
+    const readValue = (jsonKey: string, formKey: string) => isMultipart ? data.get(formKey) : data[jsonKey]
+    const readArray = (jsonKey: string, formKey: string) => {
+      const value = readValue(jsonKey, formKey)
+      if (Array.isArray(value)) return value
+      if (typeof value === "string") {
+        try { return JSON.parse(value) }
+        catch { return [] }
+      }
+      return []
+    }
 
-    const submissionType = (contentType.includes("multipart/form-data") ? data.get("submissionType") : data.submissionType) || "uniformes"
-    const targetTable = String(submissionType).startsWith("movimentacoes") ? "movement_submissions" : "submissions"
-    const { data: insertedData, error } = await supabase
-      .from(targetTable)
-      .insert({
-        requester_name: contentType.includes("multipart/form-data") ? data.get("name") : data.name,
-        registration: contentType.includes("multipart/form-data") ? data.get("matricula") : data.matricula,
-        institution: contentType.includes("multipart/form-data") ? data.get("institution") : data.institution,
-        tmbp_pms_number: (contentType.includes("multipart/form-data") ? data.get("tmbpPmsNumber") : data.tmbpPmsNumber) || null,
-        submission_type: submissionType,
-        uniforms: data.uniforms || [],
-        shoes: data.shoes || [],
-        student_kits: data.studentKits || [],
-        teacher_polos: data.teacherPolos || [],
-        backpacks: data.backpacks || [],
-        stationery_items: data.stationeryItems || [],
-        kitchen_items: data.kitchenItems || [],
-        creche_items: data.crecheItems || [],
-        movement_file_name: movementFileName,
-        movement_file_data: movementFileData,
-      })
-      .select()
-      .single()
+    const requesterName = String(readValue("name", "name") || "").trim()
+    const registration = String(readValue("matricula", "matricula") || "").trim()
+    const institution = String(readValue("institution", "institution") || "").trim()
+    if (!requesterName || !registration || !institution) {
+      return NextResponse.json({ success: false, error: "Preencha nome, matrícula e instituição." }, { status: 400 })
+    }
 
+    const submissionType = String(readValue("submissionType", "submissionType") || "uniformes")
+    const targetTable = submissionType.startsWith("movimentacoes") ? "movement_submissions" : "submissions"
+    const payload = {
+      requester_name: requesterName,
+      registration,
+      institution,
+      tmbp_pms_number: readValue("tmbpPmsNumber", "tmbpPmsNumber") || null,
+      submission_type: submissionType,
+      uniforms: readArray("uniforms", "uniforms"),
+      shoes: readArray("shoes", "shoes"),
+      student_kits: readArray("studentKits", "studentKits"),
+      teacher_polos: readArray("teacherPolos", "teacherPolos"),
+      backpacks: readArray("backpacks", "backpacks"),
+      stationery_items: readArray("stationeryItems", "stationeryItems"),
+      kitchen_items: readArray("kitchenItems", "kitchenItems"),
+      creche_items: readArray("crecheItems", "crecheItems"),
+      movement_file_name: movementFileName,
+      movement_file_data: movementFileData,
+    }
+
+    // Do not request the inserted row here: public submitters may INSERT but must not SELECT all requests.
+    const { error } = await supabase.from(targetTable).insert(payload)
     if (error) {
       console.error("Error inserting submission:", error)
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+      return NextResponse.json({ success: false, error: "Não foi possível salvar a solicitação." }, { status: 500 })
     }
 
-    const submission: Submission = {
-      id: insertedData.id,
-      timestamp: insertedData.submitted_at,
-      name: insertedData.requester_name,
-      matricula: insertedData.registration,
-      institution: insertedData.institution,
-      tmbpPmsNumber: insertedData.tmbp_pms_number || "",
-      submissionType: insertedData.submission_type,
-      documentType: insertedData.submission_type === "movimentacoes-inventario" ? "inventario" : insertedData.submission_type?.startsWith("movimentacoes") ? "termo" : undefined,
-      uniforms: insertedData.uniforms || [],
-      shoes: insertedData.shoes || [],
-      studentKits: insertedData.student_kits || [],
-      teacherPolos: insertedData.teacher_polos || [],
-      backpacks: insertedData.backpacks || [],
-      stationeryItems: insertedData.stationery_items || [],
-      kitchenItems: insertedData.kitchen_items || [],
-      crecheItems: insertedData.creche_items || [],
-    }
-
-    return NextResponse.json({ success: true, submission })
+    return NextResponse.json({ success: true })
   } catch (error) {
     console.error("Error in POST:", error)
     return NextResponse.json({ success: false, error: "Failed to save submission" }, { status: 500 })
