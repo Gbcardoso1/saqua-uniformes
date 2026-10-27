@@ -64,15 +64,20 @@ export async function GET() {
     // O painel administrativo precisa ler todos os registros, sem depender
     // da sessão/cookies do navegador nem das políticas RLS públicas.
     const serviceSupabase = createServiceClient(supabaseUrl, serviceRoleKey)
-    const { data, error } = await serviceSupabase
-      .from("submissions")
-      .select("*")
-      .order("submitted_at", { ascending: false })
+    const [{ data: regularData, error: regularError }, { data: movementData, error: movementError }] = await Promise.all([
+      serviceSupabase.from("submissions").select("*").order("submitted_at", { ascending: false }),
+      serviceSupabase.from("movement_submissions").select("*").order("submitted_at", { ascending: false }),
+    ])
 
-    if (error) {
-      console.error("Error fetching submissions:", error)
+    if (regularError || movementError) {
+      console.error("Error fetching submissions:", regularError || movementError)
       return NextResponse.json({ submissions: [], error: "Não foi possível carregar as solicitações" }, { status: 500 })
     }
+
+    // The admin panel receives both regular requests and inventory/movement requests.
+    const data = [...(regularData || []), ...(movementData || [])].sort(
+      (a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime(),
+    )
 
     // Transform database format to match frontend expectations
     const submissions: Submission[] = data.map((item) => ({
