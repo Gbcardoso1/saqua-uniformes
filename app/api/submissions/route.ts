@@ -136,7 +136,16 @@ export async function POST(request: Request) {
       movementFileName = file.name
     }
 
-    const supabase = await createClient()
+    const supabaseUrl = process.env.SUPABASE_URL
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY
+    if (!supabaseUrl || !serviceRoleKey) {
+      return NextResponse.json({ success: false, error: "Configuração do banco indisponível" }, { status: 503 })
+    }
+
+    // This public intake route writes only validated submissions server-side.
+    // Use the service client here because anonymous form users do not have a session
+    // and the admin panel needs a consistent server-controlled write path.
+    const supabase = createServiceClient(supabaseUrl, serviceRoleKey)
 
     const submissionType = (contentType.includes("multipart/form-data") ? data.get("submissionType") : data.submissionType) || "uniformes"
     const targetTable = String(submissionType).startsWith("movimentacoes") ? "movement_submissions" : "submissions"
@@ -159,10 +168,12 @@ export async function POST(request: Request) {
         movement_file_name: movementFileName,
         movement_file_data: movementFileData,
       })
+      .select()
+      .single()
 
-    if (error) {
+    if (error || !insertedData) {
       console.error("Error inserting submission:", error)
-      return NextResponse.json({ success: false, error: error.message }, { status: 500 })
+      return NextResponse.json({ success: false, error: error?.message || "Registro não retornado pelo banco" }, { status: 500 })
     }
 
     const submission: Submission = {
