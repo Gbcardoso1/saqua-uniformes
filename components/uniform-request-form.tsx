@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Download, Search, ChevronDown, ChevronUp, Shirt, Package, Users, Backpack, Footprints } from "lucide-react"
+import { Download, Search, ChevronDown, ChevronUp, Shirt, Users, Backpack, Footprints } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { InstitutionPicker } from "@/components/institution-picker"
@@ -48,16 +48,6 @@ const shoeSizes = ["14/15", "16/17", "18", "19", "20", "21", "22", "23", "24", "
 // Calçados (Crocs) - tamanhos disponíveis (14/15 até 34)
 const crocsSizes = ["14/15", "16/17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34"]
 
-// Kits de Aluno
-const studentKitTypes = [
-  "KIT CRECHE",
-  "KIT PRÉ",
-  "KIT 1º E 2º",
-  "KIT 3º AO 5º",
-  "KIT 6º AO 9º",
-  "KIT EJA",
-]
-
 // Polos de Professor
 const teacherPoloSizes = ["P", "M", "G", "GG", "EXG"]
 
@@ -83,7 +73,6 @@ export default function UniformRequestForm() {
   const [shoeQuantities, setShoeQuantities] = useState<Record<string, number>>({})
   const [crocsQuantities, setCrocsQuantities] = useState<Record<string, number>>({})
   const [footwearType, setFootwearType] = useState<"tenis" | "crocs">("tenis")
-  const [kitQuantities, setKitQuantities] = useState<Record<string, number>>({})
   const [poloQuantities, setPoloQuantities] = useState<Record<string, number>>({})
   const [kitPoloQuantity, setKitPoloQuantity] = useState<number>(0)
   const [backpackQuantities, setBackpackQuantities] = useState<Record<string, number>>({})
@@ -94,12 +83,11 @@ export default function UniformRequestForm() {
     Object.values(uniformQuantities).forEach(qty => { if (qty > 0) total += qty })
     Object.values(shoeQuantities).forEach(qty => { if (qty > 0) total += qty })
     Object.values(crocsQuantities).forEach(qty => { if (qty > 0) total += qty })
-    Object.values(kitQuantities).forEach(qty => { if (qty > 0) total += qty })
     if (kitPoloQuantity > 0) total += kitPoloQuantity
     Object.values(poloQuantities).forEach(qty => { if (qty > 0) total += qty })
     Object.values(backpackQuantities).forEach(qty => { if (qty > 0) total += qty })
     return total
-  }, [uniformQuantities, shoeQuantities, crocsQuantities, kitQuantities, poloQuantities, kitPoloQuantity, backpackQuantities])
+  }, [uniformQuantities, shoeQuantities, crocsQuantities, poloQuantities, kitPoloQuantity, backpackQuantities])
 
   const toggleCategory = (category: string) => {
     const newExpanded = new Set(expandedCategories)
@@ -137,7 +125,6 @@ export default function UniformRequestForm() {
   const prepareSubmissionData = () => {
     const uniforms: Array<{ type: string; gender: string; size: string; quantity: string }> = []
     const shoes: Array<{ size: string; quantity: string; type: string }> = []
-    const studentKits: Array<{ size: string; quantity: string }> = []
     const teacherPolos: Array<{ kit: string; kitQuantity: string; size: string; quantity: string }> = []
     const backpacks: Array<{ size: string; quantity: string }> = []
 
@@ -157,12 +144,6 @@ export default function UniformRequestForm() {
     Object.entries(crocsQuantities).forEach(([size, qty]) => {
       if (qty > 0) {
         shoes.push({ size, quantity: qty.toString(), type: "crocs" })
-      }
-    })
-
-    Object.entries(kitQuantities).forEach(([kit, qty]) => {
-      if (qty > 0) {
-        studentKits.push({ size: kit, quantity: qty.toString() })
       }
     })
 
@@ -434,13 +415,6 @@ export default function UniformRequestForm() {
                 <Badge variant="secondary" className="text-xs">{Object.values(shoeQuantities).filter(q => q > 0).length + Object.values(crocsQuantities).filter(q => q > 0).length}</Badge>
               )}
             </TabsTrigger>
-            <TabsTrigger value="kits" className="flex flex-col gap-1 py-3">
-              <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-TKwfiQgKkgI5qtM08rq1d6pHpBdIvX.png" alt="Kit de aluno" className="h-6 w-6 object-contain" />
-              <span className="text-xs">Kits Aluno</span>
-              {Object.values(kitQuantities).some(q => q > 0) && (
-                <Badge variant="secondary" className="text-xs">{Object.values(kitQuantities).filter(q => q > 0).length}</Badge>
-              )}
-            </TabsTrigger>
             <TabsTrigger value="professor" className="flex flex-col gap-1 py-3">
               <img src="/professor-uniforme.png" alt="Professor com uniforme" className="h-7 w-7 object-contain" />
               <span className="text-xs">Professor</span>
@@ -659,43 +633,6 @@ export default function UniformRequestForm() {
             </Card>
           </TabsContent>
 
-          {/* Kits de Aluno */}
-          <TabsContent value="kits" className="mt-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Package className="h-5 w-5" />
-                  Kits de Aluno
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-                  {studentKitTypes.map((kit) => {
-                    const qty = kitQuantities[kit] || 0
-                    return (
-                      <div
-                        key={kit}
-                        className={`flex items-center justify-between rounded-lg border p-4 ${qty > 0 ? 'border-selection bg-selection/12 ring-1 ring-selection/20' : ''}`}
-                      >
-                        <span className="font-medium">{kit}</span>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={qty || ""}
-                          onChange={(e) => {
-                            const val = parseInt(e.target.value) || 0
-                            setKitQuantities((prev) => ({ ...prev, [kit]: val }))
-                          }}
-                          className="w-20 h-9 text-center"
-                          placeholder="0"
-                        />
-                      </div>
-                    )
-                  })}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
 
           {/* Kit Professor */}
           <TabsContent value="professor" className="mt-4">
@@ -855,18 +792,6 @@ export default function UniformRequestForm() {
                         <Badge variant="outline" className="mr-2">Calçados</Badge>
                         <span className="font-medium">Ed. Infantil</span>
                         <span className="text-muted-foreground"> - Tam. {size}</span>
-                      </div>
-                      <Badge>Qtd: {qty}</Badge>
-                    </div>
-                  </div>
-                ))}
-                {/* Kits Aluno */}
-                {Object.entries(kitQuantities).filter(([, qty]) => qty > 0).map(([kit, qty]) => (
-                  <div key={`kit-${kit}`} className="rounded-lg bg-muted p-3 text-sm">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Badge variant="outline" className="mr-2">Kit Aluno</Badge>
-                        <span className="font-medium">{kit}</span>
                       </div>
                       <Badge>Qtd: {qty}</Badge>
                     </div>
