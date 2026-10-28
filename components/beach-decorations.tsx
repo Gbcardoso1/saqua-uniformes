@@ -79,8 +79,8 @@ export function BeachDecorations({
       className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
     >
       {/* Lua cheia com brilho no canto superior direito */}
-      <div className="absolute -right-14 -top-14 animate-sun-pulse">
-        <div className="relative h-64 w-64">
+      <div className="absolute -right-20 -top-20 animate-sun-pulse">
+        <div className="relative h-80 w-80">
           <div className="animate-sun-spin absolute inset-0">
             <SunRays />
           </div>
