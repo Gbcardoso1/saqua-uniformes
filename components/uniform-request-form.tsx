@@ -400,7 +400,7 @@ export default function UniformRequestForm() {
 
         {/* Tabs de Categorias */}
         <Tabs defaultValue="uniformes" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 h-auto">
+          <TabsList className="grid w-full grid-cols-4 h-auto">
             <TabsTrigger value="uniformes" className="flex flex-col gap-1 py-3">
               <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-H9jVG2mK1DRpu9YuAWsFkypJCgYzRb.png" alt="Uniforme" className="h-6 w-6 object-contain" />
               <span className="text-xs">Uniformes</span>
