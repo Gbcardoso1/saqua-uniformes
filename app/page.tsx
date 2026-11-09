@@ -37,7 +37,7 @@ export default function Home() {
       return
     }
 
-    alert("E-mail ou senha incorretos!")
+    alert("Login ou senha incorretos!")
     setUsername("")
     setPassword("")
   }
