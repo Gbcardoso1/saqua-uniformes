@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Lock, Package, Shirt } from "lucide-react"
 import Image from "next/image"
 import { BeachDecorations } from "@/components/beach-decorations"
+import { createClient } from "@/lib/supabase/client"
 
 export default function Home() {
   const [showLoginModal, setShowLoginModal] = useState(false)
@@ -21,20 +22,22 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<"uniformes" | "almoxarifado">("uniformes")
   const router = useRouter()
 
-  const ADMIN_USERNAME = "patrimônio"
-  const ADMIN_PASSWORD = "#cmpp123"
-
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-      // Store authentication in sessionStorage
-      sessionStorage.setItem("adminAuth", "true")
+    const supabase = createClient()
+    const { error } = await supabase.auth.signInWithPassword({
+      email: username.trim(),
+      password,
+    })
+
+    if (!error) {
       router.push("/admin")
-    } else {
-      alert("Login ou senha incorretos!")
-      setUsername("")
-      setPassword("")
+      return
     }
+
+    alert("E-mail ou senha incorretos!")
+    setUsername("")
+    setPassword("")
   }
 
   return (

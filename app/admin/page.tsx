@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { InstitutionPicker } from "@/components/institution-picker"
+import { createClient } from "@/lib/supabase/client"
 
 type Submission = {
   id: string
@@ -113,8 +114,15 @@ export default function AdminPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const auth = sessionStorage.getItem("adminAuth")
-    if (auth === "true") {
+    const loadAuthenticatedDashboard = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (!user) {
+        router.replace("/")
+        return
+      }
+
       setIsAuthenticated(true)
       fetchSubmissions()
       fetchFeedbacks()
@@ -125,9 +133,9 @@ export default function AdminPage() {
       }, 120000)
 
       return () => window.clearInterval(refreshDashboard)
-    } else {
-      router.push("/")
     }
+
+    loadAuthenticatedDashboard()
   }, [router])
 
   useEffect(() => {
@@ -321,9 +329,10 @@ export default function AdminPage() {
     document.body.removeChild(link)
   }
 
-  const handleLogout = () => {
-    sessionStorage.removeItem("adminAuth")
-    router.push("/")
+  const handleLogout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.replace("/")
   }
 
   const almoxarifadoSubmissions = submissions.filter((s) => s.submissionType === "almoxarifado")
