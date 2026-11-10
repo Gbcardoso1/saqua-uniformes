@@ -25,8 +25,10 @@ export default function Home() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     const supabase = createClient()
+    const login = username.trim().toLowerCase()
+    const email = login === "patrimônio" || login === "patrimonio" ? "recibos.cmpp@smec.saquarema.rj.gov.br" : login
     const { error } = await supabase.auth.signInWithPassword({
-      email: username.trim(),
+      email,
       password,
     })
 
@@ -35,7 +37,7 @@ export default function Home() {
       return
     }
 
-    alert("E-mail ou senha incorretos!")
+    alert("Login ou senha incorretos!")
     setUsername("")
     setPassword("")
   }
