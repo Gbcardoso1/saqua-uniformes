@@ -86,24 +86,15 @@ export function BeachDecorations({
       </div>
 
       {!subtle && (
-        <div className="animate-santa-sleigh absolute left-0 top-[27%] w-[220px] text-white drop-shadow-[0_8px_12px_rgba(4,25,18,.35)] md:top-[30%] md:w-[280px]"
-          style={{ animationDelay: "-12s" }}>
-          <svg viewBox="0 0 300 118" className="h-auto w-full" fill="none">
-            <path d="M26 72c18-10 30-10 42 0 12-10 24-10 36 0" stroke="#f2eee4" strokeWidth="3" strokeLinecap="round" />
-            <path d="M31 69l-5-8m17 9 1-10m16 12 6-8m20 7-3-9m18 12 6-9" stroke="#f2eee4" strokeWidth="2.4" strokeLinecap="round" />
-            <circle cx="28" cy="58" r="3" fill="#d8b56d" /><circle cx="76" cy="58" r="3" fill="#d8b56d" />
-            <path d="M66 78c12-13 32-13 44 0l-7 11H73l-7-11Z" fill="#7a3028" stroke="#f2eee4" strokeWidth="2" />
-            <path d="M78 74c-1-13 11-23 24-21 9 1 15 7 17 14l-8 11H82l-4-4Z" fill="#f2eee4" />
-            <circle cx="103" cy="64" r="2" fill="#173d31" /><path d="M107 69h7" stroke="#c84b4b" strokeWidth="2" strokeLinecap="round" />
-            <path d="M79 55c5-10 22-14 34-6l-3 7H81Z" fill="#c84b4b" /><path d="M81 55h30" stroke="#f2eee4" strokeWidth="4" strokeLinecap="round" /><circle cx="114" cy="48" r="4" fill="#f2eee4" />
-            <path d="M112 80h54l18 18H91c9-5 15-11 21-18Z" fill="#a93d36" stroke="#d8b56d" strokeWidth="3" />
-            <path d="M88 99c28 8 67 8 100-1" stroke="#d8b56d" strokeWidth="4" strokeLinecap="round" />
-            <path d="M131 77c-2-16 10-27 25-26 10 0 18 8 19 18l-9 11h-31l-4-3Z" fill="#f2eee4" />
-            <path d="M133 56c8-11 25-13 37-5l-3 7h-32Z" fill="#c84b4b" /><path d="M136 58h32" stroke="#f2eee4" strokeWidth="4" strokeLinecap="round" /><circle cx="171" cy="49" r="4" fill="#f2eee4" />
-            <path d="M158 77c12-3 21-1 28 5l-8 10h-25Z" fill="#f2eee4" />
-            <path d="M173 69c9-7 19-8 28-2l-6 11h-17" fill="#c84b4b" />
-            <path d="M192 81c18-5 34-3 48 4" stroke="#d8b56d" strokeWidth="2" strokeDasharray="3 6" strokeLinecap="round" />
-          </svg>
+        <div
+          className="animate-santa-sleigh absolute left-0 top-[84%] w-[220px] mix-blend-lighten drop-shadow-[0_8px_12px_rgba(4,25,18,.35)] md:top-[84%] md:w-[280px]"
+          style={{ animationDelay: "-5s" }}
+        >
+          <img
+            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-hhvYqs0qic6k4sKG9el3xlae70151n.png"
+            alt=""
+            className="h-auto w-full"
+          />
         </div>
       )}
 
