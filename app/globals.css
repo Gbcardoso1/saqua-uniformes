@@ -150,7 +150,26 @@
   .interactive-lift { animation: none; transition: none; }
 }
 
-/* ===== Animações sazonais de Halloween ===== */
+/* ===== Animações sazonais de Natal ===== */
+@keyframes christmas-sway {
+  0%, 100% { transform: rotate(-7deg); }
+  50% { transform: rotate(7deg); }
+}
+
+@keyframes christmas-snow {
+  0% { transform: translate3d(0, -5vh, 0); }
+  100% { transform: translate3d(28px, 110vh, 0); }
+}
+
+.animate-christmas-sway { animation: christmas-sway 3.8s ease-in-out infinite; transform-origin: top center; }
+.animate-christmas-snow { animation: christmas-snow linear infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-christmas-sway,
+  .animate-christmas-snow { animation: none; }
+}
+
+/* ===== Animações sazonais anteriores ===== */
 
 /* Ondas deslizando horizontalmente */
 @keyframes wave-slide {

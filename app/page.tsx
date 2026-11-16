@@ -44,7 +44,7 @@ export default function Home() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-white/15 bg-[#116f73]/85 shadow-lg shadow-[#073f45]/10 backdrop-blur-xl supports-[backdrop-filter]:bg-[#116f73]/80">
+      <header className="fixed inset-x-0 top-0 z-50 border-b border-[#d8b56d]/30 bg-[#123d32]/90 shadow-lg shadow-[#09251d]/20 backdrop-blur-xl supports-[backdrop-filter]:bg-[#123d32]/85">
         <div className="container flex h-16 items-center justify-between px-4 gap-4">
           <Image
             src="/prefeitura.png"
@@ -66,7 +66,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="relative min-h-screen overflow-hidden bg-[#0d6971] px-4 pb-12 pt-28 selection:bg-[#f7c75b]/30">
+      <main className="relative min-h-screen overflow-hidden bg-[radial-gradient(ellipse_at_top,_#28634c_0%,_#174b3b_44%,_#103b30_100%)] px-4 pb-12 pt-28 selection:bg-[#d8b56d]/30">
         <BeachDecorations />
         <div className="relative z-10 mx-auto max-w-4xl">
           <div className="animate-rise-in mb-10 text-center">
