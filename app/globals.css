@@ -163,6 +163,26 @@
 
 .animate-holiday-icon { animation: holiday-icon-float 5.5s ease-in-out infinite; }
 
+@keyframes holiday-star-twinkle {
+  0%, 100% { opacity: 0.38; transform: scale(0.72); }
+  50% { opacity: 1; transform: scale(1.18); }
+}
+
+.holiday-star {
+  clip-path: polygon(50% 0%, 61% 37%, 100% 50%, 61% 63%, 50% 100%, 39% 63%, 0 50%, 39% 37%);
+  background: #fff7d1;
+  filter: drop-shadow(0 0 5px rgb(255 238 167 / 95%));
+}
+
+.animate-holiday-star { animation: holiday-star-twinkle 3.2s ease-in-out infinite; }
+
+@keyframes santa-sleigh-crossing {
+  from { transform: translate3d(-220px, 0, 0); }
+  to { transform: translate3d(calc(100vw + 220px), -14px, 0); }
+}
+
+.animate-santa-sleigh-crossing { animation: santa-sleigh-crossing 30s linear infinite; }
+
 @keyframes christmas-snow {
   0% { transform: translate3d(0, -5vh, 0); }
   100% { transform: translate3d(28px, 110vh, 0); }
@@ -187,6 +207,8 @@
   .animate-christmas-sway,
   .animate-christmas-snow,
   .animate-holiday-icon,
+  .animate-holiday-star,
+  .animate-santa-sleigh-crossing,
   .animate-ice-skater,
   .animate-ice-skater-delayed,
   .animate-ice-skater-third { animation: none; }

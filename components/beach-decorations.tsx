@@ -94,6 +94,25 @@ export function BeachDecorations({
         </div>
       </div>
 
+      <div className="absolute inset-x-0 top-[4.25rem] flex items-center justify-center gap-2 lg:hidden">
+        {holidayIcons.map((icon, index) => (
+          <img
+            key={icon.src}
+            src={icon.src}
+            alt=""
+            className="size-6 animate-holiday-icon drop-shadow-[0_2px_5px_rgba(4,25,18,.4)] sm:size-7"
+            style={{ animationDelay: `${index * -0.8}s` }}
+          />
+        ))}
+      </div>
+
+      <div
+        className="animate-santa-sleigh-crossing pointer-events-none absolute left-0 top-[24%] w-[106px] opacity-95 drop-shadow-[0_4px_8px_rgba(4,25,18,.4)] sm:w-32 md:w-40"
+        style={{ animationDelay: "-11s" }}
+      >
+        <img src="/santa-sleigh-icon.png" alt="" className="h-auto w-full" />
+      </div>
+
       {holidayIcons.map((icon, index) => (
         <span
           key={icon.src}
@@ -112,6 +131,24 @@ export function BeachDecorations({
           />
         </span>
       ))}
+
+      {!subtle && (
+        <div className="absolute inset-0 overflow-hidden">
+          {Array.from({ length: 22 }, (_, index) => (
+            <span
+              key={index}
+              className="holiday-star animate-holiday-star absolute"
+              style={{
+                left: `${(index * 43 + 9) % 100}%`,
+                top: `${(index * 61 + 7) % 92 + 4}%`,
+                width: `${index % 3 === 0 ? 10 : 7}px`,
+                height: `${index % 3 === 0 ? 10 : 7}px`,
+                animationDelay: `${-((index * 1.3) % 7)}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {!subtle && (
         <div className="absolute inset-0 overflow-hidden">
