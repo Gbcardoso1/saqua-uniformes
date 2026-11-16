@@ -156,6 +156,13 @@
   50% { transform: rotate(7deg); }
 }
 
+@keyframes holiday-icon-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-7px) rotate(2deg); }
+}
+
+.animate-holiday-icon { animation: holiday-icon-float 5.5s ease-in-out infinite; }
+
 @keyframes christmas-snow {
   0% { transform: translate3d(0, -5vh, 0); }
   100% { transform: translate3d(28px, 110vh, 0); }
@@ -179,6 +186,7 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-christmas-sway,
   .animate-christmas-snow,
+  .animate-holiday-icon,
   .animate-ice-skater,
   .animate-ice-skater-delayed,
   .animate-ice-skater-third { animation: none; }

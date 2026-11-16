@@ -10,6 +10,15 @@ const ornaments = [
   { left: "91%", delay: "-2.5s", color: "text-[#c84b4b]", size: "size-3.5" },
 ]
 
+const holidayIcons = [
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/presente-QPN3ehH18wdLkTD8RTkEsytWa0pvjD.png", size: "size-12", left: "3%", top: "42%", rotation: "-8deg" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/homem-biscoito-LZm8JvnIRjYlBlIo6rEla1y9ay53Np.png", size: "size-11", left: "10%", top: "58%", rotation: "7deg" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/meia-Vjm7rQkSakvwhALSo1j2zXRwQrvxkj.png", size: "size-11", left: "91%", top: "43%", rotation: "-10deg" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/papai-noel-1qfgzjBBxqCjKErEoNtYvc0b9Luql9.png", size: "size-12", left: "96%", top: "59%", rotation: "6deg" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sino-de-natal-YkeeTMZLp62T9wV36ktX7l4djsxRWs.png", size: "size-11", left: "4%", top: "75%", rotation: "-7deg" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/boneco-de-neve-TQlgslq7YdozU7NH63tmq4PamalCGd.png", size: "size-11", left: "94%", top: "77%", rotation: "8deg" },
+]
+
 function SkatingSanta() {
   return (
     <svg viewBox="0 0 96 100" className="h-auto w-full" fill="none" aria-hidden="true">
@@ -84,6 +93,25 @@ export function BeachDecorations({
           <span className="absolute top-48 right-8 size-2 rounded-full bg-[#f2eee4] shadow-[0_0_12px_white]" />
         </div>
       </div>
+
+      {holidayIcons.map((icon, index) => (
+        <span
+          key={icon.src}
+          className="absolute hidden lg:block"
+          style={{
+            left: icon.left,
+            top: icon.top,
+            transform: `translate(-50%, -50%) rotate(${icon.rotation})`,
+          }}
+        >
+          <img
+            src={icon.src}
+            alt=""
+            className={`${icon.size} animate-holiday-icon opacity-90 drop-shadow-[0_3px_8px_rgba(4,25,18,.35)]`}
+            style={{ animationDelay: `${index * -0.8}s` }}
+          />
+        </span>
+      ))}
 
       {!subtle && (
         <div className="absolute inset-0 overflow-hidden">
