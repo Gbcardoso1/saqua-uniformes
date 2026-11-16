@@ -87,13 +87,14 @@ export function BeachDecorations({
 
       {!subtle && (
         <div
-          className="animate-santa-sleigh absolute left-0 top-[27%] w-[220px] mix-blend-lighten opacity-90 drop-shadow-[0_8px_12px_rgba(4,25,18,.35)] md:top-[30%] md:w-[280px]"
+          className="animate-santa-sleigh absolute left-0 top-[27%] w-[220px] opacity-90 drop-shadow-[0_8px_12px_rgba(4,25,18,.35)] md:top-[30%] md:w-[280px]"
           style={{ animationDelay: "-12s" }}
         >
           <img
             src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-hhvYqs0qic6k4sKG9el3xlae70151n.png"
             alt=""
-            className="h-auto w-full"
+            className="h-auto w-full mix-blend-screen"
+            style={{ filter: "saturate(.82) brightness(1.08)" }}
           />
         </div>
       )}
