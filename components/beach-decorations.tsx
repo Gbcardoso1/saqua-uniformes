@@ -10,6 +10,38 @@ const ornaments = [
   { left: "91%", delay: "-2.5s", color: "text-[#c84b4b]", size: "size-3.5" },
 ]
 
+function SkatingSanta() {
+  return (
+    <svg viewBox="0 0 96 100" className="h-auto w-full" fill="none" aria-hidden="true">
+      <path d="M29 91c15 5 36 5 52 0" stroke="#dff7ff" strokeWidth="3" strokeLinecap="round" />
+      <path d="m38 85-5 8m37-8 5 8" stroke="#d8b56d" strokeWidth="3" strokeLinecap="round" />
+      <path d="M36 54c2-15 22-19 31-6l7 28H32l4-22Z" fill="#b83e37" stroke="#f2eee4" strokeWidth="2" />
+      <path d="M34 74h39v9H34z" fill="#f2eee4" />
+      <path d="M42 48c-4-11 3-22 14-22 10 0 17 8 16 18l-8 10H44l-2-6Z" fill="#f2eee4" />
+      <path d="M42 31c3-13 20-16 30-7l-3 8H45Z" fill="#c84b4b" /><path d="M43 33h27" stroke="#f2eee4" strokeWidth="4" strokeLinecap="round" /><circle cx="72" cy="24" r="4" fill="#f2eee4" />
+      <circle cx="57" cy="39" r="1.5" fill="#173d31" /><path d="M61 44h4" stroke="#c84b4b" strokeWidth="2" strokeLinecap="round" />
+      <path d="M39 58 23 68m42-10 13 8" stroke="#f2eee4" strokeWidth="5" strokeLinecap="round" />
+      <path d="M41 81 35 90m27-9 9 9" stroke="#f2eee4" strokeWidth="4" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function PenguinSkater() {
+  return (
+    <svg viewBox="0 0 56 68" className="h-auto w-full" fill="none" aria-hidden="true">
+      <ellipse cx="28" cy="39" rx="19" ry="24" fill="#192b2c" />
+      <ellipse cx="28" cy="42" rx="12" ry="17" fill="#f6f3e9" />
+      <circle cx="28" cy="20" r="15" fill="#192b2c" />
+      <ellipse cx="28" cy="23" rx="10" ry="9" fill="#f6f3e9" />
+      <circle cx="24" cy="21" r="1.5" fill="#192b2c" /><circle cx="32" cy="21" r="1.5" fill="#192b2c" />
+      <path d="m26 25 2 3 3-3" fill="#e39a43" />
+      <path d="M11 34 2 42m43-8 8 7" stroke="#192b2c" strokeWidth="4" strokeLinecap="round" />
+      <path d="m20 60-3 5m18-5 3 5" stroke="#e39a43" strokeWidth="4" strokeLinecap="round" />
+      <path d="M12 66h13m6 0h13" stroke="#dff7ff" strokeWidth="2.5" strokeLinecap="round" />
+    </svg>
+  )
+}
+
 export function BeachDecorations({
   variant = "full",
 }: {
@@ -89,6 +121,25 @@ export function BeachDecorations({
               }}
             />
           ))}
+        </div>
+      )}
+
+      {!subtle && (
+        <div className="absolute inset-x-0 bottom-0 h-[34%] overflow-hidden">
+          <svg className="absolute inset-x-0 bottom-0 h-full w-full opacity-35" viewBox="0 0 1440 300" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M0 170 42 78l42 92 25-54 35 54 48-108 48 108 36-67 34 67 49-123 49 123 35-71 39 71 47-100 46 100 42-62 42 62 42-114 45 114 38-70 42 70 39-111 44 111 35-64 42 64 42-121 48 121 38-69 43 69 42-104 43 104 36-59 39 59 46-112 45 112 38-69 47 69 43-104 43 104V300H0Z" fill="#0b3028" />
+            <path d="M0 218 38 127l38 91 24-48 29 48 42-106 45 106 31-61 31 61 45-99 43 99 33-56 38 56 40-94 42 94 35-52 38 52 40-101 43 101 35-57 38 57 42-97 43 97 36-55 40 55 42-92 43 92 39-54 37 54 45-98 45 98 41-57 46 57v82H0Z" fill="#123d32" />
+          </svg>
+          <div className="absolute inset-x-0 bottom-0 h-5 bg-gradient-to-b from-[#effaff]/75 via-[#dceff0]/90 to-[#a9d6da]/75 shadow-[0_-8px_24px_rgba(226,245,248,.35)]" />
+          <div className="animate-ice-skater absolute bottom-5 left-0 w-20 text-white drop-shadow-[0_4px_8px_rgba(7,33,29,.45)] md:w-24">
+            <SkatingSanta />
+          </div>
+          <div className="animate-ice-skater-delayed absolute bottom-5 left-0 w-12 text-[#f6f3e9] drop-shadow-[0_4px_8px_rgba(7,33,29,.45)] md:w-14">
+            <PenguinSkater />
+          </div>
+          <div className="animate-ice-skater-third absolute bottom-5 left-0 w-11 text-[#f6f3e9] drop-shadow-[0_4px_8px_rgba(7,33,29,.45)] md:w-12">
+            <PenguinSkater />
+          </div>
         </div>
       )}
 

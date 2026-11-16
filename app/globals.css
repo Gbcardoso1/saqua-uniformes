@@ -166,7 +166,18 @@
   100% { transform: translate3d(calc(100vw + 320px), -18px, 0); }
 }
 
+@keyframes ice-skater {
+  0% { transform: translate3d(-120px, 0, 0) rotate(-5deg); }
+  12%, 28% { transform: translate3d(12vw, -4px, 0) rotate(3deg); }
+  44%, 60% { transform: translate3d(42vw, 0, 0) rotate(-3deg); }
+  76%, 88% { transform: translate3d(72vw, -5px, 0) rotate(4deg); }
+  100% { transform: translate3d(calc(100vw + 120px), 0, 0) rotate(-5deg); }
+}
+
 .animate-santa-sleigh { animation: santa-sleigh 28s linear infinite; }
+.animate-ice-skater { animation: ice-skater 32s ease-in-out -9s infinite; }
+.animate-ice-skater-delayed { animation: ice-skater 29s ease-in-out -19s infinite; }
+.animate-ice-skater-third { animation: ice-skater 35s ease-in-out -27s infinite; }
 
 .animate-christmas-sway { animation: christmas-sway 3.8s ease-in-out infinite; transform-origin: top center; }
 .animate-christmas-snow { animation: christmas-snow linear infinite; }
@@ -174,7 +185,10 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-christmas-sway,
   .animate-christmas-snow,
-  .animate-santa-sleigh { animation: none; }
+  .animate-santa-sleigh,
+  .animate-ice-skater,
+  .animate-ice-skater-delayed,
+  .animate-ice-skater-third { animation: none; }
 }
 
 /* ===== Animações sazonais anteriores ===== */
