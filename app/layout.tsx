@@ -7,13 +7,13 @@ const _geist = Geist({ subsets: ["latin"] });
 const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const viewport: Viewport = {
-  themeColor: '#0d6971',
+  themeColor: '#174b3b',
 }
 
 export const metadata: Metadata = {
   title: 'Solicitação de Uniformes | Sistema Educacional',
   description: 'Portal moderno para solicitação e gestão de uniformes, calçados e materiais escolares.',
-  themeColor: '#0d6971',
+  themeColor: '#174b3b',
   generator: 'v0.app',
   icons: {
     icon: [
