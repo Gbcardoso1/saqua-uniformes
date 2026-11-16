@@ -10,21 +10,13 @@ const ornaments = [
   { left: "91%", delay: "-2.5s", color: "text-[#c84b4b]", size: "size-3.5" },
 ]
 
-function SkatingSanta() {
-  return (
-    <svg viewBox="0 0 96 100" className="h-auto w-full" fill="none" aria-hidden="true">
-      <path d="M29 91c15 5 36 5 52 0" stroke="#dff7ff" strokeWidth="3" strokeLinecap="round" />
-      <path d="m38 85-5 8m37-8 5 8" stroke="#d8b56d" strokeWidth="3" strokeLinecap="round" />
-      <path d="M36 54c2-15 22-19 31-6l7 28H32l4-22Z" fill="#b83e37" stroke="#f2eee4" strokeWidth="2" />
-      <path d="M34 74h39v9H34z" fill="#f2eee4" />
-      <path d="M42 48c-4-11 3-22 14-22 10 0 17 8 16 18l-8 10H44l-2-6Z" fill="#f2eee4" />
-      <path d="M42 31c3-13 20-16 30-7l-3 8H45Z" fill="#c84b4b" /><path d="M43 33h27" stroke="#f2eee4" strokeWidth="4" strokeLinecap="round" /><circle cx="72" cy="24" r="4" fill="#f2eee4" />
-      <circle cx="57" cy="39" r="1.5" fill="#173d31" /><path d="M61 44h4" stroke="#c84b4b" strokeWidth="2" strokeLinecap="round" />
-      <path d="M39 58 23 68m42-10 13 8" stroke="#f2eee4" strokeWidth="5" strokeLinecap="round" />
-      <path d="M41 81 35 90m27-9 9 9" stroke="#f2eee4" strokeWidth="4" strokeLinecap="round" />
-    </svg>
-  )
-}
+const holidayIcons = [
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/presente-QPN3ehH18wdLkTD8RTkEsytWa0pvjD.png", size: "size-12", left: "3%", top: "42%", rotation: "-8deg" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/homem-biscoito-LZm8JvnIRjYlBlIo6rEla1y9ay53Np.png", size: "size-11", left: "10%", top: "58%", rotation: "7deg" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/meia-Vjm7rQkSakvwhALSo1j2zXRwQrvxkj.png", size: "size-11", left: "91%", top: "43%", rotation: "-10deg" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/sino-de-natal-YkeeTMZLp62T9wV36ktX7l4djsxRWs.png", size: "size-11", left: "4%", top: "75%", rotation: "-7deg" },
+  { src: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/boneco-de-neve-TQlgslq7YdozU7NH63tmq4PamalCGd.png", size: "size-11", left: "94%", top: "77%", rotation: "8deg" },
+]
 
 function PenguinSkater() {
   return (
@@ -85,16 +77,52 @@ export function BeachDecorations({
         </div>
       </div>
 
-      {!subtle && (
-        <div
-          className="animate-santa-sleigh absolute left-0 top-[27%] w-[220px] mix-blend-lighten opacity-90 drop-shadow-[0_8px_12px_rgba(4,25,18,.35)] md:top-[30%] md:w-[280px]"
-          style={{ animationDelay: "-12s" }}
+      <div className="absolute inset-x-0 top-[4.25rem] flex items-center justify-center gap-2 lg:hidden">
+        {holidayIcons.map((icon, index) => (
+          <img
+            key={icon.src}
+            src={icon.src}
+            alt=""
+            className="size-6 animate-holiday-icon drop-shadow-[0_2px_5px_rgba(4,25,18,.4)] sm:size-7"
+            style={{ animationDelay: `${index * -0.8}s` }}
+          />
+        ))}
+      </div>
+
+      {holidayIcons.map((icon, index) => (
+        <span
+          key={icon.src}
+          className="absolute hidden lg:block"
+          style={{
+            left: icon.left,
+            top: icon.top,
+            transform: `translate(-50%, -50%) rotate(${icon.rotation})`,
+          }}
         >
           <img
-            src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-hhvYqs0qic6k4sKG9el3xlae70151n.png"
+            src={icon.src}
             alt=""
-            className="h-auto w-full"
+            className={`${icon.size} animate-holiday-icon opacity-90 drop-shadow-[0_3px_8px_rgba(4,25,18,.35)]`}
+            style={{ animationDelay: `${index * -0.8}s` }}
           />
+        </span>
+      ))}
+
+      {!subtle && (
+        <div className="absolute inset-0 overflow-hidden">
+          {Array.from({ length: 22 }, (_, index) => (
+            <span
+              key={index}
+              className="holiday-star animate-holiday-star absolute"
+              style={{
+                left: `${(index * 43 + 9) % 100}%`,
+                top: `${(index * 61 + 7) % 92 + 4}%`,
+                width: `${index % 3 === 0 ? 10 : 7}px`,
+                height: `${index % 3 === 0 ? 10 : 7}px`,
+                animationDelay: `${-((index * 1.3) % 7)}s`,
+              }}
+            />
+          ))}
         </div>
       )}
 
@@ -122,9 +150,6 @@ export function BeachDecorations({
             <path d="M0 218 38 127l38 91 24-48 29 48 42-106 45 106 31-61 31 61 45-99 43 99 33-56 38 56 40-94 42 94 35-52 38 52 40-101 43 101 35-57 38 57 42-97 43 97 36-55 40 55 42-92 43 92 39-54 37 54 45-98 45 98 41-57 46 57v82H0Z" fill="#123d32" />
           </svg>
           <div className="absolute inset-x-0 bottom-0 h-5 bg-gradient-to-b from-[#effaff]/75 via-[#dceff0]/90 to-[#a9d6da]/75 shadow-[0_-8px_24px_rgba(226,245,248,.35)]" />
-          <div className="animate-ice-skater absolute bottom-5 left-0 w-20 text-white drop-shadow-[0_4px_8px_rgba(7,33,29,.45)] md:w-24">
-            <SkatingSanta />
-          </div>
           <div className="animate-ice-skater-delayed absolute bottom-5 left-0 w-12 text-[#f6f3e9] drop-shadow-[0_4px_8px_rgba(7,33,29,.45)] md:w-14">
             <PenguinSkater />
           </div>

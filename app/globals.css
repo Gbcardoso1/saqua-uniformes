@@ -156,14 +156,29 @@
   50% { transform: rotate(7deg); }
 }
 
+@keyframes holiday-icon-float {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50% { transform: translateY(-7px) rotate(2deg); }
+}
+
+.animate-holiday-icon { animation: holiday-icon-float 5.5s ease-in-out infinite; }
+
+@keyframes holiday-star-twinkle {
+  0%, 100% { opacity: 0.38; transform: scale(0.72); }
+  50% { opacity: 1; transform: scale(1.18); }
+}
+
+.holiday-star {
+  clip-path: polygon(50% 0%, 61% 37%, 100% 50%, 61% 63%, 50% 100%, 39% 63%, 0 50%, 39% 37%);
+  background: #fff7d1;
+  filter: drop-shadow(0 0 5px rgb(255 238 167 / 95%));
+}
+
+.animate-holiday-star { animation: holiday-star-twinkle 3.2s ease-in-out infinite; }
+
 @keyframes christmas-snow {
   0% { transform: translate3d(0, -5vh, 0); }
   100% { transform: translate3d(28px, 110vh, 0); }
-}
-
-@keyframes santa-sleigh {
-  0% { transform: translate3d(-320px, 0, 0); }
-  100% { transform: translate3d(calc(100vw + 320px), -18px, 0); }
 }
 
 @keyframes ice-skater {
@@ -174,8 +189,7 @@
   100% { transform: translate3d(calc(100vw + 120px), 0, 0) rotate(-5deg); }
 }
 
-.animate-santa-sleigh { animation: santa-sleigh 28s linear infinite; }
-.animate-ice-skater { animation: ice-skater 32s ease-in-out -9s infinite; }
+
 .animate-ice-skater-delayed { animation: ice-skater 29s ease-in-out -19s infinite; }
 .animate-ice-skater-third { animation: ice-skater 35s ease-in-out -27s infinite; }
 
@@ -185,8 +199,8 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-christmas-sway,
   .animate-christmas-snow,
-  .animate-santa-sleigh,
-  .animate-ice-skater,
+  .animate-holiday-icon,
+  .animate-holiday-star,
   .animate-ice-skater-delayed,
   .animate-ice-skater-third { animation: none; }
 }
