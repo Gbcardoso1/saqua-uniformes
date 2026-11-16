@@ -87,7 +87,7 @@ export function BeachDecorations({
 
       {!subtle && (
         <div
-          className="animate-santa-sleigh absolute left-0 top-[84%] w-[220px] mix-blend-lighten saturate-200 contrast-125 brightness-90 drop-shadow-[0_8px_12px_rgba(4,25,18,.35)] md:top-[84%] md:w-[280px]"
+          className="animate-santa-sleigh absolute left-0 top-[84%] w-[220px] mix-blend-lighten opacity-90 drop-shadow-[0_8px_12px_rgba(4,25,18,.35)] md:top-[84%] md:w-[280px]"
           style={{ animationDelay: "-5s" }}
         >
           <img
