@@ -161,12 +161,20 @@
   100% { transform: translate3d(28px, 110vh, 0); }
 }
 
+@keyframes santa-sleigh {
+  0% { transform: translate3d(-320px, 0, 0); }
+  100% { transform: translate3d(calc(100vw + 320px), -18px, 0); }
+}
+
+.animate-santa-sleigh { animation: santa-sleigh 28s linear infinite; }
+
 .animate-christmas-sway { animation: christmas-sway 3.8s ease-in-out infinite; transform-origin: top center; }
 .animate-christmas-snow { animation: christmas-snow linear infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-christmas-sway,
-  .animate-christmas-snow { animation: none; }
+  .animate-christmas-snow,
+  .animate-santa-sleigh { animation: none; }
 }
 
 /* ===== Animações sazonais anteriores ===== */
